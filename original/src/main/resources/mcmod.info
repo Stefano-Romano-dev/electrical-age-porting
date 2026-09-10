@@ -1,0 +1,14 @@
+[
+    {
+        "modid":"Eln",
+        "version": "${version}",
+        "mcversion": "${mcversion}",
+        "name":"Electrical Age",
+        "url":"http://electrical-age.net/",
+		"credits": "The Electrical Age Team",
+        "logoFile": "assets/eln/logo.png",
+        "requiredMods":[
+            "Forge"
+        ]
+    }
+]

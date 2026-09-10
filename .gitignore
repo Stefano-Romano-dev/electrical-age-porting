@@ -1,0 +1,13 @@
+# Preserved metadata from the two repositories consolidated into this monorepo.
+modern/.git.nested-backup/
+original/.git.nested-backup/
+
+# Local Codex metadata.
+.agents/
+.codex/
+
+# Windows and editor files at the workspace level.
+Thumbs.db
+Desktop.ini
+.DS_Store
+

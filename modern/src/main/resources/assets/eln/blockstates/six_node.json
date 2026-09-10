@@ -1,0 +1,10 @@
+{
+  "multipart": [
+    { "when": { "down": "true" }, "apply": { "model": "eln:block/resistor" } },
+    { "when": { "up": "true" }, "apply": { "model": "eln:block/resistor", "x": 180 } },
+    { "when": { "north": "true" }, "apply": { "model": "eln:block/resistor", "x": 270 } },
+    { "when": { "south": "true" }, "apply": { "model": "eln:block/resistor", "x": 90 } },
+    { "when": { "west": "true" }, "apply": { "model": "eln:block/resistor", "x": 90, "y": 90 } },
+    { "when": { "east": "true" }, "apply": { "model": "eln:block/resistor", "x": 90, "y": 270 } }
+  ]
+}

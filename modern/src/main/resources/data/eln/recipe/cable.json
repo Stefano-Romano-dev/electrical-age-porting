@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": ["CCC"],
+  "key": {
+    "C": { "item": "minecraft:copper_ingot" }
+  },
+  "result": { "id": "eln:cable", "count": 8 }
+}
