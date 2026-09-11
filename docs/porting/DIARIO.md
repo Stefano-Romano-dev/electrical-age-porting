@@ -43,5 +43,6 @@ Punto di ripresa: definire il confine del modulo di simulazione e portare il pri
 - Aggiunti cinque test numerici e un test automatico di isolamento dalla piattaforma.
 - Superati test, build forzata e dedicated server con caricamento del runtime Kotlin 2.4.20.
 - Registrati D-008 sul metodo di porting, P-008 sulla sovrascrittura del RHS e P-009 sul lock Windows della clean build.
+- Dopo la chiusura del client manuale, identificato e arrestato il relativo daemon Gradle rimasto attivo; la clean build M1 è stata poi superata con accesso coerente agli output e P-009 è stato chiuso.
 
 Punto di ripresa: portare `RootSystem`, generazione dei sottosistemi e lifecycle di aggiunta/rimozione, poi linee e inter-system.

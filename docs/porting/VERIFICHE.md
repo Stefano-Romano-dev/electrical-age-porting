@@ -67,6 +67,7 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 - Packaging: metadata Jar-in-Jar contiene `kotlin-stdlib-2.4.20.jar` con range `[2.4.0,2.5.0)` e `commons-math3-3.6.1.jar` con range `[3.6,4.0)`.
 - Artefatto osservato: `modern/build/libs/eln-0.1.0-alpha.1.jar`, SHA-256 `F50C142FA05D7632581BB38E03B93975A35B6E719CB5B57404A04AC05FBCBBE1`.
 - Nota: due `clean build` sono fallite prima della compilazione per un lock Windows sul report della configuration cache; P-009. La ricompilazione forzata è passata.
+- Verifica successiva: dopo l'arresto del daemon Gradle globale e l'esecuzione con accesso coerente agli output, `clean build --no-daemon` è superata (11 task); P-009 chiuso.
 
 ## Modello di registrazione
 
