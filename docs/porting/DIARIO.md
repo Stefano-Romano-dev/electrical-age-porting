@@ -33,3 +33,15 @@ Punto di ripresa: definire il confine del modulo di simulazione e portare il pri
 ### Conferma manuale M0
 
 - L'utente ha confermato che il client si avvia e che Electrical Age compare nell'elenco mod.
+
+## 12 settembre 2026 — M1, primo slice DC del solver
+
+- Configurato Kotlin JVM 2.4.20 senza KotlinForForge e mantenuto l'entry point NeoForge in Java.
+- Incorporati Kotlin stdlib e Commons Math tramite Jar-in-Jar, con runtime aggiuntivo per i run NeoForge 1.21.1.
+- Portato in Kotlin il nucleo MNA DC: subsystem, stati, componenti bipolari, resistore e sorgenti di corrente/tensione.
+- Mantenuti decomposizione QR, convenzioni di segno e semantica RHS legacy per stabilire la parità prima del refactoring.
+- Aggiunti cinque test numerici e un test automatico di isolamento dalla piattaforma.
+- Superati test, build forzata e dedicated server con caricamento del runtime Kotlin 2.4.20.
+- Registrati D-008 sul metodo di porting, P-008 sulla sovrascrittura del RHS e P-009 sul lock Windows della clean build.
+
+Punto di ripresa: portare `RootSystem`, generazione dei sottosistemi e lifecycle di aggiunta/rimozione, poi linee e inter-system.

@@ -54,6 +54,20 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 - Al primo avvio server Minecraft registra come errore l'assenza iniziale di `server.properties`, poi lo crea e raggiunge regolarmente `Done`; non è un errore del mod.
 - Il workflow `.github/workflows/modern-build.yml` è configurato per Java 21 e `modern/`, ma non è ancora stato osservato su GitHub Actions in questa revisione locale.
 
+## 12 settembre 2026 — Primo slice MNA di M1
+
+- Revisione/stato: working tree successivo a `7fa7093`.
+- Kotlin: 2.4.20 su JVM 21, compilazione in-process.
+- Matematica: Commons Math 3.6.1, decomposizione QR come nella 1.24.8.
+- `test --rerun-tasks --no-daemon`: superato, 7 test e 0 fallimenti/errori.
+- `build --rerun-tasks --no-daemon`: superato, 10 task eseguiti.
+- Fixture MNA: sorgente di corrente + resistore, sorgente di tensione + resistore, partitore a due nodi, matrice singolare, invalidazione matrice e aggiornamento RHS.
+- Isolamento: test automatico e ricerca statica senza import `net.minecraft` o `net.neoforged` sotto `mods/eln/sim`.
+- Dedicated server: `runServer --no-daemon` arrivato a `Done (2.557s)`; log `Starting Electrical Age ... with Kotlin 2.4.20`.
+- Packaging: metadata Jar-in-Jar contiene `kotlin-stdlib-2.4.20.jar` con range `[2.4.0,2.5.0)` e `commons-math3-3.6.1.jar` con range `[3.6,4.0)`.
+- Artefatto osservato: `modern/build/libs/eln-0.1.0-alpha.1.jar`, SHA-256 `F50C142FA05D7632581BB38E03B93975A35B6E719CB5B57404A04AC05FBCBBE1`.
+- Nota: due `clean build` sono fallite prima della compilazione per un lock Windows sul report della configuration cache; P-009. La ricompilazione forzata è passata.
+
 ## Modello di registrazione
 
 ```text

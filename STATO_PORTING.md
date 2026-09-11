@@ -4,7 +4,7 @@ Aggiornato: 12 settembre 2026
 
 ## Stato generale
 
-**Fase corrente: milestone M0 completata; prossimo lavoro sul core di simulazione (M1).**
+**Fase corrente: milestone M1 in corso; primo slice DC del solver MNA verificato.**
 
 Target confermato:
 
@@ -23,6 +23,7 @@ Toolchain fissata:
 - Parchment 2024.11.17;
 - Gradle 9.2.1;
 - Java 21;
+- Kotlin 2.4.20, senza KotlinForForge;
 - mod id `eln`, versione iniziale `0.1.0-alpha.1`.
 
 ## Avanzamento
@@ -40,7 +41,7 @@ Toolchain fissata:
 - [x] Creato il workspace NeoForge 1.21.1 in `modern/`.
 - [x] Ottenuta una clean build riproducibile e un test JUnit 5 minimale.
 - [x] Avviati client e dedicated server con caricamento del mod `eln`.
-- [ ] Estrarre e portare il core di simulazione con i test.
+- [ ] Estrarre e portare il core di simulazione con i test (primo slice DC completato: `SubSystem`, stati, resistore e sorgenti).
 - [ ] Implementare il primo SixNode verticale.
 
 ## Decisioni registrate
@@ -78,6 +79,15 @@ Deliverable previsto per M1:
 - test originali rilevanti adattati e fixture numeriche di confronto;
 - lifecycle del simulatore controllabile nei test;
 - scelta e documentazione del supporto Kotlin senza imporre KotlinForForge come dipendenza del mod.
+
+Avanzamento M1 verificato:
+
+- Kotlin JVM 2.4.20 configurato su Java 21;
+- Kotlin stdlib 2.4.20 e Commons Math 3.6.1 incorporati nel JAR con Jar-in-Jar;
+- `mods.eln.sim.mna` non importa Minecraft o NeoForge, verificato anche da test automatico;
+- portati `SubSystem`, `State`, `VoltageState`, `CurrentState`, `Component`, `Bipole`, `Resistor`, `CurrentSource` e `VoltageSource`;
+- superati i due circuiti esempio della 1.24.8, un partitore, il caso singolare e l'invalidazione dinamica della matrice/RHS;
+- dedicated server avviato con caricamento effettivo del runtime Kotlin 2.4.20.
 
 Il dettaglio tecnico e la roadmap completa sono in [ANALISI_PORTING.md](./ANALISI_PORTING.md).
 

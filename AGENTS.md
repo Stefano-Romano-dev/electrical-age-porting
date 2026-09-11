@@ -53,3 +53,8 @@ Quando esisterà la build moderna, ogni milestone deve includere in proporzione 
 - prova multiplayer per networking o sincronizzazione.
 
 Annotare sempre il comando esatto e l'esito. Non descrivere una verifica come superata se non è stata eseguita nella versione corrente del codice.
+
+## Sandbox e build
+
+- Impostare `GRADLE_USER_HOME` su `modern/.gradle` durante le esecuzioni locali dell'agente.
+- La compilazione Kotlin usa `kotlin.compiler.execution.strategy=in-process`: il daemon Kotlin tenta altrimenti di scrivere marcatori sotto `AppData` e può causare `AccessDeniedException` o lock persistenti nella sandbox Windows.

@@ -1,6 +1,7 @@
 package mods.eln;
 
 import com.mojang.logging.LogUtils;
+import kotlin.KotlinVersion;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -13,9 +14,10 @@ public final class ElectricalAge {
 
     public ElectricalAge(IEventBus modBus, ModContainer modContainer) {
         LOGGER.info(
-                "Starting {} port for Minecraft {} on {}",
+                "Starting {} port for Minecraft {} on {} with Kotlin {}",
                 modContainer.getModInfo().getDisplayName(),
                 PortingBaseline.MINECRAFT_VERSION,
-                PortingBaseline.MOD_LOADER);
+                PortingBaseline.MOD_LOADER,
+                KotlinVersion.CURRENT);
     }
 }

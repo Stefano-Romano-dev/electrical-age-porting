@@ -19,17 +19,17 @@ Criteri di uscita:
 
 ## M1 — Core di simulazione
 
-Stato: **prossimo milestone**.
+Stato: **in corso dal 12 settembre 2026**.
 
 Obiettivo: solver MNA e processi fisici essenziali indipendenti dal gioco.
 
 Criteri di uscita:
 
-- nessun import Minecraft/NeoForge nel core;
-- test originali rilevanti portati;
-- fixture numeriche di confronto con la 1.24.8;
-- lifecycle del simulatore comandabile senza event bus;
-- dipendenza matematica e packaging definiti.
+- [x] nessun import Minecraft/NeoForge nel core iniziale;
+- [ ] test originali rilevanti portati (primi esempi DC superati);
+- [ ] fixture numeriche di confronto con la 1.24.8 (prime cinque fixture presenti);
+- [ ] lifecycle del simulatore comandabile senza event bus (completo per `SubSystem`, manca `RootSystem`);
+- [x] dipendenza matematica e packaging definiti per il primo slice.
 
 ## M2 — Primo SixNode verticale
 

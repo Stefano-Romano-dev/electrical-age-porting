@@ -16,7 +16,20 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 
 | Sistema legacy | Posizione originale | Destinazione prevista | Stato | Note |
 |---|---|---|---|---|
-| Solver MNA | `mods.eln.sim.mna` | core indipendente | mappato | Priorità M1 |
+| Solver MNA | `mods.eln.sim.mna` | `mods.eln.sim.mna` Kotlin, core indipendente | in porting | Slice DC verificato; restano RootSystem, dinamica e inter-system |
+
+## Solver MNA
+
+| Elemento legacy | Destinazione moderna | Stato | Verifica |
+|---|---|---|---|
+| `SubSystem` | `mods.eln.sim.mna.SubSystem` | verificato, slice DC | QR/solve/step/singolarità |
+| `State`, `VoltageState`, `CurrentState` | stesso package logico | verificato | conteggio stati e valori risolti |
+| `Component`, `Bipole` | stesso package logico | verificato, API minima | connessioni e invalidazione |
+| `Resistor` | `component.Resistor` | verificato | tensione, corrente, potenza, cambio resistenza |
+| `CurrentSource` | `component.CurrentSource` | verificato | esempio 0,01 A / 10 Ω |
+| `VoltageSource` | `component.VoltageSource` | verificato | esempio 1 V / 10 Ω e partitore |
+| `RootSystem`, linee e inter-system | da portare | in porting | prossimo slice |
+| condensatore, induttore, trasformatore e delay | da portare | mappato | transitori e parità temporale |
 | Simulazione termica | `mods.eln.sim` | core indipendente | da analizzare | Dopo baseline elettrica |
 | SixNode | `mods.eln.node.six` | block entity host + component registry | mappato | Priorità M2 |
 | TransparentNode | `mods.eln.node.transparent` | block/block entity moderni | da analizzare | Port per famiglie |

@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id 'org.jetbrains.kotlin.jvm' version '2.4.20'
     id 'maven-publish'
     id 'net.neoforged.moddev' version '2.0.146'
     id 'idea'
@@ -141,6 +142,24 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.11.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    jarJar(implementation('org.jetbrains.kotlin:kotlin-stdlib')) {
+        version {
+            strictly '[2.4.0,2.5.0)'
+            prefer '2.4.20'
+        }
+    }
+    jarJar(implementation('org.apache.commons:commons-math3')) {
+        version {
+            strictly '[3.6,4.0)'
+            prefer '3.6.1'
+        }
+    }
+
+    // NeoForge 1.21.1 only loads ordinary libraries in development when they
+    // are also present on the additional runtime classpath.
+    additionalRuntimeClasspath 'org.jetbrains.kotlin:kotlin-stdlib:2.4.20'
+    additionalRuntimeClasspath 'org.apache.commons:commons-math3:3.6.1'
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

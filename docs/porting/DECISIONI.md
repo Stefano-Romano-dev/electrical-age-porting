@@ -62,6 +62,18 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Motivo: separare il rischio della piattaforma dal port del core e preservare il codice Kotlin utile senza vincolare l'avvio del mod a un'integrazione non ancora verificata per NeoForge 1.21.1.
 - Conseguenze: il JAR M0 non ha dipendenze esterne oltre a Minecraft e NeoForge; la configurazione Kotlin dovrà essere verificata con test e dedicated server in M1.
 - Verifica prevista: compilazione mista Java/Kotlin, inclusione controllata del runtime e avvio su client/server senza KotlinForForge.
+- Verifica eseguita: compilazione mista e dedicated server superati il 12 settembre 2026; il log dell'entry point conferma Kotlin 2.4.20. Kotlin stdlib e Commons Math sono presenti nel metadata Jar-in-Jar.
+
+## D-008 — Parità numerica prima delle correzioni del solver
+
+- Stato: accettata
+- Data: 12 settembre 2026
+- Contesto: il solver 1.24.8 contiene comportamenti discutibili, incluso `SubSystem.addToI` che assegna anziché accumulare i contributi sul vettore RHS.
+- Scelta: conservare inizialmente algoritmo QR, orientamento dei segni e semantica RHS della 1.24.8; correggere soltanto dopo aver costruito fixture di parità dedicate.
+- Alternative considerate: correggere immediatamente il solver durante la traduzione in Kotlin.
+- Motivo: evitare che un refactoring e un cambio comportamentale simultanei rendano impossibile distinguere regressioni da correzioni.
+- Conseguenze: i primi circuiti preservano i risultati originali; il caso di più sorgenti sullo stesso stato resta un rischio noto P-008.
+- Verifica prevista: fixture legacy e moderna sul caso multi-sorgente, quindi decisione esplicita sull'accumulo del RHS.
 
 ## Modello per nuove decisioni
 
