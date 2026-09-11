@@ -36,6 +36,7 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 | 12 settembre 2026 | working tree M0 | `.\\gradlew.bat clean build --no-daemon` | superato | JAR `eln-0.1.0-alpha.1.jar`; build pulita riuscita |
 | 12 settembre 2026 | working tree M0 | `.\\gradlew.bat runClient --no-daemon` | superato | Menu client raggiunto; entry point `mods.eln.ElectricalAge` caricato |
 | 12 settembre 2026 | working tree M0 | `.\\gradlew.bat runServer --no-daemon` | superato | Dedicated server arrivato a `Done (3.104s)`; mod caricato lato server |
+| 12 settembre 2026 | commit `f000b76` | Verifica manuale dell'utente | superato | Client avviato ed Electrical Age presente nell'elenco mod |
 
 ### 12 settembre 2026 — Ispezione del JAR M0
 

@@ -29,3 +29,7 @@ Punto di ripresa: creare e verificare la baseline NeoForge del milestone M0.
 - Registrata D-007: entry point Java e introduzione controllata di Kotlin nel milestone M1.
 
 Punto di ripresa: definire il confine del modulo di simulazione e portare il primo nucleo MNA con test numerici, senza dipendenze Minecraft/NeoForge.
+
+### Conferma manuale M0
+
+- L'utente ha confermato che il client si avvia e che Electrical Age compare nell'elenco mod.
