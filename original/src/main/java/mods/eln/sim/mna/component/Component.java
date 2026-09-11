@@ -6,52 +6,71 @@ import mods.eln.sim.mna.state.State;
 
 public abstract class Component {
 
-    SubSystem subSystem;
+    private SubSystem subSystem;
 
     public IAbstractor abstractedBy;
 
-	public Component() {
-		//System.out.println("new " + this);
-	}
+    public Component() {}
+    private String owner;
 
-	public void addedTo(SubSystem s) {
-		this.subSystem = s;
-	}
+    public void addToSubsystem(SubSystem s) {
+        this.subSystem = s;
+    }
 
-	public SubSystem getSubSystem() {
-		if(isAbstracted()) return abstractedBy.getAbstractorSubSystem();
-		return subSystem;
-	}
+    public SubSystem getSubSystem() {
+        if (isAbstracted()) return abstractedBy.getAbstractorSubSystem();
+        return subSystem;
+    }
 
-	public abstract void applyTo(SubSystem s);
+    protected SubSystem getLocalSubSystem() {
+        return subSystem;
+    }
 
-	public abstract State[] getConnectedStates();
+    public abstract void applyToSubsystem(SubSystem s);
 
-	public boolean canBeReplacedByInterSystem(){ return false; }
+    public abstract State[] getConnectedStates();
 
-	public void breakConnection(){}
+    public boolean canBeReplacedByInterSystem() {
+        return false;
+    }
 
-	public void returnToRootSystem(RootSystem root){
-		root.addComponents.add(this);
-	}
+    public void breakConnection() {
+    }
 
-	public void dirty() {
-		if (abstractedBy != null) {
-			abstractedBy.dirty(this);
-		} else if (getSubSystem() != null) {
-			getSubSystem().invalidate();
-		}
-	}
-	
-	public void quitSubSystem() {
-		subSystem = null;
-	}
+    public void returnToRootSystem(RootSystem root) {
+        root.addComponents.add(this);
+    }
 
-	public boolean isAbstracted() {
-		return abstractedBy != null;
-	}	
-	
-	public void onAddToRootSystem(){}
+    public void dirty() {
+        if (abstractedBy != null) {
+            abstractedBy.dirty(this);
+        } else if (getSubSystem() != null) {
+            getSubSystem().invalidate();
+        }
+    }
 
-	public void onRemovefromRootSystem(){}
+    public void quitSubSystem() {
+        subSystem = null;
+    }
+
+    public boolean isAbstracted() {
+        return abstractedBy != null;
+    }
+
+    public void onAddToRootSystem() {}
+
+    public void onRemoveFromRootSystem() {}
+
+    public String toString() {
+        return "(" + this.getClass().getSimpleName() + ")";
+    }
+
+    public Component setOwner(String owner) {
+        this.owner = owner;
+        return this;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
 }

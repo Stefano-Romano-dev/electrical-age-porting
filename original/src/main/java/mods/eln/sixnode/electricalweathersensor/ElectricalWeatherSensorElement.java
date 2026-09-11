@@ -1,5 +1,6 @@
 package mods.eln.sixnode.electricalweathersensor;
 
+import mods.eln.i18n.I18N;
 import mods.eln.misc.Direction;
 import mods.eln.misc.LRDU;
 import mods.eln.misc.Utils;
@@ -11,62 +12,72 @@ import mods.eln.sim.ElectricalLoad;
 import mods.eln.sim.ThermalLoad;
 import mods.eln.sim.nbt.NbtElectricalGateOutput;
 import mods.eln.sim.nbt.NbtElectricalGateOutputProcess;
-import net.minecraft.entity.player.EntityPlayer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ElectricalWeatherSensorElement extends SixNodeElement {
 
-	ElectricalWeatherSensorDescriptor descriptor;
+    ElectricalWeatherSensorDescriptor descriptor;
 
     public NbtElectricalGateOutput outputGate = new NbtElectricalGateOutput("outputGate");
     public NbtElectricalGateOutputProcess outputGateProcess = new NbtElectricalGateOutputProcess("outputGateProcess", outputGate);
     public ElectricalWeatherSensorSlowProcess slowProcess = new ElectricalWeatherSensorSlowProcess(this);
-	
-	public ElectricalWeatherSensorElement(SixNode sixNode, Direction side, SixNodeDescriptor descriptor) {
-		super(sixNode, side, descriptor);
-	
-    	electricalLoadList.add(outputGate);
-    	electricalComponentList.add(outputGateProcess);
-    	slowProcessList.add(slowProcess);
-    	this.descriptor = (ElectricalWeatherSensorDescriptor) descriptor;
-	}
 
-	public static boolean canBePlacedOnSide(Direction side, int type) {
-		return true;
-	}
+    public ElectricalWeatherSensorElement(SixNode sixNode, Direction side, SixNodeDescriptor descriptor) {
+        super(sixNode, side, descriptor);
 
-	@Override
-	public ElectricalLoad getElectricalLoad(LRDU lrdu) {
-		if (front == lrdu.left()) return outputGate;
-		return null;
-	}
+        electricalLoadList.add(outputGate);
+        electricalComponentList.add(outputGateProcess);
+        slowProcessList.add(slowProcess);
+        this.descriptor = (ElectricalWeatherSensorDescriptor) descriptor;
+    }
 
-	@Override
-	public ThermalLoad getThermalLoad(LRDU lrdu) {
-		return null;
-	}
+    public static boolean canBePlacedOnSide(Direction side, int type) {
+        return true;
+    }
 
-	@Override
-	public int getConnectionMask(LRDU lrdu) {
-		if (front == lrdu.left()) return NodeBase.maskElectricalOutputGate;
-		return 0;
-	}
+    @Nullable
+    @Override
+    public ElectricalLoad getElectricalLoad(LRDU lrdu, int mask) {
+        if (front == lrdu.left()) return outputGate;
+        return null;
+    }
 
-	@Override
-	public String multiMeterString() {
-		return Utils.plotVolt("U:", outputGate.getU()) + Utils.plotAmpere("I:", outputGate.getCurrent());
-	}
+    @Nullable
+    @Override
+    public ThermalLoad getThermalLoad(@NotNull LRDU lrdu, int mask) {
+        return null;
+    }
 
-	@Override
-	public String thermoMeterString() {
-		return "";
-	}
+    @Override
+    public int getConnectionMask(LRDU lrdu) {
+        if (front == lrdu.left()) return NodeBase.maskElectricalOutputGate;
+        return 0;
+    }
 
-	@Override
-	public void initialize() {
-	}
+    @Override
+    public String multiMeterString() {
+        return Utils.plotVolt("U:", outputGate.getVoltage()) + Utils.plotAmpere("I:", outputGate.getCurrent());
+    }
 
-	@Override
-	public boolean onBlockActivated(EntityPlayer entityPlayer, Direction side, float vx, float vy, float vz) {
-		return onBlockActivatedRotate(entityPlayer);
-	}
+    @NotNull
+    @Override
+    public Map<String, String> getWaila() {
+        Map<String, String> info = new HashMap<String, String>();
+        info.put(I18N.tr("Output voltage"), Utils.plotVolt("", outputGate.getVoltage()));
+        return info;
+    }
+
+    @NotNull
+    @Override
+    public String thermoMeterString() {
+        return "";
+    }
+
+    @Override
+    public void initialize() {
+    }
 }

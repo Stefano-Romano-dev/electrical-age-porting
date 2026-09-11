@@ -1,18 +1,18 @@
 package mods.eln.transparentnode.autominer;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import mods.eln.misc.Coordonate;
+import mods.eln.i18n.I18N;
+import mods.eln.item.ElectricalDrillDescriptor;
+import mods.eln.item.MiningPipeDescriptor;
+import mods.eln.misc.Coordinate;
 import mods.eln.misc.Direction;
 import mods.eln.misc.LRDU;
 import mods.eln.misc.Utils;
+import mods.eln.node.AutoAcceptInventoryProxy;
 import mods.eln.node.NodeBase;
-import mods.eln.node.transparent.*;
+import mods.eln.node.transparent.TransparentNode;
+import mods.eln.node.transparent.TransparentNodeDescriptor;
+import mods.eln.node.transparent.TransparentNodeElement;
+import mods.eln.node.transparent.TransparentNodeElementInventory;
 import mods.eln.sim.ElectricalLoad;
 import mods.eln.sim.ThermalLoad;
 import mods.eln.sim.mna.component.Resistor;
@@ -23,199 +23,205 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.NBTTagCompound;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class AutoMinerElement extends TransparentNodeElement  {
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-	TransparentNodeElementInventory inventory = new TransparentNodeElementInventory(AutoMinerContainer.inventorySize, 64, this);
-	
-	NbtElectricalLoad inPowerLoad = new NbtElectricalLoad("inPowerLoad");
-	AutoMinerSlowProcess slowProcess = new AutoMinerSlowProcess(this);
-	Resistor powerResistor = new Resistor(inPowerLoad,null);
+public class AutoMinerElement extends TransparentNodeElement {
 
-	//VoltageWatchdogProcessForInventoryItemDamageSingleLoad electricalDrillWatchDog = new VoltageWatchdogProcessForInventoryItemDamageSingleLoad(inventory, AutoMinerContainer.electricalDrillSlotId, inPowerLoad);
-	//VoltageWatchdogProcessForInventoryItemDamageSingleLoad electricalScannerWatchDog = new VoltageWatchdogProcessForInventoryItemDamageSingleLoad(inventory, AutoMinerContainer.OreScannerSlotId, inPowerLoad);
-	
-	AutoMinerDescriptor descriptor;
-	
-	Coordonate lightCoordonate;
+    AutoAcceptInventoryProxy inventory =
+        (new AutoAcceptInventoryProxy(new TransparentNodeElementInventory(AutoMinerContainer.inventorySize, 64, this)))
+            .acceptIfIncrement(2, 64, MiningPipeDescriptor.class)
+            .acceptIfEmpty(0, ElectricalDrillDescriptor.class);
 
-    VoltageStateWatchDog voltageWatchdog = new VoltageStateWatchDog();
+    NbtElectricalLoad inPowerLoad = new NbtElectricalLoad("inPowerLoad");
+    AutoMinerSlowProcess slowProcess = new AutoMinerSlowProcess(this);
+    Resistor powerResistor = new Resistor(inPowerLoad, null);
 
-    ArrayList<AutoMinerPowerNode> powerNodeList = new ArrayList<AutoMinerPowerNode>();
+    final AutoMinerDescriptor descriptor;
+
+    Coordinate lightCoordinate;
+
+    private final VoltageStateWatchDog voltageWatchdog = new VoltageStateWatchDog(inPowerLoad);
+
+    private final ArrayList<AutoMinerPowerNode> powerNodeList = new ArrayList<AutoMinerPowerNode>();
 
     boolean powerOk = false;
 
-	// Network IDs.
+    // Network IDs.
     public static final byte pushLogId = 1;
-	public static final byte toggleSilkTouch = 2;
+    public static final byte toggleSilkTouch = 2;
 
+    public AutoMinerElement(TransparentNode transparentNode, TransparentNodeDescriptor descriptor) {
+        super(transparentNode, descriptor);
+        this.descriptor = (AutoMinerDescriptor) descriptor;
+        electricalLoadList.add(inPowerLoad);
+        electricalComponentList.add(powerResistor);
+        slowProcessList.add(slowProcess);
 
-	public AutoMinerElement(TransparentNode transparentNode, TransparentNodeDescriptor descriptor) {
-		super(transparentNode, descriptor);
-		this.descriptor = (AutoMinerDescriptor) descriptor;
-		electricalLoadList.add(inPowerLoad);
-		electricalComponentList.add(powerResistor);
-		slowProcessList.add(slowProcess);
-        
-		WorldExplosion exp = new WorldExplosion(this).machineExplosion();
-		slowProcessList.add(voltageWatchdog.set(inPowerLoad).setUNominal(this.descriptor.nominalVoltage).set(exp));
-	}
+        WorldExplosion exp = new WorldExplosion(this).machineExplosion();
+        slowProcessList.add(voltageWatchdog.setNominalVoltage(this.descriptor.nominalVoltage).setDestroys(exp));
+    }
 
-	@Override
-	public ElectricalLoad getElectricalLoad(Direction side, LRDU lrdu) {
-		return inPowerLoad;
-	}
+    @Override
+    public ElectricalLoad getElectricalLoad(Direction side, LRDU lrdu) {
+        return inPowerLoad;
+    }
 
-	@Override
-	public ThermalLoad getThermalLoad(Direction side, LRDU lrdu) {
-		return null;
-	}
+    @Nullable
+    @Override
+    public ThermalLoad getThermalLoad(@NotNull Direction side, @NotNull LRDU lrdu) {
+        return null;
+    }
 
-	@Override
-	public int getConnectionMask(Direction side, LRDU lrdu) {
-		return NodeBase.maskElectricalPower;
-	}
+    @Override
+    public int getConnectionMask(Direction side, LRDU lrdu) {
+        return NodeBase.maskElectricalPower;
+    }
 
-	@Override
-	public String multiMeterString(Direction side) {
-		return Utils.plotUIP(inPowerLoad.getU(), inPowerLoad.getCurrent());
-	}
+    @NotNull
+    @Override
+    public String multiMeterString(@NotNull Direction side) {
+        return Utils.plotUIP(inPowerLoad.getVoltage(), inPowerLoad.getCurrent());
+    }
 
-	@Override
-	public String thermoMeterString(Direction side) {
-		return "";
-	}
+    @NotNull
+    @Override
+    public String thermoMeterString(@NotNull Direction side) {
+        return "";
+    }
 
-	@Override
-	public void initialize() {
-		lightCoordonate = new Coordonate(this.descriptor.lightCoord);
-		lightCoordonate.applyTransformation(front, node.coordonate);
-		
-		int idx = 0;
-		for (Coordonate c : descriptor.getPowerCoordonate(node.coordonate.world())) {
-			AutoMinerPowerNode n = new AutoMinerPowerNode();
-			n.setElement(this);
-			c.applyTransformation(front, node.coordonate);
-			
-			Direction dir;
-			if (idx != 0)
-				dir = front.left();
-			else
-				dir = front.right();
-			
-			//dir = front;
-			n.onBlockPlacedBy(c, dir, null, null);
-			
-			powerNodeList.add(n);
-			idx++;
-		}
-		
-		descriptor.applyTo(inPowerLoad);
-		
-		connect();
-	}
-	
-	@Override
-	public void onBreakElement() {
-		super.onBreakElement();
-		slowProcess.onBreakElement();
-	
-		for (AutoMinerPowerNode n : powerNodeList){
-			n.onBreakBlock();
-		}
-		powerNodeList.clear();
-	}
-    
-	@Override
-	public boolean onBlockActivated(EntityPlayer entityPlayer, Direction side, float vx, float vy, float vz) {
-		return false;
-	}
+    @Override
+    public void initialize() {
+        lightCoordinate = new Coordinate(this.descriptor.lightCoord);
+        lightCoordinate.applyTransformation(front, node.coordinate);
 
-	@Override
-	public boolean hasGui() {
-		return true;
-	}
-	
-	@Override
-	public Container newContainer(Direction side, EntityPlayer player) {
-		return new AutoMinerContainer(node, player, inventory);
-	}
-	
-	@Override
-	public IInventory getInventory() {
-		return inventory;
-	}	
-    
-	@Override
-	public void ghostDestroyed(int UUID) {
-		if (UUID == descriptor.getGhostGroupUuid()) {
-			super.ghostDestroyed(UUID);
-		}
-		slowProcess.ghostDestroyed(UUID);
-	}
-/*
-	@Override
-	public boolean ghostBlockActivated(int UUID, EntityPlayer entityPlayer, Direction side, float vx, float vy, float vz) {
-		return super.ghostBlockActivated(UUID, entityPlayer, side, vx, vy, vz);
-	}*/
-	
-	@Override
-	public void networkSerialize(DataOutputStream stream) {
-		super.networkSerialize(stream);
-		try {
-			stream.writeShort(slowProcess.pipeLength);
-			stream.writeByte(slowProcess.job.ordinal());
-			stream.writeBoolean(powerOk);
-			stream.writeBoolean(slowProcess.silkTouch);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-    
-	public void setPowerOk(boolean b) {
-		if (powerOk != (powerOk = b)){
-			needPublish();
-		}
-	}
-    
-	@Override
-	public void writeToNBT(NBTTagCompound nbt) {
-		super.writeToNBT(nbt);
-		nbt.setBoolean("powerOk", powerOk);
-		nbt.setBoolean("silkTouch", slowProcess.silkTouch);
-	}
-	
-	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
-		super.readFromNBT(nbt);
-		powerOk = nbt.getBoolean("powerOk");
-		slowProcess.silkTouch = nbt.getBoolean("silkTouch");
-	}
+        int idx = 0;
+        for (Coordinate c : descriptor.getPowerCoordonate(node.coordinate.world())) {
+            AutoMinerPowerNode n = new AutoMinerPowerNode();
+            n.setElement(this);
+            c.applyTransformation(front, node.coordinate);
 
-	void pushLog(String log){
-		sendStringToAllClient(pushLogId, log);
-	}
+            Direction dir;
+            if (idx != 0)
+                dir = front.left();
+            else
+                dir = front.right();
 
-	@Override
-	public byte networkUnserialize(DataInputStream stream) {
-		byte packetType = super.networkUnserialize(stream);
-		switch (packetType) {
-			case toggleSilkTouch:
-				slowProcess.toggleSilkTouch();
-				needPublish();
-				break;
-			default:
-				return packetType;
-		}
-		return unserializeNulldId;
-	}
+            n.onBlockPlacedBy(c, dir, null, null);
 
-	@Override
-	public Map<String, String> getWaila(){
-		//Why are you even looking at this part of the machine... it's literally the part the drill comes out of.
-		Map<String, String> info = new HashMap<String, String>();
-		info.put("Silk Touch", slowProcess.silkTouch ? "Yes" : "No");
-		info.put("Depth", Utils.plotValue(slowProcess.pipeLength, "m "));
-		return info;
-	}
+            powerNodeList.add(n);
+            idx++;
+        }
+
+        descriptor.applyTo(inPowerLoad);
+
+        connect();
+    }
+
+    @Override
+    public void onBreakElement() {
+        super.onBreakElement();
+        slowProcess.onBreakElement();
+
+        for (AutoMinerPowerNode n : powerNodeList) {
+            n.onBreakBlock();
+        }
+        powerNodeList.clear();
+    }
+
+    @Override
+    public boolean onBlockActivated(EntityPlayer player, Direction side, float vx, float vy, float vz) {
+        return inventory.take(player.getCurrentEquippedItem());
+    }
+
+    @Override
+    public boolean hasGui() {
+        return true;
+    }
+
+    @Nullable
+    @Override
+    public Container newContainer(@NotNull Direction side, @NotNull EntityPlayer player) {
+        return new AutoMinerContainer(player, inventory.getInventory());
+    }
+
+    @Override
+    public IInventory getInventory() {
+        return inventory.getInventory();
+    }
+
+    @Override
+    public void ghostDestroyed(int UUID) {
+        if (UUID == descriptor.getGhostGroupUuid()) {
+            super.ghostDestroyed(UUID);
+        }
+        slowProcess.ghostDestroyed();
+    }
+
+    @Override
+    public void networkSerialize(DataOutputStream stream) {
+        super.networkSerialize(stream);
+        try {
+            stream.writeShort(slowProcess.pipeLength);
+            stream.writeByte(slowProcess.job.ordinal());
+            stream.writeBoolean(powerOk);
+            stream.writeBoolean(slowProcess.silkTouch);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setPowerOk(boolean b) {
+        if (powerOk != (powerOk = b)) {
+            needPublish();
+        }
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbt) {
+        super.writeToNBT(nbt);
+        nbt.setBoolean("powerOk", powerOk);
+        nbt.setBoolean("silkTouch", slowProcess.silkTouch);
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound nbt) {
+        super.readFromNBT(nbt);
+        powerOk = nbt.getBoolean("powerOk");
+        slowProcess.silkTouch = nbt.getBoolean("silkTouch");
+    }
+
+    void pushLog(String log) {
+        sendStringToAllClient(pushLogId, log);
+    }
+
+    @Override
+    public byte networkUnserialize(DataInputStream stream) {
+        byte packetType = super.networkUnserialize(stream);
+        switch (packetType) {
+            case toggleSilkTouch:
+                slowProcess.toggleSilkTouch();
+                needPublish();
+                break;
+            default:
+                return packetType;
+        }
+        return unserializeNulldId;
+    }
+
+    @NotNull
+    @Override
+    public Map<String, String> getWaila() {
+        Map<String, String> info = new HashMap<String, String>();
+        info.put(I18N.tr("Silk touch"), slowProcess.silkTouch ? I18N.tr("Yes") : I18N.tr("No"));
+        info.put(I18N.tr("Depth"), Utils.plotValue(slowProcess.pipeLength, "m "));
+        return info;
+    }
 }

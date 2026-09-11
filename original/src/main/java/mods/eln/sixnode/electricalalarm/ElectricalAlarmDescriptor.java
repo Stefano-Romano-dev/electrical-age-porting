@@ -8,6 +8,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Collections;
@@ -50,7 +52,7 @@ public class ElectricalAlarmDescriptor extends SixNodeDescriptor {
         }
 
         voltageLevelColor = VoltageLevelColor.SignalVoltage;
-        changeDefaultIcon("electricalalarm");
+        setDefaultIcon("electricalalarm");
     }
 
     @Override
@@ -76,11 +78,6 @@ public class ElectricalAlarmDescriptor extends SixNodeDescriptor {
         if (lightPart != null) {
             UtilsClient.drawLightNoBind(lightPart);
         }
-    }
-
-    @Override
-    public boolean use2DIcon() {
-        return true;
     }
 
     @Override
@@ -110,11 +107,11 @@ public class ElectricalAlarmDescriptor extends SixNodeDescriptor {
     public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List list, boolean par4) {
         super.addInformation(itemStack, entityPlayer, list, par4);
         Collections.addAll(list, tr("Emits an acoustic alarm if\nthe input signal is high").split("\n"));
-        list.add(tr(""));
     }
 
+    @Nullable
     @Override
-    public LRDU getFrontFromPlace(Direction side, EntityPlayer player) {
+    public LRDU getFrontFromPlace(@NotNull Direction side, @NotNull EntityPlayer player) {
         return super.getFrontFromPlace(side, player).inverse();
     }
 }

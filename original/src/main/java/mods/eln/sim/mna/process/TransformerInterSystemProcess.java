@@ -3,67 +3,40 @@ package mods.eln.sim.mna.process;
 import mods.eln.sim.mna.component.VoltageSource;
 import mods.eln.sim.mna.misc.IRootSystemPreStepProcess;
 import mods.eln.sim.mna.state.State;
+import mods.eln.sim.mna.SubSystem.Thevenin;
 
 public class TransformerInterSystemProcess implements IRootSystemPreStepProcess {
-	State aState, bState;
-	VoltageSource aVoltgeSource, bVoltgeSource;
+    State aState, bState;
+    VoltageSource aVoltgeSource, bVoltgeSource;
 
-	double ratio = 1;
+    double ratio = 1;
 
-	public TransformerInterSystemProcess(State aState, State bState, VoltageSource aVoltgeSource, VoltageSource bVoltgeSource) {
-		this.aState = aState;
-		this.bState = bState;
-		this.aVoltgeSource = aVoltgeSource;
-		this.bVoltgeSource = bVoltgeSource;
-	}
+    public TransformerInterSystemProcess(State aState, State bState, VoltageSource aVoltgeSource, VoltageSource bVoltgeSource) {
+        this.aState = aState;
+        this.bState = bState;
+        this.aVoltgeSource = aVoltgeSource;
+        this.bVoltgeSource = bVoltgeSource;
+    }
 
-	@Override
-	public void rootSystemPreStepProcess() {
-		Th a = getTh(aState, aVoltgeSource);
-		Th b = getTh(bState, bVoltgeSource);
-		
-		double aU = (a.U * b.R + ratio * b.U * a.R) / (b.R + ratio * ratio * a.R);
-		if (Double.isNaN(aU)) {
-			aU = 0;
-		}
-		
-		aVoltgeSource.setU(aU);
-		bVoltgeSource.setU(aU * ratio);
-	}
-	
-	static class Th {
-		double R,U;		
-	}
-	
-	Th getTh(State d,VoltageSource voltageSource) {
-		Th th = new Th();
-		double originalU = d.state;
+    @Override
+    public void rootSystemPreStepProcess() {
+        Thevenin a = aVoltgeSource.getSubSystem().getTh(aState, aVoltgeSource);
+        Thevenin b = bVoltgeSource.getSubSystem().getTh(bState, bVoltgeSource);
 
-		double aU = 10;
-		voltageSource.setU(aU);
-		double aI = d.getSubSystem().solve(voltageSource.getCurrentState());
+        double voltage = (a.voltage * b.resistance + ratio * b.voltage * a.resistance) / (b.resistance + ratio * ratio * a.resistance);
+        if (Double.isNaN(voltage)) {
+            voltage = 0;
+        }
 
-		double bU = 5;
-		voltageSource.setU(bU);
-		double bI = d.getSubSystem().solve(voltageSource.getCurrentState());
+        aVoltgeSource.setVoltage(voltage);
+        bVoltgeSource.setVoltage(voltage * ratio);
+    }
 
-		double Rth = (aU - bU) / (bI - aI);
-		double Uth;
-		//if (Double.isInfinite(d.Rth)) d.Rth = Double.MAX_VALUE;
-		if (Rth > 10000000000000000000.0 || Rth < 0) {
-			Uth = 0;
-			Rth = 10000000000000000000.0;
-		} else {
-			Uth = aU + Rth * aI;
-		}
-		voltageSource.setU(originalU);
-		
-		th.R = Rth;
-		th.U = Uth;
-		return th;
-	}
+    public void setRatio(double ratio) {
+        this.ratio = ratio;
+    }
 
-	public void setRatio(double ratio) {
-		this.ratio = ratio;
-	}
+    public double getRatio() {
+        return this.ratio;
+    }
 }

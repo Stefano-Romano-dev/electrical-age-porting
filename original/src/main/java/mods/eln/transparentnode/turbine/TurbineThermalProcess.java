@@ -2,39 +2,49 @@ package mods.eln.transparentnode.turbine;
 
 import mods.eln.Eln;
 import mods.eln.sim.IProcess;
-import mods.eln.sim.PhysicalConstant;
-import mods.eln.sim.mna.component.PowerSource;
 import mods.eln.sim.mna.component.VoltageSource;
-import mods.eln.sound.SoundCommand;
-import mods.eln.sound.SoundLooper;
 
 
-public class TurbineThermalProcess implements IProcess{
-	TurbineElement turbine;
+public class TurbineThermalProcess implements IProcess {
+    private final TurbineElement turbine;
 
-	public TurbineThermalProcess(TurbineElement t) {
-		this.turbine = t;
-	}
-	
+    private double efficiency = 0.0;
 
-	
-	
-	@Override
-	public void process(double time) {
-		TurbineDescriptor descriptor = turbine.descriptor;
+    public TurbineThermalProcess(TurbineElement t) {
+        this.turbine = t;
+    }
 
-		//PowerSource eps = turbine.electricalPowerSourceProcess;
-		VoltageSource src = turbine.electricalPowerSourceProcess;
+    public double getEfficiency() {
+        return efficiency;
+    }
 
-		double eff  = Math.abs(1 - (turbine.coolLoad.Tc + PhysicalConstant.Tref)/(turbine.warmLoad.Tc + PhysicalConstant.Tref));
-		if(eff < 0.05) eff = 0.05;
+    static double computeEfficiency(double warmDeltaCelsius, double coolDeltaCelsius, double ambientKelvin) {
+        double warmAbsoluteKelvin = warmDeltaCelsius + ambientKelvin;
+        double coolAbsoluteKelvin = coolDeltaCelsius + ambientKelvin;
+        if (warmAbsoluteKelvin <= 1e-6 || coolAbsoluteKelvin <= 1e-6) {
+            return 0.05;
+        }
+        double computed = Math.abs(1 - coolAbsoluteKelvin / warmAbsoluteKelvin);
+        return Math.max(0.05, computed);
+    }
 
-		double E = src.getP()*time / Eln.instance.heatTurbinePowerFactor;
+    @Override
+    public void process(double time) {
+        TurbineDescriptor descriptor = turbine.descriptor;
 
-		double Pout = E/time;
-		double Pin = descriptor.PoutToPin.getValue(Pout) / eff;
-		turbine.warmLoad.movePowerTo(-Pin);
-		turbine.coolLoad.movePowerTo(Pin * (1 - eff));	
-	}
+        VoltageSource src = turbine.electricalPowerSourceProcess;
 
+        efficiency = computeEfficiency(
+            turbine.warmLoad.temperatureCelsius,
+            turbine.coolLoad.temperatureCelsius,
+            turbine.getAmbientTemperatureKelvin()
+        );
+
+        double E = src.getPower() * time / Eln.instance.heatTurbinePowerFactor;
+
+        double Pout = E / time;
+        double Pin = descriptor.PoutToPin.getValue(Pout) / efficiency;
+        turbine.warmLoad.movePowerTo(-Pin);
+        turbine.coolLoad.movePowerTo(Pin);
+    }
 }

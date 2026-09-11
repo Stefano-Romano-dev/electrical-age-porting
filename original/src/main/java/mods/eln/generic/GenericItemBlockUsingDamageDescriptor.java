@@ -2,7 +2,10 @@ package mods.eln.generic;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import mods.eln.Eln;
+import mods.eln.misc.RealisticEnum;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -10,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class GenericItemBlockUsingDamageDescriptor {
@@ -17,6 +21,14 @@ public class GenericItemBlockUsingDamageDescriptor {
     String iconName;
     IIcon iconIndex;
     public String name;
+
+    public static String INVALID_NAME = "$NO_DESCRIPTOR";
+
+    public static HashMap<String, GenericItemBlockUsingDamageDescriptor> byName = new HashMap<>();
+
+    public static GenericItemBlockUsingDamageDescriptor getByName(String name) {
+        return byName.get(name);
+    }
 
     public Item parentItem;
     public int parentItemDamage;
@@ -26,12 +38,20 @@ public class GenericItemBlockUsingDamageDescriptor {
     }
 
     public GenericItemBlockUsingDamageDescriptor(String name, String iconName) {
-        this.iconName = "eln:" + iconName.replaceAll(" ", "").toLowerCase();
+        setDefaultIcon(iconName);
         this.name = name;
+        byName.put(name, this);
     }
 
-    public void changeDefaultIcon(String name) {
-        this.iconName = "eln:" + name.replaceAll(" ", "").toLowerCase();
+    public void setDefaultIcon(String name) {
+        String iconName = name.replaceAll(" ", "").toLowerCase();
+        //Utils.println("Icon Name: " + iconName);
+        if (Eln.noSymbols &&
+            getClass().getClassLoader().getResource("assets/eln/textures/blocks/" + iconName + "-ni.png") != null) {
+            this.iconName = iconName + "-ni";
+        } else {
+            this.iconName = iconName;
+        }
     }
 
     public NBTTagCompound getDefaultNBT() {
@@ -41,14 +61,13 @@ public class GenericItemBlockUsingDamageDescriptor {
     public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List<String> list, boolean par4) {
     }
 
-    @SideOnly(value = Side.CLIENT)
-    public void updateIcons(IIconRegister iconRegister) {
-        if (use2DIcon())
-            this.iconIndex = iconRegister.registerIcon(iconName);
+    public RealisticEnum addRealismContext(List<String> list) {
+        return null;
     }
 
-    public boolean use2DIcon() {
-        return true;
+    @SideOnly(value = Side.CLIENT)
+    public void updateIcons(IIconRegister iconRegister) {
+        this.iconIndex = iconRegister.registerIcon("eln:" + iconName);
     }
 
     public IIcon getIcon() {
@@ -58,6 +77,8 @@ public class GenericItemBlockUsingDamageDescriptor {
     public String getName(ItemStack stack) {
         return name;
     }
+
+    private boolean hidden = false;
 
     public void setParent(Item item, int damage) {
         this.parentItem = item;
@@ -70,6 +91,12 @@ public class GenericItemBlockUsingDamageDescriptor {
 
     public ItemStack newItemStack() {
         return new ItemStack(parentItem, 1, parentItemDamage);
+    }
+
+    public boolean checkSameItemStack(ItemStack stack) {
+        if(stack == null) return false;
+        if(stack.getItem() != parentItem || stack.getItemDamage() != parentItemDamage) return false;
+        return true;
     }
 
     public static GenericItemBlockUsingDamageDescriptor getDescriptor(ItemStack stack) {
@@ -93,5 +120,25 @@ public class GenericItemBlockUsingDamageDescriptor {
 
     public boolean onItemUseFirst(ItemStack stack, EntityPlayer player) {
         return false;
+    }
+
+    private CreativeTabs creativeTab;
+
+    public GenericItemBlockUsingDamageDescriptor setCreativeTab(CreativeTabs creativeTab) {
+        this.creativeTab = creativeTab;
+        return this;
+    }
+
+    public CreativeTabs getCreativeTab() {
+        return creativeTab;
+    }
+
+    public GenericItemBlockUsingDamageDescriptor hideFromCreative() {
+        this.hidden = true;
+        return this;
+    }
+
+    public boolean isHidden() {
+        return hidden;
     }
 }

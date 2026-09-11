@@ -1,175 +1,273 @@
-# Analisi preliminare del porting di Electrical Age
+# Analisi del porting di Electrical Age
 
-Data dell'analisi: 7 settembre 2026.
+Aggiornata: 11 settembre 2026
 
-## Decisione consigliata
+## Obiettivo
 
-La piattaforma consigliata per il primo port funzionante è:
+Ripartire dal codice di Electrical Age 1.24.8 per Minecraft Forge 1.7.10 e realizzare un nuovo port per:
 
-- Minecraft 1.21.1
-- NeoForge
-- Java 21
-- Mojang mappings
-- una sola piattaforma supportata inizialmente
+- Minecraft 1.21.1;
+- NeoForge;
+- Java 21;
+- mod id moderno `eln`.
 
-Il simulatore dovrà comunque essere separato dalle API Minecraft e NeoForge, in modo da rendere possibile un futuro aggiornamento a una versione più recente o l'aggiunta di un altro loader.
+Il port deve mantenere sia la fedeltà funzionale sia quella estetica. Le API e l'architettura interna saranno modernizzate, mentre geometrie, proporzioni, texture, palette, animazioni, interfacce, particelle e suoni dovranno restare riconoscibili e confrontabili con la 1.24.8.
 
-### Decisioni confermate
+La sorgente di riferimento è `original/`. La nuova implementazione vivrà in `modern/`. In questa prima fase non è stato copiato o modificato codice del mod.
 
-- Non è richiesta la compatibilità con i mondi o i salvataggi di Electrical Age per Minecraft 1.7.10.
-- Il nuovo formato di salvataggio può essere progettato liberamente per la versione moderna.
-- Non verranno realizzati importatori, conversioni NBT o DataFixer per i vecchi mondi durante il porting iniziale.
+La release indicata come base è [Electrical Age 1.24.8](https://github.com/age-series/ElectricalAge/releases/tag/1.24.8), associata da GitHub al commit abbreviato `46ab422`. La cartella locale `original/` non contiene però un repository Git indipendente: Git risale alla radice del workspace. Non è quindi possibile certificare localmente il tag con `git describe`; per il port si assume, come indicato, che il contenuto sia quello clonato dalla release 1.24.8.
 
-## Dimensioni e stato del progetto originale
+## Dimensioni del progetto di partenza
 
-Il progetto originale è una mod Forge per Minecraft 1.7.10. Il repository è fermo al 5 dicembre 2016, sul ramo `releases/1.13`.
+| Area | Quantità |
+|---|---:|
+| Sorgenti Java principali | 478 file / 38.793 righe |
+| Sorgenti Kotlin principali | 357 file / 49.578 righe |
+| Test | 90 file / 4.314 righe |
+| Test senza import diretti Minecraft/Forge | 72 |
+| Risorse | 1.442 file / 107,88 MiB |
+| File con import Minecraft, Forge o integrazioni legacy | 607 |
+| File con import `net.minecraft.*` | 581 |
+| File con import FML `cpw.mods.fml.*` | 81 |
+| File con import Neo/Forge legacy | 84 |
+| File con uso LWJGL diretto | 144 |
+| File con lettura/scrittura NBT | 179 |
+| File coinvolti nel rendering legacy | circa 173 |
 
-L'analisi statica iniziale ha rilevato:
+Le aree più grandi sono `sixnode` (251 file), `transparentnode` (129), `sim` (85), `node` (51), `item` (46), `misc` (45), `gui` (27), `mechanical` (17) e `simplenode` (16).
 
-- 828 file Java;
-- 37 file Kotlin;
-- circa 79.700 righe di codice;
-- 564 file che importano direttamente classi Minecraft;
-- 129 file che importano direttamente Forge o FML;
-- 116 file che importano LWJGL;
-- 133 file interessati dal rendering legacy;
-- 164 file con riferimenti a NBT o ai metodi storici di serializzazione;
-- 1.002 risorse per circa 77 MB;
-- 117 modelli OBJ, 117 file MTL e 121 file Blender;
-- una classe principale `Eln.java` di oltre 6.200 righe, che concentra registrazioni, configurazione dei dispositivi e ricette.
+La dimensione rende impraticabile un port “sostituisci gli import finché compila”. Serve una migrazione per strati e per vertical slice giocabili.
 
-Il sistema di build usa ForgeGradle 1.2, compatibilità Java 6, Kotlin 1.0.5, Forge 1.7.10 e una copia inclusa di Apache Commons Math 3.3. Le integrazioni comprendono Waila, ComputerCraft, OpenComputers, IndustrialCraft e CoFH/Redstone Flux.
+## Architettura attuale
 
-Questi numeri indicano che non è possibile fare un semplice aggiornamento delle importazioni. Il porting sarà una riscrittura progressiva, nella quale si recuperano il modello matematico, le regole di gioco e le risorse ancora utilizzabili.
+### 1. Simulazione elettrica e termica
 
-## Motivazione della scelta di NeoForge
+Il valore tecnico principale è sotto `mods.eln.sim` e `mods.eln.solver`:
 
-NeoForge conserva un modello concettuale vicino a quello del vecchio Forge: registri, event bus, block entity, capability, networking e separazione fra client e server. Le API moderne sono molto diverse da Forge 1.7.10, ma la traduzione architetturale è più diretta rispetto a Fabric.
+- solver MNA (`RootSystem`, sottosistemi, stati e componenti);
+- carichi, resistori, condensatori, induttori, sorgenti e trasformatori;
+- processi elettrici e termici;
+- watchdog e distruzione;
+- parser delle equazioni e macchine a stati.
 
-NeoForge 1.21.1 fornisce capability standard per:
+Circa 76 file nelle aree `sim`/`solver` non importano direttamente Minecraft o Forge. È il primo nucleo riutilizzabile. Il solver usa Apache Commons Math 3.6.1, oggi incluso e rilocato nel JAR.
 
-- energia tramite `IEnergyStorage`;
-- fluidi tramite `IFluidHandler`;
-- inventari tramite `IItemHandler`.
+`Simulator` è agganciato al tick server e svolge più sottopassi elettrici/termici sul thread server. Questa semantica va mantenuta inizialmente: parallelizzare il solver durante il port introdurrebbe rischi di concorrenza non necessari. Prima va separato l’orologio di simulazione dall’evento NeoForge e coperto con test deterministici.
 
-L'interfaccia energetica deriva dal modello Redstone Flux e costituisce quindi la sostituzione naturale delle vecchie integrazioni CoFH presenti in Electrical Age.
+### 2. Sistema dei nodi
 
-Il networking moderno basato su payload registrati offre inoltre una destinazione chiara per sostituire `SimpleNetworkWrapper`, `IMessage` e i vecchi handler della mod.
+Il gameplay si basa su tre famiglie:
 
-Forge moderno non dà un vantaggio sostanziale soltanto perché il progetto originale usava Forge: la distanza fra Forge 1.7.10 e Forge 1.21.1 rimane enorme. NeoForge ha avuto una forte adozione sulla 1.21.1 e offre le astrazioni più utili a una mod tecnica di questo tipo.
+- `SixNode`: più componenti montabili sulle sei facce dello stesso blocco;
+- `TransparentNode`: macchina completa rappresentata da un blocco;
+- `SimpleNode`: blocchi più convenzionali e integrazioni;
+- a queste si aggiungono ghost block e grid node per multiblocchi/reti.
 
-Fabric rimane una possibilità futura, ma per la prima versione richiederebbe più decisioni e più adattatori, soprattutto per energia, fluidi, inventari e integrazioni con altre mod. Non è consigliato introdurre Architectury o un'altra astrazione multiloader prima di aver ottenuto una versione NeoForge giocabile.
+`NodeBase` combina oggi troppe responsabilità: coordinate del mondo, topologia, connessioni elettriche/termiche, piazzamento e rottura, interazione col giocatore, GUI, suoni, networking e persistenza. Questo accoppiamento è il principale ostacolo del port.
 
-## Motivazione della scelta di Minecraft 1.21.1
+`NodeManager` è un singleton globale basato su `WorldSavedData`, indicizza i nodi per coordinate comprensive di dimensione e ricostruisce le classi via stringa UUID e reflection. `NodeManagerNbt.writeToNBT` non salva attualmente il manager (la chiamata è commentata). In 1.21.1 la proprietà deve diventare esplicitamente server/level-scoped, usando `SavedData` quando serve persistenza globale e i `BlockEntity` per lo stato locale. Non va ricreato un singleton globale dipendente dal server corrente.
 
-Minecraft 1.21.1 è stata una versione stabile e molto adottata nell'ecosistema NeoForge. Offre una base conosciuta, documentazione consolidata e una vasta disponibilità di mod compatibili.
+### 3. Catalogo basato su metadata/ItemStack damage
 
-La serie Minecraft 26.1 è destinata a sostituirla e dispone ormai di build NeoForge stabili. Per un progetto nuovo sarebbe una candidata forte. Per il recupero di Electrical Age, però, la 1.21.1 riduce il rischio iniziale perché:
+Il mod registra pochi blocchi/item contenitore e vi multiplexa centinaia di descrittori tramite il damage value dell'`ItemStack`:
 
-- ha un ecosistema più maturo;
-- dispone di più esempi e integrazioni già collaudate;
-- evita le ulteriori trasformazioni del rendering introdotte dopo Minecraft 1.21.6;
-- consente di fissare una piattaforma durante un porting lungo e complesso.
+- 218 chiamate statiche a `addDescriptor`;
+- 191 chiamate a `addElement`;
+- almeno 126 descrittori SixNode e 85 TransparentNode dichiarati direttamente nei due grandi file di registrazione;
+- circa 4.700 righe nei soli file `ItemRegistration`, `SixNodeRegistration` e `TransparentNodeRegistration`.
 
-La versione di NeoForge dovrà essere almeno `21.1.229`, che include una correzione di sicurezza relativa ai pacchetti di rete. Prima di creare il nuovo progetto andrà comunque selezionata l'ultima release stabile disponibile della linea `21.1.x`.
+Questo schema non è portabile direttamente. In Minecraft moderno il damage non è un identificatore generale di sottotipo e lo stato arbitrario dell'item usa i data component. La soluzione proposta è:
 
-## Parti recuperabili
+1. conservare un unico blocco host per i SixNode, perché il montaggio multiplo per faccia è parte essenziale del design;
+2. assegnare a ogni tipo di componente un id stabile `ResourceLocation` in un registro ELN dedicato;
+3. salvare l'id del componente e la configurazione nei data component dell'item e nel `BlockEntity` host;
+4. registrare come blocchi distinti solo le macchine per cui identità, loot, blockstate o compatibilità lo richiedono;
+5. mantenere una tabella esplicita `legacy numeric id -> modern resource id` per un futuro importer, senza promettere compatibilità diretta dei mondi 1.7.10.
 
-Il nucleo più prezioso da conservare è la simulazione elettrica e termica:
+Questa scelta evita sia centinaia di classi duplicate sia il ritorno nascosto ai metadata legacy.
 
-- `mods.eln.sim`;
-- `mods.eln.sim.mna`;
-- `mods.eln.solver`;
-- modelli di carichi, componenti, processi e connessioni.
+### 4. Lifecycle, registri ed eventi
 
-Queste aree non sono ancora indipendenti da Minecraft. Il simulatore si registra direttamente sul vecchio event bus FML e alcune classi usano NBT, inventari, entità o operazioni sul mondo. La matematica e buona parte del modello elettrico possono però essere estratte dietro interfacce neutrali.
+L'entry point `Eln.java` è un service locator globale molto grande. Usa `@Mod`, `@SidedProxy`, tre fasi FML, `GameRegistry`, due event bus legacy e registrazioni imperative.
 
-## Parti da riscrivere
+In NeoForge 1.21.1 dovrà essere sostituito da:
 
-Richiederanno una riscrittura sostanziale:
+- costruttore `@Mod("eln")` con mod event bus;
+- `DeferredRegister`/`DeferredHolder` per blocchi, item, block entity type, menu, sound event, entity type, data component e altri oggetti registrati;
+- servizi server-scoped creati e distrutti sugli eventi di lifecycle;
+- registrazione client isolata in classi client-only;
+- configurazione NeoForge suddivisa in common/server/client, senza campi globali mutabili nell'entry point.
 
-- registrazione di blocchi, item, menu e block entity;
-- sistema dei descriptor basato sul metadata o damage degli item;
-- rendering immediato con OpenGL, `GL11` e `Tessellator`;
-- caricamento e uso dei vecchi modelli OBJ;
-- GUI e container;
-- pacchetti client-server;
-- persistenza basata su `WorldSavedData` e vecchie API NBT;
-- gestione del grafo rispetto a caricamento e scaricamento dei chunk;
-- generazione dei minerali;
-- ricette definite direttamente in Java;
-- ore dictionary, da sostituire con tag;
-- integrazioni Waila, ComputerCraft, OpenComputers, IndustrialCraft e CoFH.
+NeoForge raccomanda `DeferredRegister` per evitare errori di ordine durante la registrazione: [documentazione dei registri 1.21.1](https://docs.neoforged.net/docs/1.21.1/concepts/registries/).
 
-Il `NodeManager` merita particolare attenzione: conserva globalmente i nodi, eredita da `WorldSavedData` e usa nomi di classe e riflessione durante il caricamento. Nel port moderno serviranno identificatori stabili, dati versionati e una politica esplicita per nodi appartenenti a chunk non caricati.
+### 5. Block entity e persistenza
 
-## Architettura proposta
+Le vecchie `TileEntity` diventano `BlockEntity` registrate tramite `BlockEntityType`. Tick, caricamento/scaricamento chunk, update tag e pacchetti di sincronizzazione hanno firme e lifecycle differenti.
 
-Il nuovo progetto dovrebbe essere separato almeno in tre moduli logici:
+Il port deve separare:
 
-```text
-electrical-age/
-|-- simulation/    Solver, MNA, termica e processi in Java puro
-|-- common/        Modello logico dei dispositivi e serializzazione astratta
-`-- neoforge/      Blocchi, block entity, rete, rendering, GUI e capability
-```
+- stato persistente del componente;
+- stato derivato della rete elettrica;
+- snapshot minimo destinato al client;
+- configurazione dell'item prima del piazzamento.
 
-Il nuovo codice dovrebbe essere scritto in Java 21. I 37 file Kotlin originali sono concentrati soprattutto in integrazioni e networking; riscriverli in Java evita di aggiungere un language loader durante la fase iniziale.
+I riferimenti a coordinate devono diventare `BlockPos` + `ResourceKey<Level>` e non integer dimension id. Le letture/scritture NBT vanno aggiornate alle API con registry lookup. La guida di riferimento è [Block Entities in NeoForge 1.21.1](https://docs.neoforged.net/docs/1.21.1/blockentities/).
 
-La separazione deve impedire al modulo `simulation` di importare tipi Minecraft, NeoForge, NBT o classi di rendering. Tick, persistenza ed effetti sul mondo dovranno essere forniti dal livello di integrazione tramite interfacce.
+### 6. Networking
 
-## Prima fetta verticale
+Esistono due sistemi legacy sovrapposti:
 
-Prima di migrare tutto il catalogo di Electrical Age bisogna produrre una fetta giocabile composta da:
+- sette coppie packet/handler su `SimpleNetworkWrapper`, soprattutto per achievement e Waila;
+- un canale event-driven con byte discriminator e serializzazione manuale `DataInputStream`/`DataOutputStream` per nodi, GUI, suoni e informazioni client/server.
 
-1. un cavo;
-2. una sorgente;
-3. un resistore o una lampada;
-4. uno strumento per misurare la tensione;
-5. collegamento e scollegamento dei nodi;
-6. salvataggio e ricaricamento del circuito;
-7. sincronizzazione server-client;
-8. rendering delle connessioni;
-9. prova in single player e su server dedicato.
+Vanno sostituiti con payload tipizzati (`CustomPacketPayload`), id namespaced e `StreamCodec`, registrati tramite `RegisterPayloadHandlersEvent`. Ogni payload deve dichiarare direzione, validazione, limite dimensionale e gestione sul thread corretto. Riferimento: [payload NeoForge 1.21.1](https://docs.neoforged.net/docs/1.21.1/networking/payload/).
 
-Questa fetta verifica subito i rischi principali: integrazione fra mondo e simulatore, grafo elettrico, ciclo di tick, persistenza, networking e rendering. Il catalogo completo dei dispositivi va migrato solo dopo che questa base è stabile.
+Non conviene tradurre alla cieca i vecchi discriminator numerici: prima si definiscono i messaggi di dominio realmente necessari, poi si elimina la duplicazione con la sincronizzazione standard dei block entity/menu.
+
+### 7. GUI
+
+Le GUI legacy includono 27 classi infrastrutturali più molti container e schermate specifiche. Sono basate su `GuiScreen`, `GuiContainer`, `IInventory` e apertura tramite `IGuiHandler`.
+
+La destinazione usa `MenuType`, `AbstractContainerMenu`, `Screen`/`AbstractContainerScreen` e apertura server-side tramite `MenuProvider`. Le view non devono possedere lo stato della macchina. I widget ELN riutilizzabili potranno essere riscritti sopra le primitive moderne dopo il primo menu funzionante. Riferimento: [menu NeoForge 1.21.1](https://docs.neoforged.net/docs/1.21.1/gui/menus/).
+
+### 8. Rendering e modelli
+
+Questa è l'area a più alto costo:
+
+- 144 file usano direttamente LWJGL;
+- il codice usa `GL11`, `Tessellator`, `IIcon`, `IItemRenderer` e `TileEntitySpecialRenderer`;
+- esiste un loader OBJ personalizzato e un catalogo molto ampio di renderer descriptor-driven;
+- 157 file OBJ e 157 MTL sono affiancati da sorgenti `.blend` e `.xcf`.
+
+La migrazione richiede `PoseStack`, `VertexConsumer`, render type moderni, baked model/geometry loader oppure `BlockEntityRenderer` solo per le parti realmente dinamiche. È preferibile convertire le geometrie statiche in modelli baked e riservare il BER a indicatori, rotazioni, cavi e parti animate. Va prima creato un proof of concept con un SixNode e un modello OBJ reale.
+
+### 9. Risorse e data-driven content
+
+Inventario principale:
+
+- 735 PNG;
+- 157 OBJ e 157 MTL;
+- 158 file Blender, 85 XCF e altri sorgenti grafici;
+- 44 OGG e 2 WAV;
+- 19 file `.lang`;
+- solo 2 JSON moderni nell'intero albero risorse.
+
+Sono stati rilevati 708 percorsi con maiuscole o spazi. I resource location moderni devono essere normalizzati in lowercase e i rinomini devono essere tracciati in un manifest, perché su filesystem case-insensitive gli errori possono restare nascosti fino al build o al server Linux.
+
+Le azioni necessarie sono:
+
+- convertire `assets/eln/lang/<locale>.lang` in JSON lowercase (`en_us.json`, `it_it.json`, ecc.);
+- creare `sounds.json` e registrare i sound event;
+- spostare ricette imperative in `data/eln/recipe/*.json` o datagen;
+- sostituire OreDictionary con tag, usando in genere il namespace comune `c`;
+- generare blockstate, modelli item/block, loot table e tag;
+- escludere dal JAR di runtime i sorgenti `.blend`, `.xcf`, `.xlsx`, `.aseprite`, `.ai`, `.vsd` e `model-to-be-integrated`, conservandoli però nel repository;
+- verificare licenze e attribuzioni durante ogni conversione.
+
+Le ricette 1.21.1 sono principalmente data-driven ([documentazione ricette](https://docs.neoforged.net/docs/1.21.1/resources/server/recipes/)); i tag sostituiscono il ruolo dell'OreDictionary ([documentazione tag](https://docs.neoforged.net/docs/1.21.1/resources/server/tags/)).
+
+### 10. Integrazioni esterne
+
+Le dipendenze legacy sono CoFHCore/CoFHLib, Waila, IC2 Classic, OpenComputers, ComputerCraft e jSerialComm. MQTT/Modbus sono inoltre presenti nel codice.
+
+Nella release 1.24.8 CoFH Core risulta di fatto obbligatorio, nonostante l'annotazione principale usi soltanto gli ordinamenti opzionali `after:CoFHCore`, `after:CoFHAPI` e `after:CoFHAPI|energy`. `gradle.properties` pubblica infatti `cofh-core` come relazione Modrinth richiesta e `EnergyConverterElnToOtherEntity` implementa direttamente `cofh.api.energy.IEnergyHandler`. Inoltre `Other.modIdTe` vale erroneamente `"Eln"`: ELN rileva quindi sempre l'integrazione RF come caricata e le annotazioni `@Optional` non possono rimuoverla quando CoFH manca. Questo spiega il requisito osservato avviando l'originale. Tale dipendenza accidentale non deve essere riprodotta nel port moderno.
+
+Strategia:
+
+- nessuna integrazione esterna nel primo milestone;
+- definire API interne/capability ELN senza dipendere da una singola energy API esterna;
+- valutare successivamente Jade al posto di Waila e CC:Tweaked al posto di ComputerCraft;
+- verificare singolarmente disponibilità e licenza delle versioni 1.21.1 prima di abilitarle;
+- mantenere MQTT, Modbus e seriale disabilitati finché lifecycle, sicurezza e thread model non sono stati riesaminati;
+- non rendere obbligatorio un port di CoFHCore.
+
+L'API pubblica `mods.eln.api.v1.electrical` è recente e ben testata, ma espone coordinate/dimensioni e strutture interne legacy. Va preservata come specifica funzionale, non come compatibilità binaria. Una nuova API v2 potrà usare tipi moderni e ownership esplicita.
+
+## Dipendenze e toolchain di destinazione
+
+NeoForge 1.21.1 richiede Java 21; la macchina dispone già di Temurin 21.0.11 a 64 bit. Riferimento: [Getting Started NeoForge 1.21.1](https://docs.neoforged.net/docs/1.21.1/gettingstarted/).
+
+La build originale usa la convention GTNH/RetroFuturaGradle, Forge 1.7.10, mapping MCP e un wrapper Gradle 9.2.1. Quella configurazione non deve essere adattata: `modern/` deve partire da un MDK NeoForge 1.21.1 pulito e versionato, con versioni fissate.
+
+Per il codice Kotlin esistono due opzioni:
+
+- mantenere Kotlin e aggiungere esplicitamente toolchain/plugin/runtime compatibili con NeoForge 1.21.1;
+- portare inizialmente lo scaffold di piattaforma in Java e conservare il core Kotlin, evitando una riscrittura linguistica contemporanea al cambio di API.
+
+La seconda opzione minimizza il rischio iniziale. La lingua può essere uniformata in una fase successiva; riscrivere 88.000 righe per stile non è un requisito del port.
+
+## Strategia consigliata
+
+### Principio
+
+Costruire un “walking skeleton” completo e poi ampliare il catalogo. Ogni fase deve terminare con build, test e avvio su client e dedicated server.
+
+### Fase 0 — baseline riproducibile
+
+1. Creare MDK NeoForge 1.21.1 in `modern/` con Java 21.
+2. Fissare mod id `eln`, package di destinazione e versioni.
+3. Aggiungere test unitari e una CI minima.
+4. Avviare client e dedicated server vuoti.
+
+### Fase 1 — core di simulazione
+
+1. Copiare soltanto solver/MNA e processi puri.
+2. Rimuovere singleton e riferimenti a `Eln` dal core tramite configurazione esplicita.
+3. Portare prima i 72 test già indipendenti o stubbed.
+4. Verificare risultati numerici e stabilità rispetto all'originale con fixture golden.
+
+### Fase 2 — primo SixNode verticale
+
+1. Registro del tipo componente con id stabile.
+2. SixNode block + block entity con sei facce.
+3. Un cavo, un resistore e una sorgente di tensione.
+4. Salvataggio/ricaricamento, connessione/disconnessione e rebuild rete.
+5. Rendering minimale e interazione item -> faccia.
+6. Test GameTest e prova multiplayer.
+
+### Fase 3 — sincronizzazione e GUI
+
+1. Payload tipizzati e snapshot client minimi.
+2. Primo menu macchina completo.
+3. Widget comuni moderni.
+4. Suoni e luce dinamica con aggiornamenti limitati.
+
+### Fase 4 — TransparentNode e catalogo
+
+Portare i contenuti per famiglie, non per ordine alfabetico: alimentazione e cavi, misure, segnali, macchine termiche, generazione, illuminazione, meccanica, multiblocchi. Ogni famiglia include ricette, loot, traduzioni, modelli, test e criteri di completamento.
+
+### Fase 5 — mondo, entità e integrazioni
+
+Worldgen data-driven, minecart/entità, ghost/grid node, compatibilità con mod esterne e nuova API pubblica. Queste parti non devono bloccare il nucleo elettrico giocabile.
 
 ## Rischi principali
 
-1. **Rendering:** il progetto contiene una grande quantità di OpenGL immediato e modelli OBJ legacy. È probabilmente l'area con il costo maggiore.
-2. **Identità dei contenuti:** molti dispositivi sono varianti conservate nel metadata di pochi item o blocchi. Andranno assegnati identificatori moderni e stabili.
-3. **Persistenza:** bisogna progettare dati moderni e versionati prima di creare mondi di prova destinati a durare. Non è necessario interpretare o convertire il formato usato dalla versione 1.7.10.
-4. **Chunk e simulazione:** il comportamento dei circuiti che attraversano chunk caricati e non caricati deve essere deciso e verificato esplicitamente.
-5. **Prestazioni:** la simulazione MNA deve essere profilata su server, evitando di bloccare il tick principale con reti grandi.
-6. **Client e server:** le classi di rendering e GUI devono restare completamente fuori dal caricamento del server dedicato.
-7. **Licenze:** il codice è LGPL 3.0; grafica e modelli sono CC BY-NC-SA 3.0. La licenza non commerciale degli asset deve essere considerata prima della distribuzione e di qualsiasi monetizzazione.
+| Rischio | Gravità | Mitigazione |
+|---|---|---|
+| Perdita di identità dei descriptor basati su damage | Critica | Registro ELN namespaced + mappa legacy esplicita |
+| Regressioni numeriche nel solver | Critica | Portare test prima del gameplay e usare fixture golden |
+| Stato globale tra dimensioni/server | Alta | Servizi server/level-scoped, `SavedData` e block entity |
+| Rendering immediato non portabile | Alta | Proof of concept precoce, baked model per geometria statica |
+| Catalogo enorme registrato in codice | Alta | Manifest/datagen e vertical slice |
+| Risorse con case/spazi | Alta | Script di audit e manifest dei rinomini |
+| Packet legacy non validati | Alta | Payload tipizzati, limiti e validazione server-side |
+| Dipendenze 1.7.10 assenti | Media | Core senza dipendenze obbligatorie; adapter opzionali |
+| Prestazioni del tick server | Media/Alta | Benchmark per dimensione/rete prima di ottimizzare o parallelizzare |
+| Compatibilità mondi 1.7.10 | Non garantibile direttamente | Importer offline o procedura separata, dopo stabilizzazione schema moderno |
 
-## Conclusione operativa
+## Criteri di riuscita del primo milestone
 
-La base da fissare per il port è **NeoForge 1.21.1 su Java 21**. Il lavoro deve iniziare con un progetto nuovo e una piccola fetta verticale; il repository originale va mantenuto come riferimento e fonte da cui trasferire selettivamente simulazione, comportamento e risorse.
+Il primo milestone non è “tutto il mod compila”. È raggiunto quando:
 
-Non conviene copiare subito l'intero albero sorgente nel nuovo ambiente. La prima attività di implementazione dovrebbe essere l'estrazione del solver e del modello MNA in un modulo Java puro, accompagnata da test numerici su piccoli circuiti noti.
+- `modern/` compila con Java 21 e NeoForge per Minecraft 1.21.1;
+- client e dedicated server si avviano senza classloading client sul server;
+- un blocco SixNode supporta componenti su più facce;
+- cavo, resistore e sorgente formano una rete DC simulata;
+- la rete sopravvive a save/reload e chunk unload/reload;
+- piazzamento, rimozione e riconnessione aggiornano correttamente il grafo;
+- il client riceve solo lo stato necessario al rendering;
+- test unitari e GameTest coprono il percorso principale.
 
-## Stato del porting minimale
+## Conclusione
 
-L'8 settembre 2026 è stata creata una prima base in `modern/` usando il template ufficiale ModDevGradle per NeoForge 1.21.1.
-
-La base comprende:
-
-- mod ID `eln` e versione iniziale `0.1.0-alpha.1`;
-- Java 21, NeoForge 21.1.249 e Parchment mappings per Minecraft 1.21.1;
-- registrazione dell'item componente `eln:resistor` e del contenitore tecnico `eln:six_node`;
-- creative tab, traduzioni inglese e italiana, modello minimale, loot table, tag dello strumento e ricetta;
-- un primo solver DC MNA indipendente da Minecraft;
-- componenti iniziali per nodi, resistori e sorgenti di tensione;
-- test numerici per un partitore da 12 V e per il rilevamento di un circuito flottante.
-
-La build Gradle completa e i due test sono passati. È stato inoltre avviato il client di sviluppo: Electrical Age è stato riconosciuto e inizializzato senza errori nel log. Il successivo prototipo ha introdotto una block entity `SixNode` con sei posizioni indipendenti, installazione del resistore sulle facce, modello orientato, persistenza e rimozione del singolo elemento. Il componente non è ancora collegato al solver; rete elettrica, sorgente e cavi saranno la fetta successiva.
-
-## Riferimenti
-
-- [Capability NeoForge 1.21.1](https://docs.neoforged.net/docs/1.21.1/inventories/capabilities/)
-- [Networking NeoForge 1.21.1](https://docs.neoforged.net/docs/1.21.1/networking/)
-- [Adozione e supporto di NeoForge 1.21.1](https://neoforged.net/news/2024-retrospection/)
-- [Correzione di sicurezza per NeoForge 1.21.1](https://neoforged.net/news/mitigating-vulnerabilities-network/)
-- [Cambiamenti di NeoForge per Minecraft 26.1](https://neoforged.net/news/26.1release/)
+Il port è fattibile, ma equivale a una re-platforming del motore di gioco attorno a un core fisico riutilizzabile. La scelta più sicura è preservare il solver e il comportamento, ridisegnare ownership/registri/persistenza e dimostrare subito l'architettura con un SixNode verticale. Solo dopo questa prova conviene migrare le centinaia di descriptor e asset.

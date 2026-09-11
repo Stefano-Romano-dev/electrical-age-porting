@@ -1,11 +1,8 @@
 package mods.eln.transparentnode.electricalantennarx;
 
-import java.io.DataOutputStream;
-import java.util.HashMap;
-import java.util.Map;
-
 import mods.eln.Eln;
-import mods.eln.misc.Coordonate;
+import mods.eln.i18n.I18N;
+import mods.eln.misc.Coordinate;
 import mods.eln.misc.Direction;
 import mods.eln.misc.LRDU;
 import mods.eln.misc.Utils;
@@ -20,138 +17,148 @@ import mods.eln.sim.nbt.NbtElectricalGateInput;
 import mods.eln.sim.nbt.NbtElectricalLoad;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.DataOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ElectricalAntennaRxElement extends TransparentNodeElement {
 
-	ElectricalAntennaRxSlowProcess slowProcess = new ElectricalAntennaRxSlowProcess(this);
-	
-	NbtElectricalLoad powerOut = new NbtElectricalLoad("powerOut");
-	NbtElectricalGateInput signalIn = new NbtElectricalGateInput("signalIn");
+    ElectricalAntennaRxSlowProcess slowProcess = new ElectricalAntennaRxSlowProcess(this);
 
-	PowerSource powerSrc = new PowerSource("powerSrc", powerOut);
+    NbtElectricalLoad powerOut = new NbtElectricalLoad("powerOut");
+    NbtElectricalGateInput signalIn = new NbtElectricalGateInput("signalIn");
+
+    PowerSource powerSrc = new PowerSource("powerSrc", powerOut);
 
     LRDU rot = LRDU.Up;
-    Coordonate rxCoord = null;
+    Coordinate rxCoord = null;
     ElectricalAntennaRxDescriptor descriptor;
-    
-	public double getSignal() {
-		return signalIn.getBornedU();
-	}
-	
-	public void setPowerOut(double power) {
-		powerSrc.setP(power);
-	}
-	
-	public void rxDisconnect() {
-		powerSrc.setP(0.0);
-	}
 
-	public ElectricalAntennaRxElement(TransparentNode transparentNode, TransparentNodeDescriptor descriptor) {
-		super(transparentNode, descriptor);
-		slowProcessList.add(slowProcess);
-	
-		electricalLoadList.add(powerOut);
-		electricalLoadList.add(signalIn);		
-		electricalComponentList.add(powerSrc);
-		
-		this.descriptor = (ElectricalAntennaRxDescriptor) descriptor;
-	}
+    public double getSignal() {
+        return signalIn.getSignalVoltage();
+    }
 
-	@Override
-	public ElectricalLoad getElectricalLoad(Direction side, LRDU lrdu) {
-		if (front.getInverse() != side.applyLRDU(lrdu)) return null;
-		
-		if (side == front.applyLRDU(rot.left())) return powerOut;
-		if (side == front.applyLRDU(rot.right())) return signalIn;
-		return null;
-	}
+    public void setPowerOut(double power) {
+        powerSrc.setPower(power);
+    }
 
-	@Override
-	public ThermalLoad getThermalLoad(Direction side, LRDU lrdu) {
-		return null;
-	}
+    public void rxDisconnect() {
+        powerSrc.setPower(0.0);
+    }
 
-	@Override
-	public int getConnectionMask(Direction side, LRDU lrdu) {
-		if (front.getInverse() != side.applyLRDU(lrdu)) return 0;
-		
-		if (side == front.applyLRDU(rot.left())) return NodeBase.maskElectricalPower;
-		if (side == front.applyLRDU(rot.right())) return NodeBase.maskElectricalInputGate;
-		
-		return 0;
-	}
+    public ElectricalAntennaRxElement(TransparentNode transparentNode, TransparentNodeDescriptor descriptor) {
+        super(transparentNode, descriptor);
+        slowProcessList.add(slowProcess);
 
-	@Override
-	public String multiMeterString(Direction side) {
-		return "";
-	}
+        electricalLoadList.add(powerOut);
+        electricalLoadList.add(signalIn);
+        electricalComponentList.add(powerSrc);
 
-	@Override
-	public String thermoMeterString(Direction side) {
-		return "";
-	}
+        this.descriptor = (ElectricalAntennaRxDescriptor) descriptor;
+    }
 
-	@Override
-	public void initialize() {
-		descriptor.cable.applyTo(powerOut);
-		powerSrc.setUmax(descriptor.electricalMaximalVoltage * 2);
-		powerSrc.setImax(descriptor.electricalMaximalVoltage * descriptor.electricalMaximalPower * 2);
-		connect();
-	}
+    @Override
+    public ElectricalLoad getElectricalLoad(Direction side, LRDU lrdu) {
+        if (front.getInverse() != side.applyLRDU(lrdu)) return null;
 
-	@Override
-	public boolean onBlockActivated(EntityPlayer entityPlayer, Direction side, float vx, float vy, float vz) {
-		if (Utils.isPlayerUsingWrench(entityPlayer)) {
-			rot = rot.getNextClockwise();
-			node.reconnect();
-			return true;	
-		}
-		return false;
-	}
+        if (side == front.applyLRDU(rot.left())) return powerOut;
+        if (side == front.applyLRDU(rot.right())) return signalIn;
+        return null;
+    }
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
-		super.readFromNBT(nbt);
-		rot = LRDU.readFromNBT(nbt, "rot");
-	}
-	
-	@Override
-	public void writeToNBT(NBTTagCompound nbt) {
-		super.writeToNBT(nbt);
+    @Nullable
+    @Override
+    public ThermalLoad getThermalLoad(@NotNull Direction side, @NotNull LRDU lrdu) {
+        return null;
+    }
 
-		rot.writeToNBT(nbt,"rot");
-	}
-	
-	public boolean mustHaveFloor() {
-		return false;
-	}
-	
-	public boolean mustHaveCeiling() {
-		return false;
-	}
-	
-	public boolean mustHaveWall() {
-		return false;
-	}
-	
-	public boolean mustHaveWallFrontInverse() {
-		return true;
-	}
-	
-	@Override
-	public void networkSerialize(DataOutputStream stream) {
-		super.networkSerialize(stream);
-		rot.serialize(stream);		
-		node.lrduCubeMask.getTranslate(front.getInverse()).serialize(stream);
-	}
+    @Override
+    public int getConnectionMask(Direction side, LRDU lrdu) {
+        if (front.getInverse() != side.applyLRDU(lrdu)) return 0;
 
-	public Map<String, String> getWaila() {
-		Map<String, String> info = new HashMap<String, String>();
-		info.put("Receiving", powerSrc.getP() != 0 ? "Yes" : "No");
-		if(Eln.wailaEasyMode){
-			info.put("Power Received", Utils.plotPower("", powerSrc.getP()));
-			info.put("Effective Power", Utils.plotPower("", powerSrc.getEffectiveP()));
-		}
-		return info;
-	}
+        if (side == front.applyLRDU(rot.left())) return NodeBase.maskElectricalPower;
+        if (side == front.applyLRDU(rot.right())) return NodeBase.maskElectricalInputGate;
+
+        return 0;
+    }
+
+    @NotNull
+    @Override
+    public String multiMeterString(@NotNull Direction side) {
+        return "";
+    }
+
+    @NotNull
+    @Override
+    public String thermoMeterString(@NotNull Direction side) {
+        return "";
+    }
+
+    @Override
+    public void initialize() {
+        descriptor.cable.applyTo(powerOut);
+        powerSrc.setMaximumVoltage(descriptor.electricalMaximalVoltage * 2);
+        powerSrc.setMaximumCurrent(descriptor.electricalMaximalVoltage * descriptor.electricalMaximalPower * 2);
+        connect();
+    }
+
+    @Override
+    public boolean onBlockActivated(EntityPlayer player, Direction side, float vx, float vy, float vz) {
+        if (Utils.isPlayerUsingWrench(player)) {
+            rot = rot.getNextClockwise();
+            node.reconnect();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound nbt) {
+        super.readFromNBT(nbt);
+        rot = LRDU.readFromNBT(nbt, "rot");
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbt) {
+        super.writeToNBT(nbt);
+
+        rot.writeToNBT(nbt, "rot");
+    }
+
+    public boolean mustHaveFloor() {
+        return false;
+    }
+
+    public boolean mustHaveCeiling() {
+        return false;
+    }
+
+    public boolean mustHaveWall() {
+        return false;
+    }
+
+    public boolean mustHaveWallFrontInverse() {
+        return true;
+    }
+
+    @Override
+    public void networkSerialize(DataOutputStream stream) {
+        super.networkSerialize(stream);
+        rot.serialize(stream);
+        node.lrduCubeMask.getTranslate(front.getInverse()).serialize(stream);
+    }
+
+    @NotNull
+    public Map<String, String> getWaila() {
+        Map<String, String> info = new HashMap<String, String>();
+        info.put(I18N.tr("Receiving"), powerSrc.getPower() != 0 ? "Yes" : "No");
+        if (Eln.wailaEasyMode) {
+            info.put(I18N.tr("Power received"), Utils.plotPower("", powerSrc.getPower()));
+            info.put(I18N.tr("Effective power"), Utils.plotPower("", powerSrc.getEffectivePower()));
+        }
+        return info;
+    }
 }

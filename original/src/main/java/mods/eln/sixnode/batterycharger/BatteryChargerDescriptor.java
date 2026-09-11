@@ -10,6 +10,8 @@ import mods.eln.wiki.Data;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Collections;
@@ -19,14 +21,14 @@ import static mods.eln.i18n.I18N.tr;
 
 public class BatteryChargerDescriptor extends SixNodeDescriptor {
 
-	private Obj3D obj;
-	Obj3DPart main;
+    private Obj3D obj;
+    Obj3DPart main;
 
-	public double nominalVoltage;
-	public double nominalPower;
-	public ElectricalCableDescriptor cable;
-	double Rp;
-	public float[] pinDistance;
+    public double nominalVoltage;
+    public double nominalPower;
+    public ElectricalCableDescriptor cable;
+    double Rp;
+    public float[] pinDistance;
 
     Obj3DPart[] leds = new Obj3DPart[4];
 
@@ -34,96 +36,98 @@ public class BatteryChargerDescriptor extends SixNodeDescriptor {
                                     Obj3D obj,
                                     ElectricalCableDescriptor cable,
                                     double nominalVoltage, double nominalPower) {
-		super(name, BatteryChargerElement.class, BatteryChargerRender.class);
+        super(name, BatteryChargerElement.class, BatteryChargerRender.class);
 
         this.nominalVoltage = nominalVoltage;
-		this.nominalPower = nominalPower;
-		this.Rp = nominalVoltage * nominalVoltage / nominalPower;
-		this.obj = obj;
-		this.cable = cable;
+        this.nominalPower = nominalPower;
+        this.Rp = nominalVoltage * nominalVoltage / nominalPower;
+        this.obj = obj;
+        this.cable = cable;
 
-		if (obj != null) {
-			main = obj.getPart("main");
-			for (int idx = 0; idx < 4; idx++) {
-				leds[idx] = obj.getPart("led" + idx);
-			}
-			pinDistance = Utils.getSixNodePinDistance(main);
-		}
+        if (obj != null) {
+            main = obj.getPart("main");
+            for (int idx = 0; idx < 4; idx++) {
+                leds[idx] = obj.getPart("led" + idx);
+            }
+            pinDistance = Utils.getSixNodePinDistance(main);
+        }
 
-		changeDefaultIcon("batterycharger");
-		voltageLevelColor = VoltageLevelColor.fromVoltage(nominalVoltage);
-	}
+        setDefaultIcon("batterycharger");
+        voltageLevelColor = VoltageLevelColor.fromVoltage(nominalVoltage);
+    }
 
-	@Override
-	public void setParent(Item item, int damage) {
-		super.setParent(item, damage);
-		Data.addEnergy(newItemStack());
-		Data.addUtilities(newItemStack());
-	}
+    @Override
+    public void setParent(Item item, int damage) {
+        super.setParent(item, damage);
+        Data.addEnergy(newItemStack());
+        Data.addUtilities(newItemStack());
+    }
 
-	public void draw(boolean[] presence, boolean[] charged) {
-		if (main != null)
-			main.draw();
+    public void draw(boolean[] presence, boolean[] charged) {
+        if (main != null)
+            main.draw();
 
-		int idx = 0;
-		for (Obj3DPart led : leds) {
-			if (presence != null && presence[idx]) {
-				UtilsClient.ledOnOffColor(charged[idx]);
-				UtilsClient.drawLight(led);
-			} else {
-				GL11.glColor3f(0.2f, 0.2f, 0.2f);
-				led.draw();
-			}
-			idx++;
-		}
-	}
+        int idx = 0;
+        for (Obj3DPart led : leds) {
+            if (presence != null && presence[idx]) {
+                UtilsClient.ledOnOffColor(charged[idx]);
+                UtilsClient.drawLight(led);
+            } else {
+                GL11.glColor3f(0.2f, 0.2f, 0.2f);
+                led.draw();
+            }
+            idx++;
+        }
+    }
 
-	@Override
-	public boolean use2DIcon() {
-		return true;
-	}
-	
-	@Override
-	public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) {
-		return type != ItemRenderType.INVENTORY;
-	}
+    @Override
+    public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) {
+        return type != ItemRenderType.INVENTORY;
+    }
 
-	@Override
-	public boolean handleRenderType(ItemStack item, ItemRenderType type) {
-		return true;
-	}
+    @Override
+    public boolean handleRenderType(ItemStack item, ItemRenderType type) {
+        return true;
+    }
 
-	//boolean[] defaultCharged = new boolean[]{true, true, true, true};
+    //boolean[] defaultCharged = new boolean[]{true, true, true, true};
 
-	@Override
-	public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
-		if (type == ItemRenderType.INVENTORY) {
-			super.renderItem(type, item, data);
-		}
-		draw(null, null);
-	}
+    @Override
+    public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
+        if (type == ItemRenderType.INVENTORY) {
+            super.renderItem(type, item, data);
+        }
+        draw(null, null);
+    }
 
-	public void applyTo(NbtElectricalLoad powerLoad) {
-		cable.applyTo(powerLoad);
-	}
+    public void applyTo(NbtElectricalLoad powerLoad) {
+        cable.applyTo(powerLoad);
+    }
 
-	public void setRp(Resistor powerload, boolean powerOn) {
-		if (!powerOn)
-			powerload.highImpedance();
-		else
-			powerload.setR(Rp);
-	}
+    public void setRp(Resistor powerload, boolean powerOn) {
+        if (!powerOn)
+            powerload.highImpedance();
+        else
+            powerload.setResistance(Rp);
+    }
 
-	@Override
-	public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List list, boolean par4) {
-		super.addInformation(itemStack, entityPlayer, list, par4);
-		Collections.addAll(list, tr("Can be used to recharge\nelectrical items like:\nFlash Light, X-Ray scanner\nand Portable Battery ...").split("\\\n"));
-		list.add(tr("Nominal power: %1$W", nominalPower));
-		//list.add(Utils.plotPower("Maximal power", nominalPower * 3));
-	}
+    @Override
+    public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List list, boolean par4) {
+        super.addInformation(itemStack, entityPlayer, list, par4);
+        Collections.addAll(list, tr("Can be used to recharge\nelectrical items like:\nFlash Light, X-Ray scanner\nand Portable Battery ...").split("\\\n"));
+        list.add(tr("Nominal power: %1$W", Utils.plotValue(nominalPower)));
+    }
 
-	@Override
-	public LRDU getFrontFromPlace(Direction side, EntityPlayer player) {
-		return super.getFrontFromPlace(side, player).inverse();
-	}
+    @Override
+    public RealisticEnum addRealismContext(List<String> list) {
+        super.addRealismContext(list);
+        list.add(tr("This battery charger doesn't take into account battery chemistry"));
+        return RealisticEnum.IDEAL;
+    }
+
+    @Nullable
+    @Override
+    public LRDU getFrontFromPlace(@NotNull Direction side, @NotNull EntityPlayer player) {
+        return super.getFrontFromPlace(side, player).inverse();
+    }
 }

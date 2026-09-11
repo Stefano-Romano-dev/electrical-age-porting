@@ -1,6 +1,6 @@
 package mods.eln.sixnode.electricalwindsensor;
 
-import mods.eln.misc.Coordonate;
+import mods.eln.misc.Coordinate;
 import mods.eln.misc.INBTTReady;
 import mods.eln.misc.RcInterpolator;
 import mods.eln.misc.Utils;
@@ -9,7 +9,7 @@ import net.minecraft.nbt.NBTTagCompound;
 
 public class ElectricalWindSensorSlowProcess implements IProcess, INBTTReady {
 
-	ElectricalWindSensorElement element;
+    ElectricalWindSensorElement element;
 
     double timeCounter = 0;
     static final double refreshPeriode = 0.2;
@@ -17,25 +17,25 @@ public class ElectricalWindSensorSlowProcess implements IProcess, INBTTReady {
     final float premonitionTime = 120;
 
     public ElectricalWindSensorSlowProcess(ElectricalWindSensorElement element) {
-		this.element = element;
-	}
+        this.element = element;
+    }
 
-	@Override
-	public void process(double time) {
-		timeCounter += time;
-		if (timeCounter > refreshPeriode) {
-			timeCounter -= refreshPeriode;
-			Coordonate coord = element.sixNode.coordonate;
+    @Override
+    public void process(double time) {
+        timeCounter += time;
+        if (timeCounter > refreshPeriode) {
+            timeCounter -= refreshPeriode;
+            Coordinate coord = element.sixNode.coordinate;
 
-			element.outputGateProcess.setOutputNormalized(Utils.getWind(coord.dimention, coord.y) / element.descriptor.windMax);
-		}
-	}
+            element.outputGateProcess.setOutputNormalized(Utils.getWind(coord.dimension, coord.y) / element.descriptor.windMax);
+        }
+    }
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbt, String str) {
-	}
+    @Override
+    public void readFromNBT(NBTTagCompound nbt, String str) {
+    }
 
-	@Override
-	public void writeToNBT(NBTTagCompound nbt, String str) {
-	}
+    @Override
+    public void writeToNBT(NBTTagCompound nbt, String str) {
+    }
 }

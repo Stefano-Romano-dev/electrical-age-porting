@@ -4,63 +4,71 @@ import mods.eln.sim.mna.SubSystem;
 import mods.eln.sim.mna.misc.ISubSystemProcessI;
 import mods.eln.sim.mna.state.State;
 
-public class Capacitor extends Bipole  implements ISubSystemProcessI {
+public class Capacitor extends Bipole implements ISubSystemProcessI {
 
-    private double c = 0;
-    double cdt;
+    private double coulombs = 0;
+    double coulombsPerStep;
 
-	public Capacitor() {
-	}
-	
-	public Capacitor(State aPin,State bPin) {
-		connectTo(aPin, bPin);
-	}
+    public Capacitor() {}
 
-	@Override
-	public double getCurrent() {
-		return 0;
-	}
+    public Capacitor(State aPin, State bPin) {
+        connectTo(aPin, bPin);
+    }
 
-	public void setC(double c) {
-		this.c = c;
-		dirty();
-	}
+    @Override
+    public double getCurrent() {
+        return 0;
+    }
 
-	@Override
-	public void applyTo(SubSystem s) {
-		cdt = c / s.getDt();
-		
-		s.addToA(aPin, aPin, cdt);
-		s.addToA(aPin, bPin, -cdt);
-		s.addToA(bPin, bPin, cdt);
-		s.addToA(bPin, aPin, -cdt);
-	}
-	
-	@Override
-	public void simProcessI(SubSystem s) {
-		double add = (s.getXSafe(aPin) - s.getXSafe(bPin)) * cdt;
-		s.addToI(aPin, add);
-		s.addToI(bPin, -add);
-	}
-	
-	@Override
-	public void quitSubSystem() {
-		subSystem.removeProcess(this);
-		super.quitSubSystem();
-	}
+    public void setCoulombs(double coulombs) {
+        this.coulombs = coulombs;
+        dirty();
+    }
 
-	@Override
-	public void addedTo(SubSystem s) {
-		super.addedTo(s);
-		s.addProcess(this);
-	}
+    @Override
+    public void applyToSubsystem(SubSystem s) {
+        coulombsPerStep = coulombs / s.getDt();
 
-	public double getE() {
-		double u = getU();
-		return u * u * c / 2;
-	}
+        s.addToA(aPin, aPin, coulombsPerStep);
+        s.addToA(aPin, bPin, -coulombsPerStep);
+        s.addToA(bPin, bPin, coulombsPerStep);
+        s.addToA(bPin, aPin, -coulombsPerStep);
+    }
 
-	public double getC() {
-		return c;
-	}
+    @Override
+    public void simProcessI(SubSystem s) {
+        double add = (s.getXSafe(aPin) - s.getXSafe(bPin)) * coulombsPerStep;
+        s.addToI(aPin, add);
+        s.addToI(bPin, -add);
+    }
+
+    @Override
+    public void quitSubSystem() {
+        SubSystem localSubSystem = getLocalSubSystem();
+        if (localSubSystem != null) {
+            localSubSystem.removeProcess(this);
+        }
+        super.quitSubSystem();
+    }
+
+    @Override
+    public void addToSubsystem(SubSystem s) {
+        super.addToSubsystem(s);
+        s.addProcess(this);
+    }
+
+    /**
+     * getEnergy
+     * (V^2 * C) / 2 = E
+     *
+     * @return energy, in joules
+     */
+    public double getEnergy() {
+        double voltage = getVoltage();
+        return voltage * voltage * coulombs / 2;
+    }
+
+    public double getCoulombs() {
+        return coulombs;
+    }
 }

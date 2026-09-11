@@ -16,6 +16,7 @@ import mods.eln.sound.SoundClientEventListener;
 import net.minecraft.client.model.ModelSilverfish;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
+import paulscode.sound.SoundSystemConfig;
 
 public class ClientProxy extends CommonProxy {
 
@@ -44,10 +45,11 @@ public class ClientProxy extends CommonProxy {
         if (Eln.versionCheckEnabled)
             FMLCommonHandler.instance().bus().register(VersionCheckerHandler.getInstance());
 
-        if (Eln.analyticsEnabled)
-            FMLCommonHandler.instance().bus().register(AnalyticsHandler.getInstance());
-
         new FrameTime();
         new ConnectionListener();
+
+        if (Eln.soundChannels > 0) {
+            SoundSystemConfig.setNumberNormalChannels(Math.max(SoundSystemConfig.getNumberNormalChannels(), Eln.soundChannels));
+        }
     }
 }

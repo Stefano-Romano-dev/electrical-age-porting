@@ -1,26 +1,24 @@
 package mods.eln.item;
 
-import mods.eln.misc.VoltageLevelColor;
 import org.lwjgl.opengl.GL11;
 
 public class EntitySensorFilterDescriptor extends GenericItemUsingDamageDescriptorUpgrade {
 
-	public Class entityClass;
+    public Class entityClass;
 
-	float r, g, b;
+    float r, g, b;
 
-	public EntitySensorFilterDescriptor(String name, Class entityClass, float r, float g, float b) {
-		super(name);
-		this.entityClass = entityClass;
-		this.r = r;
-		this.g = g;
-		this.b = b;
-		voltageLevelColor = VoltageLevelColor.Neutral;
-	}
+    public EntitySensorFilterDescriptor(String name, Class entityClass, float r, float g, float b) {
+        super(name);
+        this.entityClass = entityClass;
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
 
-	public void glColor() {
-		GL11.glColor3f(r, g, b);
-	}
+    public void glColor() {
+        GL11.glColor3f(r, g, b);
+    }
 
     public void glColor(float intensity) {
         GL11.glColor3f(r * intensity, g * intensity, b * intensity);

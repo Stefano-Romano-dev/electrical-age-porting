@@ -1,20 +1,20 @@
 package mods.eln.sixnode.resistor;
 
 import mods.eln.Eln;
-import mods.eln.misc.Direction;
-import mods.eln.misc.LRDU;
-import mods.eln.misc.Obj3D;
-import mods.eln.misc.VoltageLevelColor;
-import mods.eln.misc.series.ISerie;
+import mods.eln.misc.*;
 import mods.eln.node.six.SixNodeDescriptor;
 import mods.eln.wiki.Data;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.IItemRenderer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
+
+import static mods.eln.i18n.I18N.tr;
 
 /**
  * Created by svein on 05/08/15.
@@ -29,13 +29,13 @@ public class ResistorDescriptor extends SixNodeDescriptor {
     public double thermalConductivityTao = Eln.cableThermalConductionTao;
     public double tempCoef;
     Obj3D.Obj3DPart ResistorBaseExtension, ResistorCore, ResistorTrack, ResistorWiper, Base, Cables;
-    ISerie series;
+    IFunction series;
     private Obj3D obj;
 
 
     public ResistorDescriptor(String name,
                               Obj3D obj,
-                              ISerie series,
+                              IFunction series,
                               double tempCoef,
                               boolean isRheostat) {
         super(name, ResistorElement.class, ResistorRender.class);
@@ -52,11 +52,6 @@ public class ResistorDescriptor extends SixNodeDescriptor {
             Cables = obj.getPart("CapacitorCables");
         }
         voltageLevelColor = VoltageLevelColor.Neutral;
-    }
-
-    @Override
-    public boolean use2DIcon() {
-        return true;
     }
 
     public double getRsValue(IInventory inventory) {
@@ -115,13 +110,22 @@ public class ResistorDescriptor extends SixNodeDescriptor {
         }
     }
 
+    @Nullable
     @Override
-    public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List list, boolean par4) {
+    public LRDU getFrontFromPlace(@NotNull Direction side, @NotNull EntityPlayer player) {
+        return super.getFrontFromPlace(side, player).left();
+    }
+
+
+    @Override
+    public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List<String> list, boolean par4) {
         super.addInformation(itemStack, entityPlayer, list, par4);
+        list.add(tr("It's a resistor"));
     }
 
     @Override
-    public LRDU getFrontFromPlace(Direction side, EntityPlayer player) {
-        return super.getFrontFromPlace(side, player).left();
+    public RealisticEnum addRealismContext(List<String> list) {
+        super.addRealismContext(list);
+        return RealisticEnum.REALISTIC;
     }
 }
