@@ -15,3 +15,17 @@ Cronologia sintetica. I dettagli tecnici appartengono agli altri documenti; qui 
 - Nessun codice del port implementato; `modern/` resta vuota.
 
 Punto di ripresa: creare e verificare la baseline NeoForge del milestone M0.
+
+## 12 settembre 2026 — Milestone M0 completato
+
+- Creato `modern/` dall'MDK ufficiale NeoForge per Minecraft 1.21.1.
+- Fissate le versioni NeoForge 21.1.250, ModDevGradle 2.0.146, Gradle 9.2.1, Parchment 2024.11.17 e Java 21.
+- Impostati mod id `eln`, package `mods.eln`, metadata, licenze e traduzioni minime.
+- Aggiunti un entry point minimale e un test JUnit 5 della baseline.
+- Corrette la dipendenza runtime del launcher JUnit e la rinomina della licenza nel JAR.
+- Superati test, clean build, avvio client e avvio dedicated server.
+- Aggiunto il workflow GitHub Actions di build nella radice del repository, con Java 21 e working directory `modern/`.
+- Ispezionato il JAR: nessun residuo `examplemod` e nessuna dipendenza CoFH.
+- Registrata D-007: entry point Java e introduzione controllata di Kotlin nel milestone M1.
+
+Punto di ripresa: definire il confine del modulo di simulazione e portare il primo nucleo MNA con test numerici, senza dipendenze Minecraft/NeoForge.

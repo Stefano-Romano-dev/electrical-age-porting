@@ -1,10 +1,10 @@
 # Stato del porting di Electrical Age
 
-Aggiornato: 11 settembre 2026
+Aggiornato: 12 settembre 2026
 
 ## Stato generale
 
-**Fase corrente: analisi iniziale completata; implementazione non iniziata.**
+**Fase corrente: milestone M0 completata; prossimo lavoro sul core di simulazione (M1).**
 
 Target confermato:
 
@@ -13,7 +13,17 @@ Target confermato:
 - sorgente legacy in `original/`;
 - nuovo progetto in `modern/`.
 
-`modern/` è attualmente vuota. Nessun file dell'implementazione originale è stato modificato.
+`modern/` contiene una baseline NeoForge funzionante derivata dall'MDK ufficiale. Nessun file sotto `original/` è stato modificato durante la creazione della baseline.
+
+Toolchain fissata:
+
+- Minecraft 1.21.1;
+- NeoForge 21.1.250;
+- ModDevGradle 2.0.146;
+- Parchment 2024.11.17;
+- Gradle 9.2.1;
+- Java 21;
+- mod id `eln`, versione iniziale `0.1.0-alpha.1`.
 
 ## Avanzamento
 
@@ -27,9 +37,9 @@ Target confermato:
 - [x] Definita la strategia a milestone e il primo vertical slice.
 - [x] Creata la documentazione operativa per roadmap, decisioni, inventario, verifiche, problemi, risorse e diario.
 - [x] Creato `AGENTS.md` con le regole persistenti del workspace.
-- [ ] Creare il workspace NeoForge 1.21.1 in `modern/`.
-- [ ] Ottenere una build vuota riproducibile.
-- [ ] Avviare client e dedicated server.
+- [x] Creato il workspace NeoForge 1.21.1 in `modern/`.
+- [x] Ottenuta una clean build riproducibile e un test JUnit 5 minimale.
+- [x] Avviati client e dedicated server con caricamento del mod `eln`.
 - [ ] Estrarre e portare il core di simulazione con i test.
 - [ ] Implementare il primo SixNode verticale.
 
@@ -55,21 +65,19 @@ Target confermato:
 - 144 file usano LWJGL direttamente e circa 173 sono legati al rendering legacy.
 - 708 resource path contengono maiuscole o spazi e richiedono normalizzazione tracciata.
 - `NodeManager` è globale e `NodeManagerNbt.writeToNBT` non scrive lo stato: l'ownership e la persistenza devono essere ridisegnate.
-- CoFH Core è effettivamente necessario nella 1.24.8: la relazione Modrinth è `required` e `Other.modIdTe = "Eln"` rende sempre attiva l'integrazione RF che implementa `IEnergyHandler`.
+- CoFH Core è effettivamente necessario nella 1.24.8: la relazione Modrinth è `required` e `Other.modIdTe = "Eln"` rende sempre attiva l'integrazione RF che implementa `IEnergyHandler`. Il JAR moderno verificato non lo dichiara.
 - La macchina dispone già di Java 21 a 64 bit (Temurin 21.0.11).
 - `original/` non ha un `.git` proprio; il repository Git effettivo è la radice del workspace e contiene modifiche/cancellazioni preesistenti che non devono essere alterate.
 
-## Prossimo milestone: baseline NeoForge
+## Prossimo milestone: core di simulazione
 
-Deliverable previsto:
+Deliverable previsto per M1:
 
-- MDK NeoForge fissato a Minecraft 1.21.1 dentro `modern/`;
-- mod id `eln` e package definitivi;
-- build Gradle riuscita;
-- avvio `runClient` riuscito;
-- avvio `runServer` riuscito senza riferimenti client-only;
-- test minimale eseguito in CI/localmente;
-- aggiornamento di questo file con versioni esatte, comandi e risultati.
+- struttura `mods.eln.sim` senza import Minecraft/NeoForge;
+- port incrementale del solver MNA e delle quantità fisiche necessarie;
+- test originali rilevanti adattati e fixture numeriche di confronto;
+- lifecycle del simulatore controllabile nei test;
+- scelta e documentazione del supporto Kotlin senza imporre KotlinForForge come dipendenza del mod.
 
 Il dettaglio tecnico e la roadmap completa sono in [ANALISI_PORTING.md](./ANALISI_PORTING.md).
 

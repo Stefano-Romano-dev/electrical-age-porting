@@ -53,6 +53,17 @@ Gli elementi ricevono un id stabile. Quando risolti, conservarli con stato `riso
 - Descrizione: 708 percorsi contengono maiuscole o spazi.
 - Mitigazione prevista: manifest di rinomina, audit automatico e verifica su ambiente case-sensitive/CI.
 
+## P-007 — Deprecazioni Gradle nella toolchain corrente
+
+- Stato: aperto, non bloccante
+- Gravità: bassa
+- Area: build
+- Rilevato: 12 settembre 2026
+- Descrizione: test e build segnalano API deprecate che diventeranno incompatibili con Gradle 10.
+- Evidenza: warning emesso da Gradle 9.2.1 anche sulla baseline derivata dall'MDK ufficiale.
+- Impatto: nessuno sul target attuale; possibile lavoro richiesto quando ModDevGradle o il wrapper verranno aggiornati.
+- Mitigazione prevista: mantenere Gradle 9.2.1 fissato per il port e rieseguire periodicamente con `--warning-mode all` dopo aggiornamenti di ModDevGradle.
+
 ## Modello
 
 ```text

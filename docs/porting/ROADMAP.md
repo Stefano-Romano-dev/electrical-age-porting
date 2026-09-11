@@ -1,21 +1,25 @@
 # Roadmap
 
-Aggiornata: 11 settembre 2026
+Aggiornata: 12 settembre 2026
 
 ## M0 — Baseline NeoForge
+
+Stato: **completato il 12 settembre 2026**.
 
 Obiettivo: progetto vuoto riproducibile per Minecraft 1.21.1, NeoForge e Java 21.
 
 Criteri di uscita:
 
-- build Gradle riuscita;
-- mod `eln` caricata;
-- client avviato;
-- dedicated server avviato senza classloading client;
-- versioni della toolchain fissate e registrate;
-- CI minima o comandi locali riproducibili.
+- [x] build Gradle riuscita;
+- [x] mod `eln` caricata;
+- [x] client avviato;
+- [x] dedicated server avviato senza classloading client;
+- [x] versioni della toolchain fissate e registrate;
+- [x] test e comandi locali riproducibili.
 
 ## M1 — Core di simulazione
+
+Stato: **prossimo milestone**.
 
 Obiettivo: solver MNA e processi fisici essenziali indipendenti dal gioco.
 

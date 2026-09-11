@@ -52,6 +52,17 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Conseguenza: asset placeholder o modelli semplificati sono ammessi durante lo sviluppo, ma non soddisfano il completamento del relativo contenuto.
 - Verifica prevista: confronto affiancato con la 1.24.8 tramite screenshot/video di riferimento e checklist per ogni famiglia di contenuti.
 
+## D-007 — Entry point e uso di Kotlin
+
+- Stato: accettata
+- Data: 12 settembre 2026
+- Contesto: la sorgente 1.24.8 contiene sia Java sia Kotlin, ma KotlinForForge non deve diventare accidentalmente una dipendenza obbligatoria del port.
+- Scelta: mantenere in Java l'entry point NeoForge; introdurre Kotlin nel milestone M1 come linguaggio JVM ordinario soltanto dopo averne fissato plugin, runtime e packaging.
+- Alternative considerate: usare subito KotlinForForge come loader/libreria obbligatoria; riscrivere tutto il core in Java.
+- Motivo: separare il rischio della piattaforma dal port del core e preservare il codice Kotlin utile senza vincolare l'avvio del mod a un'integrazione non ancora verificata per NeoForge 1.21.1.
+- Conseguenze: il JAR M0 non ha dipendenze esterne oltre a Minecraft e NeoForge; la configurazione Kotlin dovrà essere verificata con test e dedicated server in M1.
+- Verifica prevista: compilazione mista Java/Kotlin, inclusione controllata del runtime e avvio su client/server senza KotlinForForge.
+
 ## Modello per nuove decisioni
 
 ```text
