@@ -67,3 +67,11 @@ Punto di ripresa: portare linee e collegamenti inter-system con le relative fixt
 - Registrata D-010 per mantenere queste astrazioni prima di qualunque sostituzione del solver.
 
 Punto di ripresa: portare condensatore, induttore e componenti/processi dinamici essenziali con fixture temporali della 1.24.8.
+
+## 12 settembre 2026 — Contratto di fedeltà rafforzato
+
+- L'utente ha chiarito che il port completo non deve presentare differenze percepibili rispetto alla 1.24.8 durante il gioco.
+- Registrata D-011 e creato `FEDELTA.md` come matrice permanente delle prove di parità e delle sole differenze esplicitamente autorizzate.
+- Rafforzate le istruzioni del workspace: niente miglioramenti, semplificazioni o correzioni legacy silenziose.
+
+Punto di ripresa invariato: componenti dinamici essenziali, misurando anche la parità temporale oltre a quella numerica.

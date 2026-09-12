@@ -200,6 +200,8 @@ La seconda opzione minimizza il rischio iniziale. La lingua può essere uniforma
 
 ## Strategia consigliata
 
+La definizione di completamento non è una semplice equivalenza di feature: Electrical Age 1.24.8 resta il riferimento canonico dell'esperienza percepita. Il port può modernizzare internamente API e architettura, ma comportamento, tempi, interazioni, progressione, resa audiovisiva e persistenza devono risultare equivalenti; le eccezioni sono tracciate in `docs/porting/FEDELTA.md`.
+
 ### Principio
 
 Costruire un “walking skeleton” completo e poi ampliare il catalogo. Ogni fase deve terminare con build, test e avvio su client e dedicated server.

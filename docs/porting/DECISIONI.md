@@ -97,6 +97,17 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Conseguenze: `Component` e `State` distinguono appartenenza diretta e appartenenza tramite un `IAbstractor`; il break di un sottosistema collegato propaga agli altri e ripristina la topologia concreta.
 - Verifica eseguita: catena resistiva, rete da 105 stati, distruzione dell'astrazione e circuito legacy a due reti con valori numerici attesi.
 
+## D-011 — Parità percepita come definizione di completamento
+
+- Stato: accettata
+- Data: 12 settembre 2026
+- Contesto: la fedeltà funzionale ed estetica, considerate separatamente, non garantiscono che un giocatore esperto percepisca la stessa esperienza complessiva.
+- Scelta: Electrical Age 1.24.8 è il riferimento canonico; un contenuto è completo solo quando comportamento, tempi, interazioni, progressione, presentazione, audio e persistenza applicabili risultano equivalenti secondo `FEDELTA.md`.
+- Alternative considerate: conservare soltanto le funzionalità principali; modernizzare liberamente UX e bilanciamento.
+- Motivo: l'utente richiede che, a port completato, le differenze non siano percepibili durante il gioco.
+- Conseguenze: nessun miglioramento o bugfix legacy viene introdotto silenziosamente; le differenze imposte dalla piattaforma sono minimizzate e documentate, quelle intenzionali richiedono approvazione esplicita.
+- Verifica prevista: scenari gemelli 1.24.8/1.21.1, fixture numeriche e temporali, confronti visivi e audio, save/reload, chunk reload e multiplayer secondo il contenuto.
+
 ## Modello per nuove decisioni
 
 ```text

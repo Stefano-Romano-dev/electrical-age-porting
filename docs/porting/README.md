@@ -12,6 +12,7 @@ Questo indice separa informazioni con cicli di vita diversi, evitando che un uni
 | [`VERIFICHE.md`](VERIFICHE.md) | Registro riproducibile di build, test e prove | Dopo ogni verifica eseguita |
 | [`PROBLEMI.md`](PROBLEMI.md) | Bug, rischi concreti, blocchi e debito tecnico | Quando un problema viene trovato o risolto |
 | [`RISORSE.md`](RISORSE.md) | Migrazione, rinomina, conversione e licenze degli asset | Durante ogni operazione sulle risorse |
+| [`FEDELTA.md`](FEDELTA.md) | Contratto di parità percepita e matrice delle differenze | Per ogni contenuto portato o differenza intenzionale |
 | [`DIARIO.md`](DIARIO.md) | Cronologia sintetica del lavoro | Alla fine di ogni sessione significativa |
 
 ## Regola contro le duplicazioni
@@ -21,6 +22,7 @@ Questo indice separa informazioni con cicli di vita diversi, evitando che un uni
 - Un comando e il suo risultato vivono in `VERIFICHE.md`.
 - Un bug aperto vive in `PROBLEMI.md`.
 - I dettagli per singolo dispositivo o id vivono in `INVENTARIO.md`.
+- Le prove di equivalenza e le differenze approvate vivono in `FEDELTA.md`.
 
 ## Stato iniziale
 

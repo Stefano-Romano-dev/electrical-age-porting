@@ -92,6 +92,13 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 - Test presenti: 23 totali, 0 fallimenti/errori; sette appartengono a `LineInterSystemParityTest`.
 - Isolamento: nessun import Minecraft/NeoForge sotto `modern/src/main/kotlin/mods/eln/sim`.
 
+## 12 settembre 2026 — Contratto documentale di fedeltà
+
+- Revisione/stato: working tree successivo a `afa6cc3`; sola documentazione, nessun codice o asset runtime modificato.
+- `git diff --check`: superato; soltanto avvisi informativi sulla futura conversione LF/CRLF di Git.
+- Ricerca dei riferimenti a D-011 e `FEDELTA.md`: superata in istruzioni, analisi, stato e indice documentale.
+- Build non ripetuta: la modifica non interessa sorgenti, risorse runtime o configurazione Gradle.
+
 ## Modello di registrazione
 
 ```text

@@ -17,6 +17,8 @@ Portare Electrical Age 1.24.8 da Minecraft Forge 1.7.10 a Minecraft 1.21.1 con N
 
 - Preservare il comportamento e i risultati numerici del solver prima di rifattorizzarlo.
 - Preservare anche l'identità estetica originale: geometrie, proporzioni, texture, palette, animazioni, GUI, particelle e suoni. Le sostituzioni provvisorie non sono asset finali.
+- Considerare Electrical Age 1.24.8 il riferimento canonico dell'esperienza: a port completato il giocatore non deve percepire differenze nel comportamento, nei tempi, nelle interazioni, nella progressione o nella presentazione del mod, salvo eccezioni imposte dalla piattaforma e documentate.
+- Non correggere, semplificare o reinterpretare automaticamente comportamenti e particolarità legacy. Ogni differenza intenzionale richiede approvazione esplicita dell'utente e registrazione in `docs/porting/FEDELTA.md`.
 - Tenere il core di simulazione indipendente da Minecraft, NeoForge, rendering e networking.
 - Evitare singleton globali legati al server; rendere esplicita l'ownership per server, livello e chunk.
 - Usare id namespaced stabili al posto di metadata e ItemStack damage legacy.
@@ -51,6 +53,7 @@ Quando esisterà la build moderna, ogni milestone deve includere in proporzione 
 - GameTest o verifica manuale per il comportamento nel mondo;
 - save/reload e chunk unload/reload per lo stato persistente;
 - prova multiplayer per networking o sincronizzazione.
+- confronto di parità con la 1.24.8 secondo `docs/porting/FEDELTA.md`, includendo evidenze visive o numeriche pertinenti.
 
 Annotare sempre il comando esatto e l'esito. Non descrivere una verifica come superata se non è stata eseguita nella versione corrente del codice.
 

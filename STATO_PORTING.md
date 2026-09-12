@@ -56,6 +56,7 @@ Toolchain fissata:
 8. La compatibilità diretta dei mondi 1.7.10 non è parte del primo milestone.
 9. Il dedicated server è un criterio di verifica obbligatorio, non un test finale opzionale.
 10. Il port deve essere fedele anche esteticamente alla 1.24.8; placeholder e semplificazioni non costituiscono asset finali.
+11. La parità percepita con la 1.24.8 è la definizione di completamento; ogni differenza intenzionale richiede approvazione esplicita e tracciamento.
 
 ## Rilevazioni importanti
 
