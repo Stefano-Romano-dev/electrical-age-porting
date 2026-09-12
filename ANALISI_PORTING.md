@@ -60,6 +60,10 @@ Il passo termico legacy è esplicito e sensibile all'ordine: calcola prima i flu
 
 Lo scheduler legacy usa tre accumulatori temporali e sceglie il prossimo sottopasso confrontando `electricalTimeout` e `thermalTimeout`. A parità iniziale privilegia l'elettrico (`<=`), perciò il primo tick include un solve a tempo zero e uno al limite del tick; dai tick successivi il ritmo si assesta. Prima e dopo il loop esegue, nell'ordine, slow-pre, termico slow fisso a 0,05 s, slow, distruzioni differite e slow-post. Il `Simulator` moderno conserva questa sequenza senza dipendere dall'evento server; un adapter NeoForge dovrà soltanto invocare `tick()` nella fase server corretta.
 
+La batteria legacy usa `Q` come carica normalizzata rispetto a `QNominal`, ricava la tensione da una `FunctionTable` e calcola l'energia con esattamente 50 rettangoli. L'invecchiamento è quadratico rispetto alla corrente normalizzata, ha vita minima 0,1 e dipende da una configurazione globale; nel core moderno la lettura dinamica della configurazione è rappresentata da `BatteryAgingPolicy`. La distruzione resta un metodo astratto da collegare al nodo, mentre `BatteryState` conserva i suffissi NBT `NBPQ` e `NBPlife`.
+
+Il regolatore analogico non è un PID convenzionale: il termine derivativo moltiplica per `time`, il clamp inferiore dell'integrale usa `-1 + fP` e la riconfigurazione dei guadagni azzera l'integrale soltanto dopo il boot. Queste formule sono state mantenute. `RegulatorState` separa `errorIntegrated` e `target` dalla codifica NBT, conservando le chiavi composte legacy.
+
 ### 2. Sistema dei nodi
 
 Il gameplay si basa su tre famiglie:

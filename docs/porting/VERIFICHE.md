@@ -162,6 +162,18 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 - Isolamento statico: nessun import Minecraft/NeoForge nel package core, verificato dalla suite.
 - Limiti dichiarati: l'adapter evento NeoForge, ownership per server/livello, batterie, regolatori, persistenza e room manager moderno restano aperti.
 
+## 12 settembre 2026 — Curve, batterie e regolatori
+
+- Revisione/stato: working tree successivo a `5af78ad`.
+- Portata verificata: `IFunction`, `FunctionTable`, `FunctionTableYProtect`, `BatteryProcess`, `BatterySlowProcess`, `BatteryAgingPolicy`, regolatore base e adapter forno/resistore.
+- Primo `test`: fallito in compilazione test; la proprietà fixture `hit` generava `getHit()` e collideva con il metodo astratto. Rinominata in `measuredValue`, senza modifica alla produzione.
+- Secondo `$env:GRADLE_USER_HOME = (Resolve-Path '.\.gradle').Path; .\gradlew.bat test`: superato, 108 test e 0 fallimenti/errori.
+- Esteso successivamente `CoreIsolationTest` a entrambi i root puri `mods/eln/sim` e `mods/eln/misc`.
+- Comando finale `$env:GRADLE_USER_HOME = (Resolve-Path '.\.gradle').Path; .\gradlew.bat clean build --no-daemon`, eseguito con accesso coerente alla cache: superato in 13 s, 11 task (9 eseguiti e 2 da cache), 108 test e 0 fallimenti/errori.
+- Parità coperta: interpolazione/estrapolazione e clamp, carica/scarica e calore, energia a 50 campioni, scaling vita, aging quadratico e policy off, sovratensione, modalità regolatore, isteresi, PID legacy, soglie del resistore e snapshot.
+- Schemi preservati: batteria `NBPQ`/`NBPlife`; regolatore `prefix + name + errorIntegrated/target`.
+- Limiti dichiarati: codec `CompoundTag`, distruzione del nodo, configurazione server e prove su dispositivi nel mondo non fanno parte di questa slice.
+
 ## Modello di registrazione
 
 ```text

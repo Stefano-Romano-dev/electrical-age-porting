@@ -4,7 +4,7 @@ Aggiornato: 12 settembre 2026
 
 ## Stato generale
 
-**Fase corrente: milestone M1 in corso; scheduler multi-rate puro e inizializzazione termica completati.**
+**Fase corrente: milestone M1 in corso; batterie, curve e regolatori puri completati.**
 
 Target confermato:
 
@@ -104,6 +104,9 @@ Avanzamento M1 verificato:
 - portato lo scheduler `Simulator` senza event bus, con periodi elettrico/termico, fasi slow, coda distruzioni e classificazione fast/slow;
 - portati gli inizializzatori termici con validazione di stabilità posseduta dallo scheduler, `FurnaceProcess`, `DiodeProcess`, conversione resistiva legacy, `Integrator` e `Differentiator`;
 - fissate con fixture le sequenze multi-rate e le particolarità di startup/reset; la suite completa raggiunge 86 test superati;
+- portate `FunctionTable`/`FunctionTableYProtect`, batteria, invecchiamento configurabile, regolatore on-off/analogico e adapter puri forno/resistore;
+- introdotti snapshot puri per batteria e regolatore con schema legacy conservato, rimandando la codifica NBT al layer di persistenza moderno;
+- aggiunte 22 fixture per curve, carica, energia, aging, distruzione e regolazione; la suite completa raggiunge 108 test superati;
 - dedicated server avviato con caricamento effettivo del runtime Kotlin 2.4.20.
 
 Il dettaglio tecnico e la roadmap completa sono in [ANALISI_PORTING.md](./ANALISI_PORTING.md).

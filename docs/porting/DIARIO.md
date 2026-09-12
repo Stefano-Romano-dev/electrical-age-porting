@@ -123,3 +123,14 @@ Punto di ripresa: portare inizializzatori termici e processi energetici puri suc
 - Aggiunte 18 fixture; suite da 86 test e clean build superate.
 
 Punto di ripresa: portare curve numeriche, batteria, invecchiamento configurabile e regolatori, separando lo stato persistente dagli adapter NeoForge.
+
+## 12 settembre 2026 — M1, curve, batterie e regolatori
+
+- Portate le tabelle di funzione con interpolazione, estrapolazione, protezione Y e duplicazione legacy.
+- Portate batteria e aging con policy esplicita al posto del singleton `SaveConfig`; la distruzione resta un confine astratto.
+- Portati regolatore None/Manual/OnOff/Analog e adapter termici, mantenendo le formule PID non convenzionali.
+- Aggiunti snapshot puri e registrati gli schemi NBT legacy senza importare API Minecraft nel core.
+- Registrati P-015, P-016 e P-017 per impedire correzioni silenziose di sovraccarica, derivata e cache della curva.
+- Aggiunte 22 fixture; suite da 108 test e clean build superate.
+
+Punto di ripresa: portare watchdog/distruzione puri, auditare i processi M1 ancora mancanti e progettare gli adapter `CompoundTag` fuori dal core.

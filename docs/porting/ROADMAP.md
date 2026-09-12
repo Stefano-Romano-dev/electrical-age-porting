@@ -32,8 +32,9 @@ Criteri di uscita:
 - [x] dipendenza matematica e packaging definiti per il primo slice.
 - [x] primo strato fisico puro: carichi e connessioni elettriche/termiche, conversione Joule→calore e passo termico deterministico.
 - [x] scheduler multi-rate puro con inizializzatori termici, fasi slow e validazione di stabilità.
+- [x] curve numeriche, batteria, aging e regolatori con snapshot persistenti puri.
 
-Prossimo slice: batterie, curve numeriche e regolatori puri con stato persistente separato dagli adapter NeoForge.
+Prossimo slice: watchdog e distruzione pura, quindi audit di completezza dei processi M1 e definizione del confine di persistenza NeoForge.
 
 ## M2 — Primo SixNode verticale
 

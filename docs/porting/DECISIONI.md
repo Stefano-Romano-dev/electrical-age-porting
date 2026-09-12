@@ -130,6 +130,17 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Conseguenze: resta da decidere l'ownership concreta server/livello/chunk; il solve elettrico aggiuntivo al primo tick e il periodo slow fisso a 0,05 s vengono conservati.
 - Verifica eseguita: fixture su conteggi a 20/400 Hz, ordine delle sette fasi, autorimozione dei processi slow, classificazione fast/slow e validazione termica.
 
+## D-014 — Policy configurabili e snapshot separati dalla piattaforma
+
+- Stato: accettata
+- Data: 12 settembre 2026
+- Contesto: batteria e regolatore legacy leggono rispettivamente `SaveConfig.instance` e `NBTTagCompound`, introducendo singleton e API Minecraft nel core.
+- Scelta: rappresentare l'opzione di aging con `BatteryAgingPolicy` iniettata a ogni processo e lo stato persistente con `BatteryState`/`RegulatorState`; codec e adapter NeoForge saranno esterni al core.
+- Alternative considerate: mantenere una configurazione statica globale; importare `CompoundTag` direttamente nei processi; rimandare interamente batteria e regolatori.
+- Motivo: formule e lettura dinamica dell'opzione restano verificabili, mentre ownership della configurazione e formato di storage possono essere assegnati correttamente a server/livello.
+- Conseguenze: i costruttori moderni ricevono esplicitamente la policy; gli adapter futuri devono conservare suffissi, chiavi e riparazione dei valori non finiti documentati nell'inventario.
+- Verifica eseguita: aging abilitato/disabilitato, snapshot validi/non finiti e composizione esatta delle chiavi legacy.
+
 ## Modello per nuove decisioni
 
 ```text

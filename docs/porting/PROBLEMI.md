@@ -140,6 +140,39 @@ Gli elementi ricevono un id stabile. Quando risolti, conservarli con stato `riso
 - Impatto: un regolatore o filtro riutilizzato può produrre un impulso diverso da un'istanza nuova.
 - Mitigazione prevista: preservare finché non sono stati auditati tutti i chiamanti; nessuna correzione senza approvazione esplicita.
 
+## P-015 — La batteria ricaricabile non limita `Q` superiormente
+
+- Stato: aperto, comportamento legacy preservato
+- Gravità: media
+- Area: batteria
+- Rilevato: 12 settembre 2026
+- Descrizione: durante la ricarica `BatteryProcess` applica soltanto `max(Q - deltaQ, 0)`; non esiste un clamp a 1 e `Q/life` può superare il dominio nominale della curva.
+- Riproduzione/evidenza: fixture da `Q=0,9` con corrente di ricarica porta a `Q=1,2`.
+- Impatto: `FunctionTable` estrapola oltre l'ultimo punto e può produrre tensioni superiori al profilo nominale, attivando poi la distruzione per sovratensione.
+- Mitigazione prevista: preservare per fedeltà e verificare la traiettoria di una batteria reale nella vertical slice.
+
+## P-016 — Termine derivativo del regolatore moltiplicato per il tempo
+
+- Stato: aperto, comportamento legacy preservato
+- Gravità: media
+- Area: regolazione
+- Rilevato: 12 settembre 2026
+- Descrizione: il termine D usa `(hit - hitLast) * D * time` anziché dividere per l'intervallo; il comportamento dipende quindi dalla frequenza in modo non convenzionale.
+- Riproduzione/evidenza: fixture analogica con `time=2` e comando risultante 0,2.
+- Impatto: cambiare frequenza o “correggere” la derivata altera risposta, overshoot e tempi percepiti dei regolatori.
+- Mitigazione prevista: conservare formula e periodi D-013; nessuna correzione senza confronto su dispositivi reali e approvazione.
+
+## P-017 — `FunctionTable.xMax` non aggiorna le scale in cache
+
+- Stato: aperto, comportamento legacy preservato
+- Gravità: bassa
+- Area: curve numeriche
+- Rilevato: 12 settembre 2026
+- Descrizione: `xMaxInv` e `xDelta` sono calcolati soltanto nel costruttore; assegnare successivamente `xMax` non li ricalcola.
+- Riproduzione/evidenza: dopo il cambio `xMax` da 1 a 2, `getValue(1)` continua a usare la vecchia scala e restituisce il valore finale.
+- Impatto: eventuali chiamanti che mutano la scala possono osservare una curva incoerente con il campo pubblico.
+- Mitigazione prevista: preservare e auditare i chiamanti prima di decidere se rendere immutabile o sincronizzare il campo.
+
 ## Modello
 
 ```text

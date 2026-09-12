@@ -47,7 +47,12 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 | Inizializzatori termici | stesso package logico, validator esplicito | verificato, core | formule `Rs`/`Rp`/`C`, copia, applicazione e rifiuto instabile |
 | `FurnaceProcess`, `DiodeProcess`, conversione resistiva | stesso package logico | verificato, core | consumo combustibile, clamp gain, segno del diodo e potenza Joule |
 | `Integrator`, `Differentiator` | stesso package logico | verificato, core | sequenze campione-per-campione e reset legacy |
-| Simulazione termica | `mods.eln.sim` | core indipendente + adapter ambiente | implementato, parità parziale | Batterie, regolatori, watchdog e adapter stanza/persistenza restano aperti |
+| `FunctionTable`, `FunctionTableYProtect` | `mods.eln.misc` puro | verificato, core | interpolazione, estrapolazione, clamp, duplicazione e cache scale legacy |
+| `BatteryProcess`, `BatterySlowProcess` | `mods.eln.sim` + `BatteryAgingPolicy` | verificato, core | carica/scarica, calore di ricarica, energia a 50 campioni, vita, aging e distruzione astratta |
+| `RegulatorProcess` e adapter termici | `mods.eln.sim` | verificato, core | None/Manual/OnOff/Analog, reset guadagni, clamp e soglie resistenza |
+| Persistenza batteria | `BatteryState` + futuro codec/adapter | schema mappato, adapter rimandato | suffissi legacy `NBPQ`, `NBPlife`; valori non finiti riparati come in origine |
+| Persistenza regolatore | `RegulatorState` + futuro codec/adapter | schema mappato, adapter rimandato | chiavi `prefix + name + errorIntegrated/target`; solo integrale NaN riparato |
+| Simulazione termica | `mods.eln.sim` | core indipendente + adapter ambiente | implementato, parità parziale | Watchdog, adapter stanza e persistenza concreta restano aperti |
 | SixNode | `mods.eln.node.six` | block entity host + component registry | mappato | Priorità M2 |
 | TransparentNode | `mods.eln.node.transparent` | block/block entity moderni | da analizzare | Port per famiglie |
 | SimpleNode | `mods.eln.node.simple`, `simplenode` | blocchi/capability moderni | da analizzare | Include integrazioni |
