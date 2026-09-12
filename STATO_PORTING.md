@@ -4,7 +4,7 @@ Aggiornato: 12 settembre 2026
 
 ## Stato generale
 
-**Fase corrente: milestone M1 in corso; componenti MNA avanzati in verifica finale.**
+**Fase corrente: milestone M1 in corso; audit strutturale del package MNA completato.**
 
 Target confermato:
 
@@ -89,13 +89,15 @@ Avanzamento M1 verificato:
 - portati `SubSystem`, `State`, `VoltageState`, `CurrentState`, `Component`, `Bipole`, `Resistor`, `CurrentSource` e `VoltageSource`;
 - superati i due circuiti esempio della 1.24.8, un partitore, il caso singolare e l'invalidazione dinamica della matrice/RHS;
 - portati ownership esplicita di `RootSystem`, generazione deterministica dei sottosistemi con confini privati, break/rebuild, oversampling pre-step, flush globale e distruttori;
-- aggiunti nove test del lifecycle di root, inclusa la non-riregistrazione di componenti rimossi;
+- aggiunti nove test del lifecycle di root; l'audit successivo ha riallineato la riscoperta legacy dei componenti rimossi ma non scollegati;
 - portate la compressione delle catene resistive in `Line`, la soglia legacy di 100 stati, `InterSystemAbstraction` e l'equivalente di Thévenin;
 - verificata la convergenza dell'esempio legacy a due reti prima e dopo l'aggiunta di un carico;
 - portati `Capacitor`, `Inductor` e `Delay` con semantica temporale backward Euler e stato interno legacy;
 - verificate traiettorie RC/RL campione per campione e la progressione interna di `Delay`;
 - portati `ResistorSwitch`, `Transformer`, `PowerSource`, `PowerSourceBipole` e `TransformerInterSystemProcess`;
 - verificati rapporti del trasformatore, limiti tensione/corrente, potenza effettiva, fallback NaN e lifecycle dei processi root;
+- completata la corrispondenza dei 30 tipi MNA legacy con `Monopole` e `SubSystemDebugSnapshot`;
+- riallineate semantiche di teardown e connettività emerse dall'audit; gli adapter persistenti e i chiamanti reali restano da verificare;
 - dedicated server avviato con caricamento effettivo del runtime Kotlin 2.4.20.
 
 Il dettaglio tecnico e la roadmap completa sono in [ANALISI_PORTING.md](./ANALISI_PORTING.md).

@@ -166,7 +166,7 @@ class RootSystemLifecycleTest {
     }
 
     @Test
-    fun `removed component is not rediscovered through stale state connectivity`() {
+    fun `removed component is rediscovered through stale state connectivity like legacy`() {
         val root = RootSystem(dt = 0.1, interSystemOverSampling = 1)
         val node = VoltageState()
         val resistor = Resistor(node, null)
@@ -179,8 +179,8 @@ class RootSystemLifecycleTest {
         root.generate()
 
         assertFalse(resistor in root.pendingComponents)
-        assertNull(resistor.subSystem)
-        assertTrue(root.findSubSystemWith(node)?.components.orEmpty().isEmpty())
+        assertSame(root.findSubSystemWith(node), resistor.subSystem)
+        assertTrue(resistor in root.findSubSystemWith(node)?.components.orEmpty())
     }
 
     @Test

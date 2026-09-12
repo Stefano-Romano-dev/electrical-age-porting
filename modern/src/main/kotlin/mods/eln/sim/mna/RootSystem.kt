@@ -13,11 +13,6 @@ class RootSystem(
     val dt: Double,
     val interSystemOverSampling: Int,
 ) {
-    init {
-        require(dt > 0.0 && dt.isFinite()) { "dt must be finite and positive" }
-        require(interSystemOverSampling > 0) { "interSystemOverSampling must be positive" }
-    }
-
     val systems = mutableListOf<SubSystem>()
     val pendingComponents = linkedSetOf<Component>()
     val pendingStates = linkedSetOf<State>()
@@ -115,7 +110,7 @@ class RootSystem(
             if (!states.add(state)) continue
 
             for (component in state.connectedComponentsNotAbstracted()) {
-                if (component !in pendingComponents || component.subSystem != null || component in components) continue
+                if (component.subSystem != null || component in components) continue
                 if (!privateSystem && queue.size + states.size > MAX_SUBSYSTEM_SIZE && component.canBeReplacedByInterSystem()) {
                     continue
                 }
@@ -143,7 +138,7 @@ class RootSystem(
     private fun isValidForLine(state: State): Boolean {
         if (!state.canBeSimplifiedByLine()) return false
         val connected = state.connectedComponentsNotAbstracted()
-        return connected.size == 2 && connected.all { it is Resistor && it in pendingComponents }
+        return connected.size == 2 && connected.all { it is Resistor }
     }
 
     private fun generateLines() {

@@ -83,7 +83,7 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Scelta: ogni simulazione possiede un'istanza esplicita di `RootSystem`; stati, componenti e sottosistemi sono raccolti in ordine deterministico e la modifica di una rete ne provoca break e rigenerazione controllati.
 - Alternative considerate: conservare un root globale; affidare immediatamente il lifecycle agli eventi NeoForge.
 - Motivo: il core resta testabile senza gioco e l'ownership potrà essere assegnata esplicitamente a server, livello o chunk nel milestone del mondo.
-- Conseguenze: la politica concreta di partizionamento per livello/chunk resta da decidere in M2; componenti rimossi sono esclusi dalla traversata anche se un oggetto `State` conserva temporaneamente il vecchio collegamento.
+- Conseguenze: la politica concreta di partizionamento per livello/chunk resta da decidere in M2; la traversata conserva la semantica legacy e può riscoprire un componente rimosso se non è stato prima scollegato dagli stati.
 - Verifica eseguita: nove test coprono generazione, soluzione, break/rebuild, confini privati, processi, rimozione e distruttori.
 
 ## D-010 — Conservazione delle astrazioni Line e inter-system

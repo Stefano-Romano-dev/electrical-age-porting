@@ -96,6 +96,17 @@ Gli elementi ricevono un id stabile. Quando risolti, conservarli con stato `riso
 - Impatto: un cambio dinamico del rapporto può essere ritardato e dipendere da altre modifiche della rete.
 - Mitigazione prevista: mantenere la semantica per parità D-011; verificare come i dispositivi originali impostano il rapporto prima di proporre qualsiasi correzione.
 
+## P-011 — Un componente rimosso ma collegato può essere riscoperto
+
+- Stato: aperto, comportamento legacy preservato
+- Gravità: media
+- Area: lifecycle MNA
+- Rilevato: 12 settembre 2026 durante l'audit di parità
+- Descrizione: `RootSystem.removeComponent` rimuove il componente dall'insieme pending, ma `buildSubSystem` attraversa tutti i componenti ancora collegati agli stati; senza `breakConnection` il componente rientra quindi nella rete.
+- Riproduzione/evidenza: rimuovere un resistore da una rete generata senza scollegarlo e rigenerare; il resistore appartiene nuovamente al sottosistema.
+- Impatto: il teardown deve rispettare l'ordine legacy scollegamento/rimozione; cambiarlo silenziosamente produrrebbe una differenza di lifecycle.
+- Mitigazione prevista: mantenere il comportamento per D-011 e coprire con test i percorsi di rimozione dei futuri nodi.
+
 ## Modello
 
 ```text

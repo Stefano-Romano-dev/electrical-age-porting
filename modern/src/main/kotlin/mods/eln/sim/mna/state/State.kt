@@ -47,9 +47,7 @@ open class State {
     }
 
     internal fun addComponent(component: Component) {
-        if (component !in connectedComponents) {
-            connectedComponents += component
-        }
+        connectedComponents += component
     }
 
     internal fun removeComponent(component: Component) {

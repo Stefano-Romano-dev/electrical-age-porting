@@ -16,7 +16,7 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 
 | Sistema legacy | Posizione originale | Destinazione prevista | Stato | Note |
 |---|---|---|---|---|
-| Solver MNA | `mods.eln.sim.mna` | `mods.eln.sim.mna` Kotlin, core indipendente | in porting | DC, lifecycle, linee e inter-system verificati; resta la dinamica |
+| Solver MNA | `mods.eln.sim.mna` | `mods.eln.sim.mna` Kotlin, core indipendente | implementato, parità parziale | 30/30 tipi presenti; persistenza e chiamanti reali ancora da verificare, vedi `MNA_AUDIT.md` |
 
 ## Solver MNA
 
@@ -38,6 +38,7 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 | `Transformer` | stesso package logico | verificato, core | rapporto, stati di corrente e comportamento di invalidazione legacy |
 | `PowerSource`, `PowerSourceBipole` | component/process moderni puri | verificato, core | Thévenin, limiti, potenza e fallback NaN; adapter NBT da integrare |
 | `TransformerInterSystemProcess` | stesso package logico | verificato, core | accoppiamento Thévenin e rapporto |
+| `Monopole`, `SubSystemDebugSnapshot` | stesso package logico | verificato | connessione legacy e snapshot diagnostico distaccato dalla matrice viva |
 | Simulazione termica | `mods.eln.sim` | core indipendente | da analizzare | Dopo baseline elettrica |
 | SixNode | `mods.eln.node.six` | block entity host + component registry | mappato | Priorità M2 |
 | TransparentNode | `mods.eln.node.transparent` | block/block entity moderni | da analizzare | Port per famiglie |

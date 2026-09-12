@@ -9,6 +9,7 @@ Questo indice separa informazioni con cicli di vita diversi, evitando che un uni
 | [`ROADMAP.md`](ROADMAP.md) | Ordine delle fasi, dipendenze e criteri di uscita | Quando cambia la sequenza del lavoro |
 | [`DECISIONI.md`](DECISIONI.md) | Registro delle decisioni architetturali | Prima o insieme a una scelta non banale |
 | [`INVENTARIO.md`](INVENTARIO.md) | Mappa legacy -> moderno di sistemi e contenuti | Durante l'analisi e il port di ogni famiglia |
+| [`MNA_AUDIT.md`](MNA_AUDIT.md) | Audit file/API/schema del solver MNA legacy e moderno | Quando cambia il core MNA o viene chiusa una lacuna |
 | [`VERIFICHE.md`](VERIFICHE.md) | Registro riproducibile di build, test e prove | Dopo ogni verifica eseguita |
 | [`PROBLEMI.md`](PROBLEMI.md) | Bug, rischi concreti, blocchi e debito tecnico | Quando un problema viene trovato o risolto |
 | [`RISORSE.md`](RISORSE.md) | Migrazione, rinomina, conversione e licenze degli asset | Durante ogni operazione sulle risorse |

@@ -31,7 +31,7 @@ Criteri di uscita:
 - [x] lifecycle base del simulatore comandabile senza event bus tramite un `RootSystem` posseduto esplicitamente;
 - [x] dipendenza matematica e packaging definiti per il primo slice.
 
-Prossimo slice: audit di completezza del package MNA e selezione del primo strato fisico sopra il solver.
+Prossimo slice: primo strato fisico puro sopra il solver, guidato dall'audit dei chiamanti legacy.
 
 ## M2 — Primo SixNode verticale
 

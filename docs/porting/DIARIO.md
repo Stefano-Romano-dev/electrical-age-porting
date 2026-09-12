@@ -93,3 +93,13 @@ Punto di ripresa: switch resistivo, trasformatore, sorgente di potenza e process
 - Aggiunte fixture per trasformazione, potenza costante, limiti, NaN e rimozione dei processi root.
 
 Punto di ripresa: audit dei sorgenti e test MNA ancora mancanti, poi primo strato fisico puro sopra il solver.
+
+## 12 settembre 2026 — M1, audit di completezza MNA
+
+- Confrontati tutti i tipi del package legacy con il port: raggiunta la copertura strutturale 30/30.
+- Aggiunti `Monopole`, snapshot diagnostico e accessori di ispezione del sottosistema.
+- Aumentata la copertura a 49 test con coefficienti diretti di matrice e RHS.
+- Corrette divergenze della traduzione su pin, duplicati di connessione, current source, gestione errori QR e riscoperta dei componenti non scollegati.
+- Registrato P-011 e creato `MNA_AUDIT.md` con schemi persistenti e criteri ancora aperti.
+
+Punto di ripresa: analizzare i chiamanti puri in `mods.eln.sim` e portare il primo strato fisico sopra MNA.

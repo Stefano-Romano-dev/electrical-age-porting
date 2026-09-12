@@ -124,6 +124,18 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 - Isolamento statico: nessun import Minecraft/NeoForge sotto `modern/src/main/kotlin/mods/eln/sim`.
 - Limite dichiarato: gli adapter moderni di persistenza per switch e sorgenti non fanno parte di questo slice.
 
+## 12 settembre 2026 — Audit di completezza MNA
+
+- Revisione/stato: working tree successivo a `e84d68e`.
+- Confronto file: 30 tipi Java sotto il package MNA legacy e 30 controparti Kotlin moderne dopo l'aggiunta di `Monopole` e `SubSystemDebugSnapshot`.
+- API diagnostiche aggiunte: snapshot di matrice/RHS/ownership/connessioni, `setX`, `getX`, `getXSafe`, `componentSize` e descrizione del sottosistema.
+- Semantiche riallineate: pin conservati dopo `breakConnection`, duplicati nella lista componenti dello stato, membership particolare di `CurrentSource`, catch generale della decomposizione QR e riscoperta dei componenti non scollegati.
+- `test --no-daemon`: superato, 49 test e 0 fallimenti/errori.
+- Comando finale `$env:GRADLE_USER_HOME = (Resolve-Path '.\\.gradle').Path; .\\gradlew.bat clean build --no-daemon`: superato, 11 task (6 eseguiti e 5 da cache), 49 test e 0 fallimenti/errori.
+- Nuove fixture audit: sette per snapshot, coefficienti MNA e API; due aggiuntive per teardown pin e duplicati legacy.
+- Isolamento statico: nessun import Minecraft/NeoForge sotto `modern/src/main/kotlin/mods/eln/sim`.
+- Limiti dichiarati: adapter NBT, chiamanti reali e benchmark/convergenza rappresentativi restano aperti; dettagli in `MNA_AUDIT.md`.
+
 ## Modello di registrazione
 
 ```text

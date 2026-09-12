@@ -7,10 +7,10 @@ import mods.eln.sim.mna.misc.ISubSystemProcessFlush
 import mods.eln.sim.mna.component.VoltageSource
 import mods.eln.sim.mna.misc.MnaConst
 import mods.eln.sim.mna.state.State
+import mods.eln.sim.mna.state.VoltageState
 import org.apache.commons.math3.linear.MatrixUtils
-import org.apache.commons.math3.linear.RealMatrix
-import org.apache.commons.math3.linear.SingularMatrixException
 import org.apache.commons.math3.linear.QRDecomposition
+import org.apache.commons.math3.linear.RealMatrix
 
 /**
  * A platform-independent modified nodal analysis system.
@@ -115,6 +115,33 @@ class SubSystem(
     }
 
     fun contains(state: State): Boolean = state in mutableStates
+
+    fun setX(state: State, value: Double) {
+        state.state = value
+    }
+
+    fun getX(state: State): Double = state.state
+
+    fun getXSafe(state: State?): Double = state?.let(::getX) ?: 0.0
+
+    fun componentSize(): Int = mutableComponents.size
+
+    @Synchronized
+    fun captureDebugSnapshot(): SubSystemDebugSnapshot {
+        ensureMatrix()
+        return SubSystemDebugSnapshot(
+            conductanceMatrix = matrix?.data ?: emptyArray(),
+            rhsVector = rhsData.copyOf(),
+            stateLabels = mutableStates.map(::describeState).toTypedArray(),
+            stateOwners = mutableStates.map { it.owner }.toTypedArray(),
+            componentLabels = mutableComponents.map(::describeComponent).toTypedArray(),
+            componentOwners = mutableComponents.map { it.owner }.toTypedArray(),
+            componentConnections = mutableComponents.map { component ->
+                component.connectedStates().map { it?.id ?: -1 }.toIntArray()
+            }.toTypedArray(),
+            isSingular = singularMatrix,
+        )
+    }
 
     fun breakSystem(): Boolean {
         if (broken) return false
@@ -242,10 +269,23 @@ class SubSystem(
         try {
             inverseData = QRDecomposition(matrix).solver.inverse.data
             singularMatrix = false
-        } catch (_: SingularMatrixException) {
+        } catch (_: Exception) {
             inverseData = emptyArray()
             singularMatrix = true
         }
         matrixValid = true
     }
+
+    private fun describeState(state: State): String = buildString {
+        append('#').append(state.id).append(' ').append(state.javaClass.simpleName)
+        state.owner?.takeIf { it.isNotEmpty() }?.let { append(" [").append(it).append(']') }
+        if (state is VoltageState) append(" %.4fV".format(state.voltage))
+    }
+
+    private fun describeComponent(component: Component): String = buildString {
+        append(component.javaClass.simpleName)
+        component.owner?.takeIf { it.isNotEmpty() }?.let { append(" [").append(it).append(']') }
+    }
+
+    override fun toString(): String = mutableComponents.joinToString(separator = "")
 }

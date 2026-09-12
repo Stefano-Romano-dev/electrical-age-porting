@@ -19,13 +19,11 @@ class CurrentSource(
     override fun applyToSubsystem(subSystem: SubSystem) = Unit
 
     override fun addToSubsystem(subSystem: SubSystem) {
-        super.addToSubsystem(subSystem)
         subSystem.addProcess(this)
     }
 
     override fun quitSubSystem() {
         directSubSystem?.removeProcess(this)
-        super.quitSubSystem()
     }
 
     override fun simProcessI(subSystem: SubSystem) {
