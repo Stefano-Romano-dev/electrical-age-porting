@@ -56,6 +56,8 @@ Il solver legacy applica inoltre due astrazioni prestazionali che fanno parte de
 
 `Simulator` è agganciato al tick server e svolge più sottopassi elettrici/termici sul thread server. Questa semantica va mantenuta inizialmente: parallelizzare il solver durante il port introdurrebbe rischi di concorrenza non necessari. Prima va separato l’orologio di simulazione dall’evento NeoForge e coperto con test deterministici.
 
+Il passo termico legacy è esplicito e sensibile all'ordine: calcola prima i flussi sulle `ThermalConnection`, esegue poi i processi termici, applica lo scambio con la stanza (o la dispersione verso 0 °C tramite `temperatureCelsius / Rp`), integra `temperatureCelsius += PcTemp * dt / heatCapacity`, pubblica gli accumulatori e infine li azzera. Nel port questo algoritmo vive in `ThermalSimulator`; l'unico contatto con il mondo è `ThermalAmbientExchange`, che verrà implementato dal layer NeoForge senza contaminare il core.
+
 ### 2. Sistema dei nodi
 
 Il gameplay si basa su tre famiglie:

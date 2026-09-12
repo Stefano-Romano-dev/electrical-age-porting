@@ -4,7 +4,7 @@ Aggiornato: 12 settembre 2026
 
 ## Stato generale
 
-**Fase corrente: milestone M1 in corso; audit strutturale del package MNA completato.**
+**Fase corrente: milestone M1 in corso; primo strato elettrico/termico puro completato.**
 
 Target confermato:
 
@@ -41,7 +41,7 @@ Toolchain fissata:
 - [x] Creato il workspace NeoForge 1.21.1 in `modern/`.
 - [x] Ottenuta una clean build riproducibile e un test JUnit 5 minimale.
 - [x] Avviati client e dedicated server con caricamento del mod `eln`.
-- [ ] Estrarre e portare il core di simulazione con i test (baseline dei componenti MNA quasi completa; restano audit dei test legacy e processi fisici esterni al solver).
+- [ ] Estrarre e portare il core di simulazione con i test (MNA e primo strato elettrico/termico verificati; restano scheduler, processi fisici superiori e persistenza).
 - [ ] Implementare il primo SixNode verticale.
 
 ## Decisioni registrate
@@ -98,6 +98,9 @@ Avanzamento M1 verificato:
 - verificati rapporti del trasformatore, limiti tensione/corrente, potenza effettiva, fallback NaN e lifecycle dei processi root;
 - completata la corrispondenza dei 30 tipi MNA legacy con `Monopole` e `SubSystemDebugSnapshot`;
 - riallineate semantiche di teardown e connettività emerse dall'audit; gli adapter persistenti e i chiamanti reali restano da verificare;
+- portati `ElectricalLoad`, `ElectricalConnection`, carichi/connessioni/resistori termici e i tre processi base di conversione Joule→calore;
+- estratto il passo termico nell'esecutore puro `ThermalSimulator`, conservando ordine delle fasi, formule e accumulatori legacy e isolando lo scambio termico con la stanza dietro un adapter;
+- aggiunte 19 fixture fisiche; la suite completa raggiunge 68 test superati;
 - dedicated server avviato con caricamento effettivo del runtime Kotlin 2.4.20.
 
 Il dettaglio tecnico e la roadmap completa sono in [ANALISI_PORTING.md](./ANALISI_PORTING.md).

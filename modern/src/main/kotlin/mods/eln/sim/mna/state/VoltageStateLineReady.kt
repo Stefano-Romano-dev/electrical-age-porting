@@ -1,6 +1,6 @@
 package mods.eln.sim.mna.state
 
-class VoltageStateLineReady : VoltageState() {
+open class VoltageStateLineReady : VoltageState() {
     private var lineSimplificationEnabled = false
 
     fun setCanBeSimplifiedByLine(value: Boolean) {

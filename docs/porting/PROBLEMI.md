@@ -107,6 +107,17 @@ Gli elementi ricevono un id stabile. Quando risolti, conservarli con stato `riso
 - Impatto: il teardown deve rispettare l'ordine legacy scollegamento/rimozione; cambiarlo silenziosamente produrrebbe una differenza di lifecycle.
 - Mitigazione prevista: mantenere il comportamento per D-011 e coprire con test i percorsi di rimozione dei futuri nodi.
 
+## P-012 — `movePowerTo` registra throughput termico con segno
+
+- Stato: aperto, comportamento legacy preservato
+- Gravità: bassa
+- Area: simulazione termica
+- Rilevato: 12 settembre 2026
+- Descrizione: `ThermalLoad.movePowerTo` nella 1.24.8 somma direttamente `power` sia a `PcTemp` sia a `PspTemp`, mentre gli altri trasferimenti aggiungono il valore assoluto a `PspTemp` e il commento descrive un trasferimento assoluto.
+- Riproduzione/evidenza: chiamando `movePowerTo(-3)` entrambi gli accumulatori diventano `-3`; fixture dedicata in `ThermalLayerParityTest`.
+- Impatto: potenze negative possono ridurre `Psp` e quindi il valore restituito da `getPower`; correggerlo cambierebbe telemetria o comportamenti che la consumano.
+- Mitigazione prevista: preservare per D-011 e verificare i chiamanti prima di proporre una correzione separata.
+
 ## Modello
 
 ```text

@@ -108,6 +108,17 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Conseguenze: nessun miglioramento o bugfix legacy viene introdotto silenziosamente; le differenze imposte dalla piattaforma sono minimizzate e documentate, quelle intenzionali richiedono approvazione esplicita.
 - Verifica prevista: scenari gemelli 1.24.8/1.21.1, fixture numeriche e temporali, confronti visivi e audio, save/reload, chunk reload e multiplayer secondo il contenuto.
 
+## D-012 — Confine dello scambio termico ambientale
+
+- Stato: accettata
+- Data: 12 settembre 2026
+- Contesto: `Simulator.thermalStep` della 1.24.8 contiene sia l'algoritmo termico sia chiamate a `RoomThermalManager`, che dipende dal mondo Minecraft.
+- Scelta: conservare formule e ordine del passo in un `ThermalSimulator` puro e rappresentare il solo scambio con la stanza tramite `ThermalAmbientExchange`; l'assenza dell'adapter usa la dispersione legacy verso 0 °C.
+- Alternative considerate: portare subito il room manager nel core; omettere temporaneamente lo scambio ambientale; riscrivere il modello termico.
+- Motivo: consente fixture deterministiche e mantiene il core indipendente dalla piattaforma senza cambiare il punto né il segno con cui la potenza ambientale entra nell'algoritmo.
+- Conseguenze: il futuro adapter NeoForge deve restituire potenza positiva quando esce dal carico e replicare la semantica di `RoomThermalManager`; le coordinate primitive legacy restano nel carico finché non verrà definita l'ownership per livello/chunk.
+- Verifica eseguita: fixture con fallback ambientale, carico con coordinate e adapter, ordine connessione/processo e integrazione degli accumulatori.
+
 ## Modello per nuove decisioni
 
 ```text

@@ -136,6 +136,19 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 - Isolamento statico: nessun import Minecraft/NeoForge sotto `modern/src/main/kotlin/mods/eln/sim`.
 - Limiti dichiarati: adapter NBT, chiamanti reali e benchmark/convergenza rappresentativi restano aperti; dettagli in `MNA_AUDIT.md`.
 
+## 12 settembre 2026 — Primo strato elettrico e termico puro
+
+- Revisione/stato: working tree successivo a `3b1ec01`.
+- Portata verificata: `ElectricalLoad`, `ElectricalConnection`, `ThermalLoad`, `ThermalConnection`, `ThermalResistor`, `ThermalSimulator` e processi heater base.
+- Primo tentativo `test`: non avviato; `GRADLE_USER_HOME` puntava erroneamente a `modern/modern/.gradle`.
+- Secondo tentativo `test -Dkotlin.compiler.execution.strategy=in-process`: non avviato; PowerShell ha passato l'opzione `-D` come nome task. La proprietà era già fissata correttamente in `gradle.properties`.
+- Primo test effettivo: fallito 1 su 68 perché la fixture pretendeva pin nulli dopo `breakConnection`; riallineata alla conservazione dei riferimenti legacy già documentata nell'audit MNA.
+- Comando `$env:GRADLE_USER_HOME = (Resolve-Path '.\.gradle').Path; .\gradlew.bat test`: superato, 68 test e 0 fallimenti/errori.
+- Comando finale `$env:GRADLE_USER_HOME = (Resolve-Path '.\.gradle').Path; .\gradlew.bat clean build --no-daemon`: superato in 30 s, 11 task (6 eseguiti e 5 da cache), 68 test e 0 fallimenti/errori.
+- Parità coperta: resistenza seriale e bridge, corrente dimezzata con esclusione `Line`, trasferimenti termici e guardie NaN, stranezza signed-throughput, coordinate/velocità, ordine completo del passo, adapter ambiente e tre processi Joule→calore.
+- Isolamento statico: `CoreIsolationTest` copre l'intero package `modern/src/main/kotlin/mods/eln/sim`; nessun import Minecraft/NeoForge.
+- Limiti dichiarati: scheduler multi-rate, `RoomThermalManager` moderno, persistenza e processi fisici superiori non fanno parte di questa slice.
+
 ## Modello di registrazione
 
 ```text

@@ -30,8 +30,9 @@ Criteri di uscita:
 - [ ] fixture numeriche di confronto con la 1.24.8 (DC, inter-system, RC/RL, trasformazione e regolazione di potenza presenti);
 - [x] lifecycle base del simulatore comandabile senza event bus tramite un `RootSystem` posseduto esplicitamente;
 - [x] dipendenza matematica e packaging definiti per il primo slice.
+- [x] primo strato fisico puro: carichi e connessioni elettriche/termiche, conversione Joule→calore e passo termico deterministico.
 
-Prossimo slice: primo strato fisico puro sopra il solver, guidato dall'audit dei chiamanti legacy.
+Prossimo slice: inizializzatori termici e processi energetici puri superiori, quindi scheduler multi-rate controllabile nei test.
 
 ## M2 — Primo SixNode verticale
 

@@ -48,6 +48,7 @@ Le tolleranze numeriche devono essere motivate e sufficientemente strette da non
 | Lifecycle, Line e inter-system | fixture strutturali e numeriche presenti, incluso teardown pin legacy | oversampling legacy coperto | non applicabile | non applicabile | non applicabile | test automatici M1 e `MNA_AUDIT.md` | parziale |
 | Condensatore, induttore e delay | energia e stato interno coperti | traiettorie RC/RL e primi campioni delay coperti | non applicabile | non applicabile | persistenza induttore da integrare | test automatici M1 | parziale |
 | Switch, trasformatore e sorgenti di potenza | rapporti, limiti, fallback e potenza coperti | regolazione pre-step coperta | non applicabile | non applicabile | adapter di persistenza da integrare | test automatici M1 | parziale |
+| Primo strato elettrico/termico | resistenze seriali, trasferimenti termici, dispersione e calore Joule coperti | ordine del passo e integrazione a `dt` coperti | non applicabile | non applicabile | adapter stanza e persistenza da integrare | 19 test automatici M1 | parziale |
 
 `parziale` significa che l'area coperta è equivalente per le prove indicate, ma il sistema complessivo non è ancora completo.
 

@@ -39,7 +39,11 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 | `PowerSource`, `PowerSourceBipole` | component/process moderni puri | verificato, core | Thévenin, limiti, potenza e fallback NaN; adapter NBT da integrare |
 | `TransformerInterSystemProcess` | stesso package logico | verificato, core | accoppiamento Thévenin e rapporto |
 | `Monopole`, `SubSystemDebugSnapshot` | stesso package logico | verificato | connessione legacy e snapshot diagnostico distaccato dalla matrice viva |
-| Simulazione termica | `mods.eln.sim` | core indipendente | da analizzare | Dopo baseline elettrica |
+| `ElectricalLoad`, `ElectricalConnection` | `mods.eln.sim` | verificato, core | resistenze seriali, notifica del bridge e convenzione corrente dimezzata |
+| `ThermalLoad`, `ThermalConnection`, `ThermalResistor` | `mods.eln.sim` | verificato, core | trasferimenti, segni, accumulatori, coordinate e flag fast/slow |
+| `Simulator.thermalStep` | `ThermalSimulator` + `ThermalAmbientExchange` | verificato, core | ordine connessioni/processi/ambiente/integrazione e reset accumulatori |
+| Processi heater base | `mods.eln.sim.process.heater` | verificato, core | resistore, diodo e resistenza seriale di `ElectricalLoad` |
+| Simulazione termica | `mods.eln.sim` | core indipendente + adapter ambiente | implementato, parità parziale | Scheduler e processi superiori restano aperti |
 | SixNode | `mods.eln.node.six` | block entity host + component registry | mappato | Priorità M2 |
 | TransparentNode | `mods.eln.node.transparent` | block/block entity moderni | da analizzare | Port per famiglie |
 | SimpleNode | `mods.eln.node.simple`, `simplenode` | blocchi/capability moderni | da analizzare | Include integrazioni |

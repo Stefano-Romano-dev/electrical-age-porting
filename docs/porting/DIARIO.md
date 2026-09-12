@@ -103,3 +103,13 @@ Punto di ripresa: audit dei sorgenti e test MNA ancora mancanti, poi primo strat
 - Registrato P-011 e creato `MNA_AUDIT.md` con schemi persistenti e criteri ancora aperti.
 
 Punto di ripresa: analizzare i chiamanti puri in `mods.eln.sim` e portare il primo strato fisico sopra MNA.
+
+## 12 settembre 2026 — M1, primo strato elettrico e termico
+
+- Portati i carichi elettrici con resistenza seriale, i bridge inter-system e la convenzione legacy per la corrente osservata.
+- Portati carichi, connessioni e resistori termici con accumulatori e coordinate, più i processi base che convertono la dissipazione elettrica in calore.
+- Estratto il passo termico completo in un esecutore puro, lasciando lo scambio stanza dietro un adapter per il futuro layer NeoForge.
+- Conservata e testata la particolarità per cui `movePowerTo` aggiunge a `PspTemp` una potenza con segno; registrato P-012.
+- Aggiunte 19 fixture; suite da 68 test e clean build entrambe superate.
+
+Punto di ripresa: portare inizializzatori termici e processi energetici puri successivi, poi ricostruire lo scheduler multi-rate del `Simulator` senza event bus.
