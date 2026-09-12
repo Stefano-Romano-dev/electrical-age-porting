@@ -4,7 +4,7 @@ Aggiornato: 12 settembre 2026
 
 ## Stato generale
 
-**Fase corrente: milestone M1 in corso; watchdog/distruzione pura e audit dei processi completati.**
+**Fase corrente: milestone M1 in chiusura; persistenza di piattaforma e lifecycle server collegati.**
 
 Target confermato:
 
@@ -41,7 +41,7 @@ Toolchain fissata:
 - [x] Creato il workspace NeoForge 1.21.1 in `modern/`.
 - [x] Ottenuta una clean build riproducibile e un test JUnit 5 minimale.
 - [x] Avviati client e dedicated server con caricamento del mod `eln`.
-- [ ] Estrarre e portare il core di simulazione con i test (MNA e primo strato elettrico/termico verificati; restano scheduler, processi fisici superiori e persistenza).
+- [x] Estrarre e portare il core di simulazione M1 con test di parità, scheduler, processi fisici essenziali e codec persistenti esterni.
 - [ ] Implementare il primo SixNode verticale.
 
 ## Decisioni registrate
@@ -111,6 +111,10 @@ Avanzamento M1 verificato:
 - auditati 42 tipi tra `mods.eln.sim` e `sim.process`: 32 hanno una controparte pura, 10 sono instradati alle vertical slice che ne possiedono le dipendenze;
 - aggiunte 18 fixture per soglie, timeout, isteresi di guasto, categorie, diagnostica e timer; la suite completa raggiunge 126 test superati;
 - dedicated server avviato con caricamento effettivo del runtime Kotlin 2.4.20.
+- aggiunti codec `CompoundTag` esterni al core per batteria, regolatore, stati elettrici/termici, forno e componenti MNA persistenti, conservando chiavi e precisione della 1.24.8;
+- abilitato il runner unit test ModDevGradle per verificare i codec contro il vero `CompoundTag`; suite completa a 134 test superati;
+- collegato `Simulator.tick()` a `ServerTickEvent.Pre` tramite un owner per identità di `MinecraftServer`, creato all'avvio e rimosso allo stop senza singleton del server corrente;
+- dedicated server verificato fino a `Done` con creazione dell'owner; il callback di stop resta da osservare in una successiva prova con console interattiva affidabile.
 
 Il dettaglio tecnico e la roadmap completa sono in [ANALISI_PORTING.md](./ANALISI_PORTING.md).
 

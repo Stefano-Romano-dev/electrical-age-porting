@@ -32,26 +32,26 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 | `Line`, `VoltageStateLineReady` | stesso package logico | verificato | compressione, resistenza equivalente, flush stati intermedi e ripristino |
 | `InterSystem`, `InterSystemAbstraction` | stesso package logico | verificato | split oltre 100 stati, Thévenin, convergenza e distruzione |
 | `Capacitor` | stesso package logico | verificato, core | energia e traiettoria RC; corrente zero legacy conservata |
-| `Inductor` | stesso package logico | verificato, core | energia, reset e traiettoria RL; adapter di persistenza ancora da integrare |
+| `Inductor` | stesso package logico | verificato, core + codec | energia, reset, traiettoria RL e chiave `Istate`; composizione block entity in M2 |
 | `Delay` | stesso package logico | verificato, core | primi campioni `oldIa`/`oldIb` conservati |
 | `ResistorSwitch` | stesso package logico | verificato, core | stato, resistenza base/off, alta impedenza e restore persistente puro |
 | `Transformer` | stesso package logico | verificato, core | rapporto, stati di corrente e comportamento di invalidazione legacy |
-| `PowerSource`, `PowerSourceBipole` | component/process moderni puri | verificato, core | Thévenin, limiti, potenza e fallback NaN; adapter NBT da integrare |
+| `PowerSource`, `PowerSourceBipole` | component/process moderni puri | verificato, core + codec | Thévenin, limiti, potenza, fallback NaN e campi NBT legacy |
 | `TransformerInterSystemProcess` | stesso package logico | verificato, core | accoppiamento Thévenin e rapporto |
 | `Monopole`, `SubSystemDebugSnapshot` | stesso package logico | verificato | connessione legacy e snapshot diagnostico distaccato dalla matrice viva |
 | `ElectricalLoad`, `ElectricalConnection` | `mods.eln.sim` | verificato, core | resistenze seriali, notifica del bridge e convenzione corrente dimezzata |
 | `ThermalLoad`, `ThermalConnection`, `ThermalResistor` | `mods.eln.sim` | verificato, core | trasferimenti, segni, accumulatori, coordinate e flag fast/slow |
 | `Simulator.thermalStep` | `ThermalSimulator` + `ThermalAmbientExchange` | verificato, core | ordine connessioni/processi/ambiente/integrazione e reset accumulatori |
 | Processi heater base | `mods.eln.sim.process.heater` | verificato, core | resistore, diodo e resistenza seriale di `ElectricalLoad` |
-| `Simulator` | `mods.eln.sim.Simulator` puro + futuro adapter tick NeoForge | verificato, scheduler base | sequenza multi-rate, fasi slow, distruzioni differite, registrazione fast/slow e stabilità termica |
+| `Simulator` | `mods.eln.sim.Simulator` puro + `ServerSimulationLifecycle` | verificato, scheduler + avvio server | sequenza multi-rate e owner per identità server; callback stop ancora da osservare |
 | Inizializzatori termici | stesso package logico, validator esplicito | verificato, core | formule `Rs`/`Rp`/`C`, copia, applicazione e rifiuto instabile |
 | `FurnaceProcess`, `DiodeProcess`, conversione resistiva | stesso package logico | verificato, core | consumo combustibile, clamp gain, segno del diodo e potenza Joule |
 | `Integrator`, `Differentiator` | stesso package logico | verificato, core | sequenze campione-per-campione e reset legacy |
 | `FunctionTable`, `FunctionTableYProtect` | `mods.eln.misc` puro | verificato, core | interpolazione, estrapolazione, clamp, duplicazione e cache scale legacy |
 | `BatteryProcess`, `BatterySlowProcess` | `mods.eln.sim` + `BatteryAgingPolicy` | verificato, core | carica/scarica, calore di ricarica, energia a 50 campioni, vita, aging e distruzione astratta |
 | `RegulatorProcess` e adapter termici | `mods.eln.sim` | verificato, core | None/Manual/OnOff/Analog, reset guadagni, clamp e soglie resistenza |
-| Persistenza batteria | `BatteryState` + futuro codec/adapter | schema mappato, adapter rimandato | suffissi legacy `NBPQ`, `NBPlife`; valori non finiti riparati come in origine |
-| Persistenza regolatore | `RegulatorState` + futuro codec/adapter | schema mappato, adapter rimandato | chiavi `prefix + name + errorIntegrated/target`; solo integrale NaN riparato |
+| Persistenza batteria | `BatteryState` + `BatteryProcessTagCodec` | verificato | suffissi legacy `NBPQ`, `NBPlife`; valori non finiti riparati come in origine |
+| Persistenza regolatore | `RegulatorState` + `RegulatorProcessTagCodec` | verificato | chiavi `prefix + name + errorIntegrated/target`; solo integrale NaN riparato |
 | Watchdog elettrici/termici | `mods.eln.sim.process.destruct` + policy/sink | verificato, core | soglie, primo overflow ignorato, timeout casuale, categorie e telemetria trip |
 | `DelayedDestruction`, `TimeRemover` | stesso package logico + owner `Simulator` | verificato, core | registrazione, scadenza, autorimozione e callback |
 | `WorldExplosion` | adapter mondo NeoForge | rimandato | nessun placeholder: forza, rimozione blocco ed effetti verranno portati con il nodo |

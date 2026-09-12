@@ -145,3 +145,14 @@ Punto di ripresa: portare watchdog/distruzione puri, auditare i processi M1 anco
 - Aggiunte 18 fixture; suite da 126 test e clean build superate.
 
 Punto di ripresa: implementare codec `CompoundTag` esterni al core, collegare il tick server NeoForge a un owner esplicito e verificare il lifecycle su dedicated server.
+
+## 12 settembre 2026 — M1, persistenza di piattaforma e lifecycle server
+
+- Implementati codec `CompoundTag` esterni al core per gli stati persistenti già auditati, mantenendo schema e precisione della 1.24.8.
+- Conservata e testata l'anomalia di `NbtResistor`, registrata come P-020 invece di correggerla silenziosamente.
+- Abilitato il supporto unit test ModDevGradle, necessario per usare il vero `CompoundTag`; adattato il test di isolamento al diverso working directory del runner.
+- Collegato il simulatore puro a `ServerTickEvent.Pre` con ownership per identità di server e cleanup previsto su `ServerStoppingEvent`; registrata D-016.
+- Suite da 134 test e build completa superate; dedicated server arrivato a `Done` e owner creato.
+- La rimozione allo stop non è stata osservata perché la console Gradle non inoltrava il comando al processo Minecraft; questa verifica resta esplicitamente aperta.
+
+Punto di ripresa: osservare il callback di stop con un harness affidabile, poi iniziare M2 dalla mappa degli id e dallo scheletro persistente del SixNode host.

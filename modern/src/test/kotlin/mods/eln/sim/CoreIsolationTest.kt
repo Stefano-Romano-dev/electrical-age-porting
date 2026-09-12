@@ -10,9 +10,10 @@ import kotlin.io.path.extension
 class CoreIsolationTest {
     @Test
     fun `simulation core has no Minecraft or NeoForge imports`() {
+        val projectRoot = Path.of(System.getProperty("eln.projectDir", "."))
         val sourceRoots = listOf(
-            Path.of("src", "main", "kotlin", "mods", "eln", "sim"),
-            Path.of("src", "main", "kotlin", "mods", "eln", "misc"),
+            projectRoot.resolve(Path.of("src", "main", "kotlin", "mods", "eln", "sim")),
+            projectRoot.resolve(Path.of("src", "main", "kotlin", "mods", "eln", "misc")),
         )
         sourceRoots.forEach { sourceRoot ->
             assertTrue(Files.isDirectory(sourceRoot), "Missing pure source root: $sourceRoot")

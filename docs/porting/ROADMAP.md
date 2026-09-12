@@ -34,8 +34,10 @@ Criteri di uscita:
 - [x] scheduler multi-rate puro con inizializzatori termici, fasi slow e validazione di stabilità.
 - [x] curve numeriche, batteria, aging e regolatori con snapshot persistenti puri.
 - [x] watchdog, timer e distruzione astratta; audit strutturale dei processi M1.
+- [x] codec `CompoundTag` legacy fuori dal core, testati con il runtime NeoForge.
+- [x] owner `Simulator` per istanza server e collegamento a `ServerTickEvent.Pre`.
 
-Prossimo slice: codec `CompoundTag` esterni al core e adapter tick server NeoForge; poi verifica dedicated server del lifecycle M1.
+Prossimo slice: chiudere l'audit M1 con una prova osservabile del callback di arresto, quindi iniziare M2 definendo id canonici e scheletro del SixNode host.
 
 ## M2 — Primo SixNode verticale
 

@@ -185,6 +185,19 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 - Isolamento statico: nessun import Minecraft/NeoForge nei root puri `mods/eln/sim` e `mods/eln/misc`.
 - Limiti dichiarati: `WorldExplosion`, `ShaftSpeedWatchdog`, adapter di configurazione/dump e teardown di nodi reali non fanno parte di questa slice.
 
+## 12 settembre 2026 — Codec NBT e lifecycle server NeoForge
+
+- Revisione/stato: working tree successivo a `3ecad5b`.
+- Portata verificata: codec `CompoundTag` per batteria, regolatore, tensione, temperatura, forno, sorgenti, induttore, switch, sorgenti di potenza e resistore; owner `Simulator` per istanza server.
+- Primo comando `.\gradlew.bat test --no-daemon`: fallito in `compileTestKotlin`, perché la classpath test predefinita di ModDevGradle non comprendeva Minecraft.
+- Diagnosi `.\gradlew.bat dependencies --configuration compileClasspath --no-daemon` e `.\gradlew.bat dependencies --configuration testCompileClasspath --no-daemon`: confermata la presenza di NeoForge/Minecraft soltanto nella prima; abilitato `neoForge.unitTest` secondo l'API del plugin.
+- Comando finale `.\gradlew.bat test --no-daemon`, con accesso coerente alla cache: superato, 134 test e 0 fallimenti/errori.
+- Primo comando `.\gradlew.bat build --no-daemon`, con accesso coerente alla cache: superato, 13 task tutti aggiornati e artefatto completo valido.
+- Comando finale `.\gradlew.bat build --no-daemon` dopo la revisione conclusiva di codice e documentazione: superato in 15 s, 13 task (3 eseguiti, 10 aggiornati), 134 test e 0 fallimenti/errori.
+- Comando `.\gradlew.bat runServer --no-daemon`: dedicated server arrivato a `Done (2.506s)` e log `Created Electrical Age simulation owner for server ...`; nessun classloading client osservato.
+- Parità coperta: nomi esatti delle chiavi, uso float/double legacy, riparazione dei valori non finiti prevista dall'originale, limiti delle sorgenti, restore dello switch e anomalia `NbtResistor` `prefix + R`.
+- Limite dichiarato: la console del task Gradle non ha inoltrato `stop` al processo Minecraft; il callback `ServerStoppingEvent` e il relativo log di rimozione non sono quindi dichiarati verificati in questa revisione. Le istanze di prova sono state arrestate e la porta 25565 risulta libera.
+
 ## Modello di registrazione
 
 ```text

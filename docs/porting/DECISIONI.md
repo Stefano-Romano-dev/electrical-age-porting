@@ -124,7 +124,7 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Stato: accettata
 - Data: 12 settembre 2026
 - Contesto: il `Simulator` legacy combina algoritmo temporale, liste dei processi, ownership MNA, callback Forge e accesso a singleton globali.
-- Scelta: mantenere nel core un `Simulator` posseduto esplicitamente che replica accumulatori, confronti, periodi e ordine delle fasi; il futuro adapter NeoForge si limita a chiamare `tick()` sul simulatore del server/livello appropriato.
+- Scelta: mantenere nel core un `Simulator` posseduto esplicitamente che replica accumulatori, confronti, periodi e ordine delle fasi; l'adapter NeoForge si limita a chiamare `tick()` sul simulatore del server appropriato.
 - Alternative considerate: riscrivere il ritmo sui tick Minecraft; integrare direttamente gli eventi NeoForge nel core; uniformare tutti i processi a 20 Hz.
 - Motivo: frequenze e ordine sono comportamento osservabile e devono essere verificabili deterministicamente senza avviare il gioco.
 - Conseguenze: resta da decidere l'ownership concreta server/livello/chunk; il solve elettrico aggiuntivo al primo tick e il periodo slow fisso a 0,05 s vengono conservati.
@@ -138,7 +138,7 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Scelta: rappresentare l'opzione di aging con `BatteryAgingPolicy` iniettata a ogni processo e lo stato persistente con `BatteryState`/`RegulatorState`; codec e adapter NeoForge saranno esterni al core.
 - Alternative considerate: mantenere una configurazione statica globale; importare `CompoundTag` direttamente nei processi; rimandare interamente batteria e regolatori.
 - Motivo: formule e lettura dinamica dell'opzione restano verificabili, mentre ownership della configurazione e formato di storage possono essere assegnati correttamente a server/livello.
-- Conseguenze: i costruttori moderni ricevono esplicitamente la policy; gli adapter futuri devono conservare suffissi, chiavi e riparazione dei valori non finiti documentati nell'inventario.
+- Conseguenze: i costruttori moderni ricevono esplicitamente la policy; i codec di piattaforma conservano suffissi, chiavi e riparazione dei valori non finiti documentati nell'inventario.
 - Verifica eseguita: aging abilitato/disabilitato, snapshot validi/non finiti e composizione esatta delle chiavi legacy.
 
 ## D-015 — Effetti dei watchdog come confini iniettati
@@ -151,6 +151,17 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Motivo: soglie, distribuzione e tempi possono essere verificati deterministicamente senza perdere gli effetti finali, che richiedono ownership e API del livello.
 - Conseguenze: ogni nodo moderno deve fornire esplicitamente policy e distruttore; l'assenza di un distruttore replica il target nullo legacy ma non soddisfa la vertical slice del contenuto.
 - Verifica eseguita: categorie, policy off, fattore deterministico, trip termico, dump riuscito/fallito e callback distruttiva.
+
+## D-016 — Codec di piattaforma e simulatore per istanza server
+
+- Stato: accettata
+- Data: 12 settembre 2026
+- Contesto: gli schemi NBT legacy devono restare fedeli senza introdurre Minecraft nel core; il simulatore non può dipendere da un singleton che indichi il server corrente.
+- Scelta: collocare i codec `CompoundTag` in `mods.eln.platform.persistence` e possedere un `Simulator` per identità concreta di `MinecraftServer` in `ServerSimulationLifecycle`. Il tick avviene su `ServerTickEvent.Pre`, equivalente alla fase START legacy.
+- Alternative considerate: rendere i processi direttamente NBT-aware; usare un unico simulatore statico globale; creare un simulatore per livello già in M1.
+- Motivo: mantiene puro il modello numerico, conserva le chiavi 1.24.8 e rende esplicito il confine del lifecycle prima dell'introduzione di livelli, chunk e nodi.
+- Conseguenze: i block entity M2 comporranno questi codec; l'eventuale partizionamento per livello/chunk sarà deciso con la topologia reale. Lo schema anomalo di `NbtResistor`, `prefix + "R"` senza nome, resta intenzionalmente conservato.
+- Verifica eseguita: 8 test con il vero `CompoundTag`, suite totale da 134 test, build completa e dedicated server fino a `Done` con creazione dell'owner.
 
 ## Modello per nuove decisioni
 

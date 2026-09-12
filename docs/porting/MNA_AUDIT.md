@@ -34,18 +34,18 @@ Riferimento: `original/src/main/java/mods/eln/sim/mna` della release 1.24.8.
 - `Delay` conserva l'accumulo di `oldIa` e `oldIb`.
 - Gli errori durante l'inversione QR rendono il sottosistema singolare, come nel catch generale originale.
 
-## Schemi persistenti da collegare agli adapter moderni
+## Schemi persistenti collegati agli adapter moderni
 
-Il core non importa NBT. Queste chiavi legacy devono essere conservate nella mappa di migrazione e coperte quando verrà introdotta la persistenza del mondo.
+Il core non importa NBT. I codec esterni conservano queste chiavi legacy e sono coperti con il vero `CompoundTag`; l'integrazione nei block entity e le prove save/reload restano a M2.
 
 | Tipo | Chiavi legacy, dopo il prefisso | Stato moderno |
 |---|---|---|
-| `VoltageSource` | `<name>U`, `<name>Istate` | adapter da implementare |
-| `CurrentSource` | `<name>I` | adapter da implementare |
-| `Inductor` | `<name>Istate` | adapter da implementare |
-| `ResistorSwitch` | `<name>R`, `<name>State` | logica di restore pura presente; adapter da implementare |
-| `PowerSource` | chiavi `VoltageSource` più `<name>P`, `<name>Umax`, `<name>Imax` | adapter da implementare |
-| `PowerSourceBipole` | `P`, `Umax`, `Imax` dopo il prefisso | adapter da implementare |
+| `VoltageSource` | `<name>U`, `<name>Istate` | codec implementato e testato |
+| `CurrentSource` | `<name>I` | codec implementato e testato |
+| `Inductor` | `<name>Istate` | codec implementato e testato |
+| `ResistorSwitch` | `<name>R`, `<name>State` | codec e riparazione restore testati |
+| `PowerSource` | chiavi `VoltageSource` più `<name>P`, `<name>Umax`, `<name>Imax` | codec implementato e testato |
+| `PowerSourceBipole` | `P`, `Umax`, `Imax` dopo il prefisso | codec implementato e testato |
 
 La compatibilità diretta dei mondi 1.7.10 resta esclusa dal primo port, ma lo schema non deve andare perso.
 
@@ -53,7 +53,7 @@ La compatibilità diretta dei mondi 1.7.10 resta esclusa dal primo port, ma lo s
 
 Il package MNA puro ha corrispondenza di tipi e copertura numerica/strutturale. Prima di dichiarare completa la parità dell'intero sistema elettrico restano:
 
-- adapter di persistenza e prove save/reload;
+- integrazione dei codec nei block entity e prove save/reload;
 - audit dei chiamanti in `mods.eln.sim` per ordine di registrazione, teardown e aggiornamenti dinamici;
 - fixture ricavate dai dispositivi reali, non soltanto da circuiti sintetici;
 - verifica delle prestazioni e della convergenza su reti rappresentative della 1.24.8.

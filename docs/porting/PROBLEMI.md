@@ -195,6 +195,17 @@ Gli elementi ricevono un id stabile. Quando risolti, conservarli con stato `riso
 - Impatto: il corretto teardown del nodo deve rimuovere rapidamente il processo; altrimenti effetti e diagnostica possono ripetersi.
 - Mitigazione prevista: conservare la logica e coprire l'autorimozione/teardown nella vertical slice dei nodi.
 
+## P-020 — `NbtResistor` ignora il nome nella chiave persistente
+
+- Stato: aperto, comportamento legacy preservato
+- Gravità: media
+- Area: persistenza
+- Rilevato: 12 settembre 2026
+- Descrizione: `NbtResistor` muta internamente il proprio nome durante read/write ma salva e legge sempre soltanto `prefix + "R"`; due resistori con lo stesso prefisso collidono anche se hanno nomi diversi.
+- Riproduzione/evidenza: il codec moderno usa intenzionalmente `pfxR`; il test verifica l'assenza di `pfx<name>R` e il restore con un nome differente.
+- Impatto: la composizione dei prefissi nei futuri block entity deve replicare gli schemi esistenti senza creare collisioni accidentali nuove.
+- Mitigazione prevista: conservare il formato 1.24.8 per parità; assegnare prefissi univoci a livello di componente e documentare separatamente un eventuale schema moderno versionato.
+
 ## Modello
 
 ```text
