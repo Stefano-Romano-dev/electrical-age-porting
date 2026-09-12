@@ -19,7 +19,7 @@ open class Resistor(
     val power: Double
         get() = voltage * current
 
-    fun setResistance(resistance: Double): Resistor = apply {
+    open fun setResistance(resistance: Double): Resistor = apply {
         if (!resistance.isFinite()) return@apply
         if (this.resistance != resistance) {
             this.resistance = resistance
@@ -28,7 +28,7 @@ open class Resistor(
         }
     }
 
-    fun highImpedance() {
+    open fun highImpedance() {
         setResistance(MnaConst.HIGH_IMPEDANCE)
     }
 

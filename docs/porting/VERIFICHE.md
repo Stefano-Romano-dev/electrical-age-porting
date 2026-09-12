@@ -111,6 +111,19 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 - Isolamento statico: nessun import Minecraft/NeoForge sotto `modern/src/main/kotlin/mods/eln/sim`.
 - Limite dichiarato: l'adapter moderno per la persistenza della corrente dell'induttore non fa parte di questo slice.
 
+## 12 settembre 2026 — Componenti MNA avanzati
+
+- Revisione/stato: working tree successivo a `3af92b2`.
+- Portata verificata: `ResistorSwitch`, `Transformer`, `PowerSource`, `PowerSourceBipole` e `TransformerInterSystemProcess`.
+- Primo `test --no-daemon`: fallito in compilazione; Kotlin vieta un setter privato su una proprietà aperta. `VoltageSource.voltage` è stata resa finale mantenendo l'accesso tramite `setVoltage`.
+- Secondo `test --no-daemon`: fallito 1 test su 39 per conteggio errato della fixture; il quinto stato è la corrente interna della sorgente di tensione, come nell'originale.
+- Terzo `test --no-daemon`: superato, 39 test e 0 fallimenti/errori.
+- Fixture aggiuntiva successiva: fallback a tensione zero quando la potenza richiesta è NaN.
+- Comando finale `$env:GRADLE_USER_HOME = (Resolve-Path '.\\.gradle').Path; .\\gradlew.bat clean build --no-daemon`: superato, 11 task (9 eseguiti e 2 da cache), 40 test e 0 fallimenti/errori.
+- Parità coperta: rapporto ideale, mancata invalidazione legacy al cambio rapporto, limiti di tensione/corrente, potenza erogata, formule Thévenin e fallback NaN.
+- Isolamento statico: nessun import Minecraft/NeoForge sotto `modern/src/main/kotlin/mods/eln/sim`.
+- Limite dichiarato: gli adapter moderni di persistenza per switch e sorgenti non fanno parte di questo slice.
+
 ## Modello di registrazione
 
 ```text

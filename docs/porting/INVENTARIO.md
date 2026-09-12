@@ -34,7 +34,10 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 | `Capacitor` | stesso package logico | verificato, core | energia e traiettoria RC; corrente zero legacy conservata |
 | `Inductor` | stesso package logico | verificato, core | energia, reset e traiettoria RL; adapter di persistenza ancora da integrare |
 | `Delay` | stesso package logico | verificato, core | primi campioni `oldIa`/`oldIb` conservati |
-| trasformatore, switch e sorgenti di potenza | da portare | mappato | prossimo slice MNA |
+| `ResistorSwitch` | stesso package logico | verificato, core | stato, resistenza base/off, alta impedenza e restore persistente puro |
+| `Transformer` | stesso package logico | verificato, core | rapporto, stati di corrente e comportamento di invalidazione legacy |
+| `PowerSource`, `PowerSourceBipole` | component/process moderni puri | verificato, core | Thévenin, limiti, potenza e fallback NaN; adapter NBT da integrare |
+| `TransformerInterSystemProcess` | stesso package logico | verificato, core | accoppiamento Thévenin e rapporto |
 | Simulazione termica | `mods.eln.sim` | core indipendente | da analizzare | Dopo baseline elettrica |
 | SixNode | `mods.eln.node.six` | block entity host + component registry | mappato | Priorità M2 |
 | TransparentNode | `mods.eln.node.transparent` | block/block entity moderni | da analizzare | Port per famiglie |

@@ -24,7 +24,7 @@ class CurrentSource(
     }
 
     override fun quitSubSystem() {
-        subSystem?.removeProcess(this)
+        directSubSystem?.removeProcess(this)
         super.quitSubSystem()
     }
 

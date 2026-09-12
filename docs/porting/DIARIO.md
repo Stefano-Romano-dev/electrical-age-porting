@@ -84,3 +84,12 @@ Punto di ripresa invariato: componenti dinamici essenziali, misurando anche la p
 - La persistenza della corrente dell'induttore resta esplicitamente da collegare al formato moderno quando verrà introdotto lo stato del mondo.
 
 Punto di ripresa: switch resistivo, trasformatore, sorgente di potenza e processi accoppiati rimanenti del nucleo MNA.
+
+## 12 settembre 2026 — M1, componenti MNA avanzati
+
+- Portati switch resistivo, trasformatore, sorgente di potenza monopolo e processi bipolo/inter-system.
+- Conservati formule Thévenin, ordine dei clamp, fallback NaN e mancata invalidazione automatica del rapporto del trasformatore.
+- Registrato P-010 per impedire che quest'ultima particolarità venga corretta senza una decisione esplicita.
+- Aggiunte fixture per trasformazione, potenza costante, limiti, NaN e rimozione dei processi root.
+
+Punto di ripresa: audit dei sorgenti e test MNA ancora mancanti, poi primo strato fisico puro sopra il solver.

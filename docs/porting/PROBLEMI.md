@@ -85,6 +85,17 @@ Gli elementi ricevono un id stabile. Quando risolti, conservarli con stato `riso
 - Soluzione: identificato il PID dalla command line, arrestato esclusivamente il daemon con `gradlew --stop`, quindi eseguita `clean build` con lo stesso livello di accesso usato per creare gli output.
 - Verifica di chiusura: `clean build --no-daemon` superata il 12 settembre 2026, 11 task senza errori.
 
+## P-010 — Il rapporto del trasformatore non invalida la matrice
+
+- Stato: aperto, comportamento legacy preservato
+- Gravità: media
+- Area: solver MNA / trasformatore
+- Rilevato: 12 settembre 2026
+- Descrizione: `Transformer.setRatio` nella 1.24.8 aggiorna il rapporto ma non chiama `dirty`; una matrice già generata continua quindi a usare il rapporto precedente finché non viene invalidata per un'altra causa.
+- Riproduzione/evidenza: fixture con rapporto iniziale 1, cambio a 2 e invalidazione manuale; la tensione secondaria cambia soltanto dopo l'invalidazione.
+- Impatto: un cambio dinamico del rapporto può essere ritardato e dipendere da altre modifiche della rete.
+- Mitigazione prevista: mantenere la semantica per parità D-011; verificare come i dispositivi originali impostano il rapporto prima di proporre qualsiasi correzione.
+
 ## Modello
 
 ```text

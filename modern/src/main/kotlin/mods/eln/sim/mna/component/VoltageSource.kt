@@ -5,20 +5,20 @@ import mods.eln.sim.mna.misc.ISubSystemProcessI
 import mods.eln.sim.mna.state.CurrentState
 import mods.eln.sim.mna.state.State
 
-class VoltageSource(
+open class VoltageSource(
     val name: String,
     aPin: State? = null,
     bPin: State? = null,
 ) : Bipole(aPin, bPin), ISubSystemProcessI {
     internal val currentState = CurrentState()
 
-    override var voltage: Double = 0.0
+    final override var voltage: Double = 0.0
         private set
 
     override val current: Double
         get() = -currentState.state
 
-    val power: Double
+    open val power: Double
         get() = voltage * current
 
     fun setVoltage(voltage: Double): VoltageSource = apply {
@@ -32,8 +32,8 @@ class VoltageSource(
     }
 
     override fun quitSubSystem() {
-        subSystem?.removeState(currentState)
-        subSystem?.removeProcess(this)
+        directSubSystem?.removeState(currentState)
+        directSubSystem?.removeProcess(this)
         super.quitSubSystem()
     }
 

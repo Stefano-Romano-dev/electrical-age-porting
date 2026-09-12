@@ -26,12 +26,12 @@ Obiettivo: solver MNA e processi fisici essenziali indipendenti dal gioco.
 Criteri di uscita:
 
 - [x] nessun import Minecraft/NeoForge nel core iniziale;
-- [ ] test originali rilevanti portati (DC, lifecycle, linee, inter-system e primo nucleo dinamico coperti);
-- [ ] fixture numeriche di confronto con la 1.24.8 (incluse fixture DC, inter-system e traiettorie RC/RL);
+- [ ] test originali rilevanti portati (baseline MNA coperta; audit e processi fisici esterni restanti);
+- [ ] fixture numeriche di confronto con la 1.24.8 (DC, inter-system, RC/RL, trasformazione e regolazione di potenza presenti);
 - [x] lifecycle base del simulatore comandabile senza event bus tramite un `RootSystem` posseduto esplicitamente;
 - [x] dipendenza matematica e packaging definiti per il primo slice.
 
-Prossimo slice: componenti MNA rimanenti e processi accoppiati, iniziando da switch, trasformatore e sorgente di potenza.
+Prossimo slice: audit di completezza del package MNA e selezione del primo strato fisico sopra il solver.
 
 ## M2 — Primo SixNode verticale
 
