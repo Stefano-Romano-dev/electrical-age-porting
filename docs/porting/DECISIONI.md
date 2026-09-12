@@ -86,6 +86,17 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Conseguenze: la politica concreta di partizionamento per livello/chunk resta da decidere in M2; componenti rimossi sono esclusi dalla traversata anche se un oggetto `State` conserva temporaneamente il vecchio collegamento.
 - Verifica eseguita: nove test coprono generazione, soluzione, break/rebuild, confini privati, processi, rimozione e distruttori.
 
+## D-010 — Conservazione delle astrazioni Line e inter-system
+
+- Stato: accettata
+- Data: 12 settembre 2026
+- Contesto: la 1.24.8 riduce la dimensione delle matrici comprimendo catene resistive e partizionando reti pubbliche oltre 100 stati.
+- Scelta: conservare `Line`, la soglia legacy di 100 stati e l'accoppiamento tramite equivalenti di Thévenin prima di valutare algoritmi diversi.
+- Alternative considerate: risolvere sempre una matrice monolitica; sostituire subito il partizionamento con un nuovo solver sparso.
+- Motivo: prestazioni, convergenza e ricostruzione della topologia sono comportamento osservabile del mod originale e devono avere una baseline di parità.
+- Conseguenze: `Component` e `State` distinguono appartenenza diretta e appartenenza tramite un `IAbstractor`; il break di un sottosistema collegato propaga agli altri e ripristina la topologia concreta.
+- Verifica eseguita: catena resistiva, rete da 105 stati, distruzione dell'astrazione e circuito legacy a due reti con valori numerici attesi.
+
 ## Modello per nuove decisioni
 
 ```text

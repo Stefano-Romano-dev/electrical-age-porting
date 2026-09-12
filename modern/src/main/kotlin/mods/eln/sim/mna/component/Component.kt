@@ -7,19 +7,29 @@ abstract class Component {
     var owner: String? = null
         private set
 
-    var subSystem: SubSystem? = null
-        private set
+    private var localSubSystem: SubSystem? = null
+
+    var abstractedBy: IAbstractor? = null
+
+    val subSystem: SubSystem?
+        get() = abstractedBy?.abstractorSubSystem ?: localSubSystem
+
+    val isAbstracted: Boolean
+        get() = abstractedBy != null
+
+    internal val directSubSystem: SubSystem?
+        get() = localSubSystem
 
     open fun addToSubsystem(subSystem: SubSystem) {
-        this.subSystem = subSystem
+        localSubSystem = subSystem
     }
 
     open fun quitSubSystem() {
-        subSystem = null
+        localSubSystem = null
     }
 
     fun dirty() {
-        subSystem?.invalidate()
+        abstractedBy?.dirty(this) ?: localSubSystem?.invalidate()
     }
 
     abstract fun applyToSubsystem(subSystem: SubSystem)
@@ -34,7 +44,7 @@ abstract class Component {
 
     open fun onRemoveFromRootSystem() = Unit
 
-    fun returnToRootSystem(rootSystem: mods.eln.sim.mna.RootSystem) {
+    open fun returnToRootSystem(rootSystem: mods.eln.sim.mna.RootSystem) {
         rootSystem.pendingComponents += this
     }
 

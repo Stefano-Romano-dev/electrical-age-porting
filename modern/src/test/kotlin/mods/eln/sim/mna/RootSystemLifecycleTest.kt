@@ -105,7 +105,8 @@ class RootSystemLifecycleTest {
         root.generate()
 
         assertEquals(2, root.subSystemCount)
-        assertTrue(bridge in root.pendingComponents)
+        assertTrue(bridge.isAbstracted)
+        assertTrue(root.pendingComponents.isEmpty())
     }
 
     @Test

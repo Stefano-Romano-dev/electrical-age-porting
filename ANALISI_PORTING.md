@@ -52,6 +52,8 @@ Il valore tecnico principale è sotto `mods.eln.sim` e `mods.eln.solver`:
 
 Circa 76 file nelle aree `sim`/`solver` non importano direttamente Minecraft o Forge. È il primo nucleo riutilizzabile. Il solver usa Apache Commons Math 3.6.1, oggi incluso e rilocato nel JAR.
 
+Il solver legacy applica inoltre due astrazioni prestazionali che fanno parte del comportamento da preservare: comprime le catene resistive in componenti `Line` e spezza le reti pubbliche oltre 100 stati in sottosistemi accoppiati tramite equivalenti di Thévenin. Queste astrazioni devono poter essere distrutte e ricostruite quando cambia la topologia, ripristinando componenti e stati originali.
+
 `Simulator` è agganciato al tick server e svolge più sottopassi elettrici/termici sul thread server. Questa semantica va mantenuta inizialmente: parallelizzare il solver durante il port introdurrebbe rischi di concorrenza non necessari. Prima va separato l’orologio di simulazione dall’evento NeoForge e coperto con test deterministici.
 
 ### 2. Sistema dei nodi

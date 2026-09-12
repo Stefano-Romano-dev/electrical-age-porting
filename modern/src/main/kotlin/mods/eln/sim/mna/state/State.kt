@@ -2,6 +2,7 @@ package mods.eln.sim.mna.state
 
 import mods.eln.sim.mna.SubSystem
 import mods.eln.sim.mna.component.Component
+import mods.eln.sim.mna.component.IAbstractor
 
 /** A scalar unknown in the modified nodal analysis system. */
 open class State {
@@ -13,8 +14,21 @@ open class State {
     var owner: String? = null
         private set
 
-    internal var subSystem: SubSystem? = null
-        private set
+    private var localSubSystem: SubSystem? = null
+
+    var abstractedBy: IAbstractor? = null
+
+    val subSystem: SubSystem?
+        get() = abstractedBy?.abstractorSubSystem ?: localSubSystem
+
+    val isAbstracted: Boolean
+        get() = abstractedBy != null
+
+    val isNotSimulated: Boolean
+        get() = localSubSystem == null && abstractedBy == null
+
+    internal val directSubSystem: SubSystem?
+        get() = localSubSystem
 
     private val connectedComponents = mutableListOf<Component>()
 
@@ -24,11 +38,11 @@ open class State {
     private var farFromInterSystem: Boolean = false
 
     internal fun attachTo(subSystem: SubSystem) {
-        this.subSystem = subSystem
+        localSubSystem = subSystem
     }
 
     internal fun detachFromSubSystem() {
-        subSystem = null
+        localSubSystem = null
         id = -1
     }
 
@@ -44,7 +58,9 @@ open class State {
 
     fun connectedComponents(): List<Component> = connectedComponents.toList()
 
-    fun connectedComponentsNotAbstracted(): List<Component> = connectedComponents()
+    fun connectedComponentsNotAbstracted(): List<Component> = connectedComponents.filterNot { it.isAbstracted }
+
+    open fun canBeSimplifiedByLine(): Boolean = false
 
     fun setAsPrivate(): State = apply { isPrivateSubSystem = true }
 

@@ -25,6 +25,13 @@ abstract class Bipole(
         dirty()
     }
 
+    fun connectGhostTo(aPin: State?, bPin: State?): Bipole = apply {
+        breakConnection()
+        this.aPin = aPin
+        this.bPin = bPin
+        dirty()
+    }
+
     override fun breakConnection() {
         aPin?.removeComponent(this)
         bPin?.removeComponent(this)

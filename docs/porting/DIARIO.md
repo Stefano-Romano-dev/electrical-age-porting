@@ -57,3 +57,13 @@ Punto di ripresa: portare `RootSystem`, generazione dei sottosistemi e lifecycle
 - Registrata D-009 sull'ownership e sulla ricostruzione deterministica delle reti.
 
 Punto di ripresa: portare linee e collegamenti inter-system con le relative fixture legacy, senza anticipare il refactoring numerico.
+
+## 12 settembre 2026 — M1, linee e inter-system
+
+- Portata la compressione delle catene resistive tramite `Line`, incluso il flush delle tensioni intermedie e il ripristino della topologia al break.
+- Portati `IAbstractor`, `InterSystem`, `InterSystemAbstraction`, `VoltageStateLineReady` e il calcolo equivalente di Thévenin.
+- Conservati il limite legacy di 100 stati e la priorità degli stati che devono restare lontani dai bridge inter-system.
+- Verificata la convergenza numerica dell'esempio originale a due reti, anche dopo una modifica dinamica del carico.
+- Registrata D-010 per mantenere queste astrazioni prima di qualunque sostituzione del solver.
+
+Punto di ripresa: portare condensatore, induttore e componenti/processi dinamici essenziali con fixture temporali della 1.24.8.

@@ -81,6 +81,17 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 - Isolamento: nessun import Minecraft/NeoForge sotto `modern/src/main/kotlin/mods/eln/sim`.
 - Limite intenzionale: linee e inter-system non fanno parte di questo slice e non sono dichiarati verificati.
 
+## 12 settembre 2026 — Linee e inter-system
+
+- Revisione/stato: working tree successivo a `5a67c37`.
+- Portata verificata: astrazione `Line`, ripristino della topologia, split delle reti oltre 100 stati, `InterSystemAbstraction`, Thévenin e propagazione del break.
+- Primo `test --no-daemon`: fallito 1 test su 16; il test del confine privato attendeva ancora il bridge pending invece della nuova astrazione inter-system. Aspettativa aggiornata al comportamento completo.
+- Secondo `test --no-daemon`: superato dopo l'aggiunta delle fixture dedicate.
+- Fixture principale: esempio `RootSystem.main` della 1.24.8; dopo 50 step `n2=0,6896551724`, `n12=0,7241379310`, poi con il secondo carico `n2=0,6470588235`, `n12=0,6176470588`.
+- Comando finale `$env:GRADLE_USER_HOME = (Resolve-Path '.\\.gradle').Path; .\\gradlew.bat clean build --no-daemon`: superato, 11 task eseguiti.
+- Test presenti: 23 totali, 0 fallimenti/errori; sette appartengono a `LineInterSystemParityTest`.
+- Isolamento: nessun import Minecraft/NeoForge sotto `modern/src/main/kotlin/mods/eln/sim`.
+
 ## Modello di registrazione
 
 ```text

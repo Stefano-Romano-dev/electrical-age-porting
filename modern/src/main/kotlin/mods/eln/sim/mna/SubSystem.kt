@@ -3,6 +3,9 @@ package mods.eln.sim.mna
 import mods.eln.sim.mna.component.Component
 import mods.eln.sim.mna.misc.IDestructor
 import mods.eln.sim.mna.misc.ISubSystemProcessI
+import mods.eln.sim.mna.misc.ISubSystemProcessFlush
+import mods.eln.sim.mna.component.VoltageSource
+import mods.eln.sim.mna.misc.MnaConst
 import mods.eln.sim.mna.state.State
 import org.apache.commons.math3.linear.MatrixUtils
 import org.apache.commons.math3.linear.RealMatrix
@@ -22,6 +25,7 @@ class SubSystem(
     private val mutableComponents = mutableListOf<Component>()
     private val mutableStates = mutableListOf<State>()
     private val rhsProcesses = mutableListOf<ISubSystemProcessI>()
+    private val flushProcesses = mutableListOf<ISubSystemProcessFlush>()
 
     val components: List<Component>
         get() = mutableComponents
@@ -98,6 +102,14 @@ class SubSystem(
         rhsProcesses -= process
     }
 
+    fun addProcess(process: ISubSystemProcessFlush) {
+        if (process !in flushProcesses) flushProcesses += process
+    }
+
+    fun removeProcess(process: ISubSystemProcessFlush) {
+        flushProcesses -= process
+    }
+
     fun invalidate() {
         matrixValid = false
     }
@@ -164,6 +176,7 @@ class SubSystem(
         } else {
             stateTable.forEachIndexed { index, state -> state.state = pendingStateData[index] }
         }
+        flushProcesses.toList().forEach { it.simProcessFlush() }
     }
 
     fun solve(state: State): Double {
@@ -173,6 +186,44 @@ class SubSystem(
         rhsData.fill(0.0)
         rhsProcesses.forEach { it.simProcessI(this) }
         return rhsData.indices.sumOf { inverseData[state.id][it] * rhsData[it] }
+    }
+
+    data class Thevenin(
+        var resistance: Double = 0.0,
+        var voltage: Double = 0.0,
+    ) {
+        val isHighImpedance: Boolean
+            get() = resistance > 1e8
+    }
+
+    fun getTh(state: State, voltageSource: VoltageSource): Thevenin {
+        val originalVoltage = state.state
+        val testVoltage = originalVoltage + 5.0
+
+        voltageSource.setVoltage(testVoltage)
+        val testCurrent = solve(voltageSource.currentState)
+        voltageSource.setVoltage(originalVoltage)
+        val originalCurrent = solve(voltageSource.currentState)
+
+        var resistance = (testVoltage - originalVoltage) / (originalCurrent - testCurrent)
+        var voltage: Double
+        if (resistance > 1e19 || resistance < 0.0) {
+            voltage = 0.0
+            resistance = 1e19
+        } else {
+            voltage = testVoltage + resistance * testCurrent
+        }
+        voltageSource.setVoltage(originalVoltage)
+
+        if (voltage.isNaN() || resistance.isNaN()) {
+            voltage = originalVoltage
+            resistance = MnaConst.HIGH_IMPEDANCE
+        }
+        return Thevenin(resistance = resistance, voltage = voltage)
+    }
+
+    internal fun restoreAbstractedComponent(component: Component) {
+        if (component !in mutableComponents) mutableComponents += component
     }
 
     private fun ensureMatrix() {

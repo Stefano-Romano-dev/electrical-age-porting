@@ -1,6 +1,9 @@
 package mods.eln.sim.mna
 
 import mods.eln.sim.mna.component.Component
+import mods.eln.sim.mna.component.Line
+import mods.eln.sim.mna.component.Resistor
+import mods.eln.sim.mna.component.InterSystemAbstraction
 import mods.eln.sim.mna.misc.IRootSystemPreStepProcess
 import mods.eln.sim.mna.misc.ISubSystemProcessFlush
 import mods.eln.sim.mna.state.State
@@ -55,9 +58,14 @@ class RootSystem(
     }
 
     fun generate() {
+        generateLines()
+        pendingStates.filter { it.mustBeFarFromInterSystem() }.toList().forEach { state ->
+            if (state in pendingStates && state.subSystem == null) buildSubSystem(state)
+        }
         while (pendingStates.isNotEmpty()) {
             buildSubSystem(pendingStates.first())
         }
+        generateInterSystems()
     }
 
     fun step() {
@@ -108,6 +116,9 @@ class RootSystem(
 
             for (component in state.connectedComponentsNotAbstracted()) {
                 if (component !in pendingComponents || component.subSystem != null || component in components) continue
+                if (!privateSystem && queue.size + states.size > MAX_SUBSYSTEM_SIZE && component.canBeReplacedByInterSystem()) {
+                    continue
+                }
 
                 val connected = component.connectedStates().filterNotNull()
                 val crossesBoundary = connected.any {
@@ -127,5 +138,72 @@ class RootSystem(
         states.forEach(subSystem::addState)
         components.forEach(subSystem::addComponent)
         systems += subSystem
+    }
+
+    private fun isValidForLine(state: State): Boolean {
+        if (!state.canBeSimplifiedByLine()) return false
+        val connected = state.connectedComponentsNotAbstracted()
+        return connected.size == 2 && connected.all { it is Resistor && it in pendingComponents }
+    }
+
+    private fun generateLines() {
+        val stateScope = pendingStates.filterTo(linkedSetOf(), ::isValidForLine)
+        while (stateScope.isNotEmpty()) {
+            val rootState = stateScope.first()
+            var statePointer = rootState
+            var resistorPointer = statePointer.connectedComponentsNotAbstracted().first() as Resistor
+
+            while (true) {
+                resistorPointer = statePointer.connectedComponentsNotAbstracted()
+                    .first { it !== resistorPointer } as Resistor
+                val next = resistorPointer.otherPin(statePointer)
+                if (next == null || next === rootState || next !in stateScope) break
+                statePointer = next
+            }
+
+            val lineStates = mutableListOf<State>()
+            val lineResistors = mutableListOf(resistorPointer)
+            while (true) {
+                lineStates += statePointer
+                stateScope -= statePointer
+                resistorPointer = statePointer.connectedComponentsNotAbstracted()
+                    .first { it !== resistorPointer } as Resistor
+                lineResistors += resistorPointer
+
+                val next = resistorPointer.otherPin(statePointer)
+                if (next == null || next !in stateScope) break
+                statePointer = next
+            }
+
+            if (lineResistors.first() === lineResistors.last()) {
+                lineResistors.removeFirst()
+                lineStates.removeFirst()
+            }
+            Line.create(this, lineResistors, lineStates)
+        }
+    }
+
+    internal fun generateInterSystems() {
+        pendingComponents.toList().forEach { component ->
+            val resistor = component as? Resistor ?: return@forEach
+            val a = resistor.aPin ?: return@forEach
+            val b = resistor.bPin ?: return@forEach
+            val aSystem = a.subSystem ?: return@forEach
+            val bSystem = b.subSystem ?: return@forEach
+            if (aSystem === bSystem) return@forEach
+
+            InterSystemAbstraction(this, resistor)
+            pendingComponents -= resistor
+        }
+    }
+
+    private fun Resistor.otherPin(state: State): State? = when {
+        aPin !== state -> aPin
+        bPin !== state -> bPin
+        else -> null
+    }
+
+    private companion object {
+        const val MAX_SUBSYSTEM_SIZE = 100
     }
 }

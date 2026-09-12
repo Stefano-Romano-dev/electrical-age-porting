@@ -4,7 +4,7 @@ import mods.eln.sim.mna.SubSystem
 import mods.eln.sim.mna.misc.MnaConst
 import mods.eln.sim.mna.state.State
 
-class Resistor(
+open class Resistor(
     aPin: State? = null,
     bPin: State? = null,
 ) : Bipole(aPin, bPin) {
