@@ -26,7 +26,17 @@ abstract class Component {
 
     abstract fun connectedStates(): Array<State?>
 
+    open fun canBeReplacedByInterSystem(): Boolean = false
+
     open fun breakConnection() = Unit
+
+    open fun onAddToRootSystem() = Unit
+
+    open fun onRemoveFromRootSystem() = Unit
+
+    fun returnToRootSystem(rootSystem: mods.eln.sim.mna.RootSystem) {
+        rootSystem.pendingComponents += this
+    }
 
     fun setOwner(owner: String?): Component = apply { this.owner = owner }
 

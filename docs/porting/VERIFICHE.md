@@ -69,6 +69,18 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 - Nota: due `clean build` sono fallite prima della compilazione per un lock Windows sul report della configuration cache; P-009. La ricompilazione forzata è passata.
 - Verifica successiva: dopo l'arresto del daemon Gradle globale e l'esecuzione con accesso coerente agli output, `clean build --no-daemon` è superata (11 task); P-009 chiuso.
 
+## 12 settembre 2026 — Lifecycle base di RootSystem
+
+- Revisione/stato: working tree successivo a `69bee69`.
+- Portata verificata: ownership di root, generazione dei sottosistemi con confini privati, break/rebuild, processi pre-step e flush, distruttori e rimozione dalla topologia.
+- Primo tentativo `test --no-daemon`: non avviato, percorso `GRADLE_USER_HOME` errato (`modern/modern/.gradle`).
+- Secondo tentativo `test --no-daemon`: fallito in compilazione test; il test usava `isRegistered` con un `Component` mentre l'API accetta `State`. Corretto senza modificare il codice di produzione.
+- Terzo tentativo `test --no-daemon`: superato.
+- Test presenti: 16 totali, 0 fallimenti/errori; nove appartengono a `RootSystemLifecycleTest`.
+- Comando finale `$env:GRADLE_USER_HOME = (Resolve-Path '.\\.gradle').Path; .\\gradlew.bat clean build --no-daemon`: superato, 11 task (6 eseguiti e 5 da cache).
+- Isolamento: nessun import Minecraft/NeoForge sotto `modern/src/main/kotlin/mods/eln/sim`.
+- Limite intenzionale: linee e inter-system non fanno parte di questo slice e non sono dichiarati verificati.
+
 ## Modello di registrazione
 
 ```text

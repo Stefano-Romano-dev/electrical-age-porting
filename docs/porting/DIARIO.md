@@ -46,3 +46,14 @@ Punto di ripresa: definire il confine del modulo di simulazione e portare il pri
 - Dopo la chiusura del client manuale, identificato e arrestato il relativo daemon Gradle rimasto attivo; la clean build M1 è stata poi superata con accesso coerente agli output e P-009 è stato chiuso.
 
 Punto di ripresa: portare `RootSystem`, generazione dei sottosistemi e lifecycle di aggiunta/rimozione, poi linee e inter-system.
+
+## 12 settembre 2026 — M1, lifecycle base di RootSystem
+
+- Portato `RootSystem` come oggetto posseduto esplicitamente, senza dipendenze da Minecraft, NeoForge o event bus.
+- Implementate generazione deterministica dei sottosistemi con confini privati, rottura e rigenerazione della topologia, oversampling pre-step, flush e distruttori.
+- Estesi stati e componenti con gli hook minimi necessari al lifecycle.
+- Impedita la riscoperta di un componente rimosso attraverso collegamenti obsoleti ancora presenti nello stato.
+- Aggiunti nove test dedicati; l'intera suite contiene 16 test superati.
+- Registrata D-009 sull'ownership e sulla ricostruzione deterministica delle reti.
+
+Punto di ripresa: portare linee e collegamenti inter-system con le relative fixture legacy, senza anticipare il refactoring numerico.

@@ -18,6 +18,11 @@ open class State {
 
     private val connectedComponents = mutableListOf<Component>()
 
+    var isPrivateSubSystem: Boolean = false
+        private set
+
+    private var farFromInterSystem: Boolean = false
+
     internal fun attachTo(subSystem: SubSystem) {
         this.subSystem = subSystem
     }
@@ -38,6 +43,18 @@ open class State {
     }
 
     fun connectedComponents(): List<Component> = connectedComponents.toList()
+
+    fun connectedComponentsNotAbstracted(): List<Component> = connectedComponents()
+
+    fun setAsPrivate(): State = apply { isPrivateSubSystem = true }
+
+    fun setAsMustBeFarFromInterSystem(): State = apply { farFromInterSystem = true }
+
+    fun mustBeFarFromInterSystem(): Boolean = farFromInterSystem
+
+    fun returnToRootSystem(rootSystem: mods.eln.sim.mna.RootSystem) {
+        rootSystem.pendingStates += this
+    }
 
     fun setOwner(owner: String?): State = apply { this.owner = owner }
 

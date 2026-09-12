@@ -75,6 +75,17 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Conseguenze: i primi circuiti preservano i risultati originali; il caso di più sorgenti sullo stesso stato resta un rischio noto P-008.
 - Verifica prevista: fixture legacy e moderna sul caso multi-sorgente, quindi decisione esplicita sull'accumulo del RHS.
 
+## D-009 — Ownership e ricostruzione deterministica delle reti
+
+- Stato: accettata
+- Data: 12 settembre 2026
+- Contesto: il `RootSystem` legacy governa topologia e processi globali, mentre nel port non sono ammessi singleton server-globali impliciti.
+- Scelta: ogni simulazione possiede un'istanza esplicita di `RootSystem`; stati, componenti e sottosistemi sono raccolti in ordine deterministico e la modifica di una rete ne provoca break e rigenerazione controllati.
+- Alternative considerate: conservare un root globale; affidare immediatamente il lifecycle agli eventi NeoForge.
+- Motivo: il core resta testabile senza gioco e l'ownership potrà essere assegnata esplicitamente a server, livello o chunk nel milestone del mondo.
+- Conseguenze: la politica concreta di partizionamento per livello/chunk resta da decidere in M2; componenti rimossi sono esclusi dalla traversata anche se un oggetto `State` conserva temporaneamente il vecchio collegamento.
+- Verifica eseguita: nove test coprono generazione, soluzione, break/rebuild, confini privati, processi, rimozione e distruttori.
+
 ## Modello per nuove decisioni
 
 ```text

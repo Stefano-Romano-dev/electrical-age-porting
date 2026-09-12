@@ -28,8 +28,10 @@ Criteri di uscita:
 - [x] nessun import Minecraft/NeoForge nel core iniziale;
 - [ ] test originali rilevanti portati (primi esempi DC superati);
 - [ ] fixture numeriche di confronto con la 1.24.8 (prime cinque fixture presenti);
-- [ ] lifecycle del simulatore comandabile senza event bus (completo per `SubSystem`, manca `RootSystem`);
+- [x] lifecycle base del simulatore comandabile senza event bus tramite un `RootSystem` posseduto esplicitamente;
 - [x] dipendenza matematica e packaging definiti per il primo slice.
+
+Prossimo slice: linee e collegamenti inter-system, quindi componenti dinamici e fixture temporali.
 
 ## M2 — Primo SixNode verticale
 

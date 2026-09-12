@@ -4,7 +4,7 @@ Aggiornato: 12 settembre 2026
 
 ## Stato generale
 
-**Fase corrente: milestone M1 in corso; primo slice DC del solver MNA verificato.**
+**Fase corrente: milestone M1 in corso; solver DC e lifecycle base di `RootSystem` verificati.**
 
 Target confermato:
 
@@ -41,7 +41,7 @@ Toolchain fissata:
 - [x] Creato il workspace NeoForge 1.21.1 in `modern/`.
 - [x] Ottenuta una clean build riproducibile e un test JUnit 5 minimale.
 - [x] Avviati client e dedicated server con caricamento del mod `eln`.
-- [ ] Estrarre e portare il core di simulazione con i test (primo slice DC completato: `SubSystem`, stati, resistore e sorgenti).
+- [ ] Estrarre e portare il core di simulazione con i test (solver DC e lifecycle base di `RootSystem` completati; linee, inter-system e dinamica restano da portare).
 - [ ] Implementare il primo SixNode verticale.
 
 ## Decisioni registrate
@@ -87,6 +87,8 @@ Avanzamento M1 verificato:
 - `mods.eln.sim.mna` non importa Minecraft o NeoForge, verificato anche da test automatico;
 - portati `SubSystem`, `State`, `VoltageState`, `CurrentState`, `Component`, `Bipole`, `Resistor`, `CurrentSource` e `VoltageSource`;
 - superati i due circuiti esempio della 1.24.8, un partitore, il caso singolare e l'invalidazione dinamica della matrice/RHS;
+- portati ownership esplicita di `RootSystem`, generazione deterministica dei sottosistemi con confini privati, break/rebuild, oversampling pre-step, flush globale e distruttori;
+- aggiunti nove test del lifecycle di root, inclusa la non-riregistrazione di componenti rimossi;
 - dedicated server avviato con caricamento effettivo del runtime Kotlin 2.4.20.
 
 Il dettaglio tecnico e la roadmap completa sono in [ANALISI_PORTING.md](./ANALISI_PORTING.md).

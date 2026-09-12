@@ -16,7 +16,7 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 
 | Sistema legacy | Posizione originale | Destinazione prevista | Stato | Note |
 |---|---|---|---|---|
-| Solver MNA | `mods.eln.sim.mna` | `mods.eln.sim.mna` Kotlin, core indipendente | in porting | Slice DC verificato; restano RootSystem, dinamica e inter-system |
+| Solver MNA | `mods.eln.sim.mna` | `mods.eln.sim.mna` Kotlin, core indipendente | in porting | Slice DC e lifecycle base RootSystem verificati; restano dinamica, linee e inter-system |
 
 ## Solver MNA
 
@@ -28,7 +28,8 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 | `Resistor` | `component.Resistor` | verificato | tensione, corrente, potenza, cambio resistenza |
 | `CurrentSource` | `component.CurrentSource` | verificato | esempio 0,01 A / 10 Ω |
 | `VoltageSource` | `component.VoltageSource` | verificato | esempio 1 V / 10 Ω e partitore |
-| `RootSystem`, linee e inter-system | da portare | in porting | prossimo slice |
+| `RootSystem` | `mods.eln.sim.mna.RootSystem` | verificato, lifecycle base | generazione, break/rebuild, confini privati, processi e rimozione |
+| linee e inter-system | da portare | in porting | prossimo slice; connettività avanzata non ancora implementata |
 | condensatore, induttore, trasformatore e delay | da portare | mappato | transitori e parità temporale |
 | Simulazione termica | `mods.eln.sim` | core indipendente | da analizzare | Dopo baseline elettrica |
 | SixNode | `mods.eln.node.six` | block entity host + component registry | mappato | Priorità M2 |
