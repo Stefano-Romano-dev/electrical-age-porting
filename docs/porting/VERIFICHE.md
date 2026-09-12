@@ -99,6 +99,18 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 - Ricerca dei riferimenti a D-011 e `FEDELTA.md`: superata in istruzioni, analisi, stato e indice documentale.
 - Build non ripetuta: la modifica non interessa sorgenti, risorse runtime o configurazione Gradle.
 
+## 12 settembre 2026 — Primo nucleo dinamico MNA
+
+- Revisione/stato: working tree successivo a `ade6271`.
+- Portata verificata: `Capacitor`, `Inductor` e `Delay`, mantenendo formule e ordine di aggiornamento della 1.24.8.
+- Primo `test --no-daemon`: fallito 1 test su 30 perché la fixture chiamava `Delay.simProcessI` prima della generazione della matrice e degli id MNA.
+- Secondo `test --no-daemon`: fallito 1 test su 30 perché la fixture ipotizzava corrente 0 al secondo aggiornamento di `Delay`; il codice originale produce 2 per l'accumulo di `oldIa`/`oldIb`, quindi l'aspettativa è stata corretta alla semantica legacy.
+- Terzo `test --no-daemon`: superato, 30 test e 0 fallimenti/errori.
+- Comando finale `$env:GRADLE_USER_HOME = (Resolve-Path '.\\.gradle').Path; .\\gradlew.bat clean build --no-daemon`: superato, 11 task (6 eseguiti e 5 da cache).
+- Fixture temporali: RC con campioni `0,5; 0,75; 0,875; 0,9375`, RL con `0,05; 0,075; 0,0875; 0,09375`, entrambe a `dt=0,1`.
+- Isolamento statico: nessun import Minecraft/NeoForge sotto `modern/src/main/kotlin/mods/eln/sim`.
+- Limite dichiarato: l'adapter moderno per la persistenza della corrente dell'induttore non fa parte di questo slice.
+
 ## Modello di registrazione
 
 ```text

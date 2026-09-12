@@ -75,3 +75,12 @@ Punto di ripresa: portare condensatore, induttore e componenti/processi dinamici
 - Rafforzate le istruzioni del workspace: niente miglioramenti, semplificazioni o correzioni legacy silenziose.
 
 Punto di ripresa invariato: componenti dinamici essenziali, misurando anche la parità temporale oltre a quella numerica.
+
+## 12 settembre 2026 — M1, primo nucleo dinamico
+
+- Portati condensatore, induttore e delay senza dipendenze dalla piattaforma.
+- Conservati integrazione backward Euler, nome legacy `coulombs`, corrente del condensatore sempre zero e accumulo interno del delay.
+- Aggiunte sette fixture per energia, lifecycle e traiettorie temporali RC/RL.
+- La persistenza della corrente dell'induttore resta esplicitamente da collegare al formato moderno quando verrà introdotto lo stato del mondo.
+
+Punto di ripresa: switch resistivo, trasformatore, sorgente di potenza e processi accoppiati rimanenti del nucleo MNA.

@@ -4,7 +4,7 @@ Aggiornato: 12 settembre 2026
 
 ## Stato generale
 
-**Fase corrente: milestone M1 in corso; solver DC, lifecycle, linee e inter-system verificati.**
+**Fase corrente: milestone M1 in corso; primo nucleo dinamico MNA verificato.**
 
 Target confermato:
 
@@ -41,7 +41,7 @@ Toolchain fissata:
 - [x] Creato il workspace NeoForge 1.21.1 in `modern/`.
 - [x] Ottenuta una clean build riproducibile e un test JUnit 5 minimale.
 - [x] Avviati client e dedicated server con caricamento del mod `eln`.
-- [ ] Estrarre e portare il core di simulazione con i test (solver DC, lifecycle, linee e inter-system completati; componenti dinamici e processi fisici restano da portare).
+- [ ] Estrarre e portare il core di simulazione con i test (solver DC, lifecycle, linee, inter-system, condensatore, induttore e delay completati; restano gli altri componenti e processi fisici).
 - [ ] Implementare il primo SixNode verticale.
 
 ## Decisioni registrate
@@ -92,6 +92,8 @@ Avanzamento M1 verificato:
 - aggiunti nove test del lifecycle di root, inclusa la non-riregistrazione di componenti rimossi;
 - portate la compressione delle catene resistive in `Line`, la soglia legacy di 100 stati, `InterSystemAbstraction` e l'equivalente di Thévenin;
 - verificata la convergenza dell'esempio legacy a due reti prima e dopo l'aggiunta di un carico;
+- portati `Capacitor`, `Inductor` e `Delay` con semantica temporale backward Euler e stato interno legacy;
+- verificate traiettorie RC/RL campione per campione e la progressione interna di `Delay`;
 - dedicated server avviato con caricamento effettivo del runtime Kotlin 2.4.20.
 
 Il dettaglio tecnico e la roadmap completa sono in [ANALISI_PORTING.md](./ANALISI_PORTING.md).

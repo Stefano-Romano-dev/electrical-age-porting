@@ -31,7 +31,10 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 | `RootSystem` | `mods.eln.sim.mna.RootSystem` | verificato, lifecycle base | generazione, break/rebuild, confini privati, processi e rimozione |
 | `Line`, `VoltageStateLineReady` | stesso package logico | verificato | compressione, resistenza equivalente, flush stati intermedi e ripristino |
 | `InterSystem`, `InterSystemAbstraction` | stesso package logico | verificato | split oltre 100 stati, Thévenin, convergenza e distruzione |
-| condensatore, induttore, trasformatore e delay | da portare | mappato | transitori e parità temporale |
+| `Capacitor` | stesso package logico | verificato, core | energia e traiettoria RC; corrente zero legacy conservata |
+| `Inductor` | stesso package logico | verificato, core | energia, reset e traiettoria RL; adapter di persistenza ancora da integrare |
+| `Delay` | stesso package logico | verificato, core | primi campioni `oldIa`/`oldIb` conservati |
+| trasformatore, switch e sorgenti di potenza | da portare | mappato | prossimo slice MNA |
 | Simulazione termica | `mods.eln.sim` | core indipendente | da analizzare | Dopo baseline elettrica |
 | SixNode | `mods.eln.node.six` | block entity host + component registry | mappato | Priorità M2 |
 | TransparentNode | `mods.eln.node.transparent` | block/block entity moderni | da analizzare | Port per famiglie |
