@@ -43,7 +43,11 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 | `ThermalLoad`, `ThermalConnection`, `ThermalResistor` | `mods.eln.sim` | verificato, core | trasferimenti, segni, accumulatori, coordinate e flag fast/slow |
 | `Simulator.thermalStep` | `ThermalSimulator` + `ThermalAmbientExchange` | verificato, core | ordine connessioni/processi/ambiente/integrazione e reset accumulatori |
 | Processi heater base | `mods.eln.sim.process.heater` | verificato, core | resistore, diodo e resistenza seriale di `ElectricalLoad` |
-| Simulazione termica | `mods.eln.sim` | core indipendente + adapter ambiente | implementato, parità parziale | Scheduler e processi superiori restano aperti |
+| `Simulator` | `mods.eln.sim.Simulator` puro + futuro adapter tick NeoForge | verificato, scheduler base | sequenza multi-rate, fasi slow, distruzioni differite, registrazione fast/slow e stabilità termica |
+| Inizializzatori termici | stesso package logico, validator esplicito | verificato, core | formule `Rs`/`Rp`/`C`, copia, applicazione e rifiuto instabile |
+| `FurnaceProcess`, `DiodeProcess`, conversione resistiva | stesso package logico | verificato, core | consumo combustibile, clamp gain, segno del diodo e potenza Joule |
+| `Integrator`, `Differentiator` | stesso package logico | verificato, core | sequenze campione-per-campione e reset legacy |
+| Simulazione termica | `mods.eln.sim` | core indipendente + adapter ambiente | implementato, parità parziale | Batterie, regolatori, watchdog e adapter stanza/persistenza restano aperti |
 | SixNode | `mods.eln.node.six` | block entity host + component registry | mappato | Priorità M2 |
 | TransparentNode | `mods.eln.node.transparent` | block/block entity moderni | da analizzare | Port per famiglie |
 | SimpleNode | `mods.eln.node.simple`, `simplenode` | blocchi/capability moderni | da analizzare | Include integrazioni |

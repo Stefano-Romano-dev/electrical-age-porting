@@ -118,6 +118,28 @@ Gli elementi ricevono un id stabile. Quando risolti, conservarli con stato `riso
 - Impatto: potenze negative possono ridurre `Psp` e quindi il valore restituito da `getPower`; correggerlo cambierebbe telemetria o comportamenti che la consumano.
 - Mitigazione prevista: preservare per D-011 e verificare i chiamanti prima di proporre una correzione separata.
 
+## P-013 — Il primo tick esegue due solve elettrici
+
+- Stato: aperto, comportamento legacy preservato
+- Gravità: bassa
+- Area: scheduler simulazione
+- Rilevato: 12 settembre 2026
+- Descrizione: con accumulatori iniziali a zero, il confronto `electricalTimeout <= thermalTimeout` esegue un solve elettrico a tempo zero; il limite inclusivo provoca un secondo solve al termine del primo tick da 0,05 s. I tick successivi ne eseguono normalmente uno.
+- Riproduzione/evidenza: `SimulatorScheduleParityTest` osserva conteggi elettrici cumulativi 2 dopo il primo tick e 3 dopo il secondo, con configurazione legacy 20 Hz/400 Hz.
+- Impatto: transitorio iniziale e processi elettrici ricevono una chiamata aggiuntiva all'avvio.
+- Mitigazione prevista: preservare per D-011/D-013 e confrontare l'avvio di dispositivi reali prima di valutare modifiche.
+
+## P-014 — `Differentiator.reset` non ripristina il warm-up
+
+- Stato: aperto, comportamento legacy preservato
+- Gravità: bassa
+- Area: utility numeriche
+- Rilevato: 12 settembre 2026
+- Descrizione: `reset()` azzera i quattro campioni ma non `stepsTaken`; dopo un precedente warm-up, il campione successivo usa subito lo stencil di ordine superiore.
+- Riproduzione/evidenza: fixture `differentiator reset preserves legacy warmup counter` con risultato `22 / (6 * dt)` dopo il reset.
+- Impatto: un regolatore o filtro riutilizzato può produrre un impulso diverso da un'istanza nuova.
+- Mitigazione prevista: preservare finché non sono stati auditati tutti i chiamanti; nessuna correzione senza approvazione esplicita.
+
 ## Modello
 
 ```text

@@ -119,6 +119,17 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Conseguenze: il futuro adapter NeoForge deve restituire potenza positiva quando esce dal carico e replicare la semantica di `RoomThermalManager`; le coordinate primitive legacy restano nel carico finché non verrà definita l'ownership per livello/chunk.
 - Verifica eseguita: fixture con fallback ambientale, carico con coordinate e adapter, ordine connessione/processo e integrazione degli accumulatori.
 
+## D-013 — Scheduler multi-rate separato dall'evento NeoForge
+
+- Stato: accettata
+- Data: 12 settembre 2026
+- Contesto: il `Simulator` legacy combina algoritmo temporale, liste dei processi, ownership MNA, callback Forge e accesso a singleton globali.
+- Scelta: mantenere nel core un `Simulator` posseduto esplicitamente che replica accumulatori, confronti, periodi e ordine delle fasi; il futuro adapter NeoForge si limita a chiamare `tick()` sul simulatore del server/livello appropriato.
+- Alternative considerate: riscrivere il ritmo sui tick Minecraft; integrare direttamente gli eventi NeoForge nel core; uniformare tutti i processi a 20 Hz.
+- Motivo: frequenze e ordine sono comportamento osservabile e devono essere verificabili deterministicamente senza avviare il gioco.
+- Conseguenze: resta da decidere l'ownership concreta server/livello/chunk; il solve elettrico aggiuntivo al primo tick e il periodo slow fisso a 0,05 s vengono conservati.
+- Verifica eseguita: fixture su conteggi a 20/400 Hz, ordine delle sette fasi, autorimozione dei processi slow, classificazione fast/slow e validazione termica.
+
 ## Modello per nuove decisioni
 
 ```text

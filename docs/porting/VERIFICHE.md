@@ -149,6 +149,19 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 - Isolamento statico: `CoreIsolationTest` copre l'intero package `modern/src/main/kotlin/mods/eln/sim`; nessun import Minecraft/NeoForge.
 - Limiti dichiarati: scheduler multi-rate, `RoomThermalManager` moderno, persistenza e processi fisici superiori non fanno parte di questa slice.
 
+## 12 settembre 2026 — Scheduler multi-rate e inizializzatori termici
+
+- Revisione/stato: working tree successivo a `16686c4`.
+- Portata verificata: scheduler puro `Simulator`, validazione/inizializzazione termica, `FurnaceProcess`, `DiodeProcess`, conversione resistiva, `Integrator` e `Differentiator`.
+- Primo `test`: fallito 3 test su 85 per aspettative della fixture; l'implementazione mostrava il doppio solve elettrico iniziale legacy e la potenza residua del forno dopo il consumo. Le aspettative sono state riallineate alle formule sorgente.
+- Secondo `test`: superato, 85 test e 0 fallimenti/errori.
+- Aggiunta una fixture per verificare che l'inizializzatore deleghi davvero il rifiuto dei parametri instabili; totale corrente 86 test.
+- Primo comando finale `$env:GRADLE_USER_HOME = (Resolve-Path '.\.gradle').Path; .\gradlew.bat clean build --no-daemon`: fallito in `compileJava` per `AccessDeniedException` sul JAR `mergetool-2.0.3-api.jar` nella cache locale, dopo compilazione Kotlin riuscita.
+- Stesso comando con accesso coerente alla cache/output: superato in 14 s, 11 task (10 eseguiti e 1 da cache), 86 test e 0 fallimenti/errori.
+- Parità coperta: 2/3 solve elettrici cumulativi nei primi due tick, 20 passi termici fast per tick, ordine slow-pre/elettrico/termico/slow/distruzione/slow-post, formule di stabilità, consumi e utility numeriche.
+- Isolamento statico: nessun import Minecraft/NeoForge nel package core, verificato dalla suite.
+- Limiti dichiarati: l'adapter evento NeoForge, ownership per server/livello, batterie, regolatori, persistenza e room manager moderno restano aperti.
+
 ## Modello di registrazione
 
 ```text

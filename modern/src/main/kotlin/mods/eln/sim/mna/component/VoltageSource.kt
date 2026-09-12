@@ -10,7 +10,7 @@ open class VoltageSource(
     aPin: State? = null,
     bPin: State? = null,
 ) : Bipole(aPin, bPin), ISubSystemProcessI {
-    internal val currentState = CurrentState()
+    val currentState = CurrentState()
 
     final override var voltage: Double = 0.0
         private set

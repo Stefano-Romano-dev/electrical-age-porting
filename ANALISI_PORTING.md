@@ -58,6 +58,8 @@ Il solver legacy applica inoltre due astrazioni prestazionali che fanno parte de
 
 Il passo termico legacy è esplicito e sensibile all'ordine: calcola prima i flussi sulle `ThermalConnection`, esegue poi i processi termici, applica lo scambio con la stanza (o la dispersione verso 0 °C tramite `temperatureCelsius / Rp`), integra `temperatureCelsius += PcTemp * dt / heatCapacity`, pubblica gli accumulatori e infine li azzera. Nel port questo algoritmo vive in `ThermalSimulator`; l'unico contatto con il mondo è `ThermalAmbientExchange`, che verrà implementato dal layer NeoForge senza contaminare il core.
 
+Lo scheduler legacy usa tre accumulatori temporali e sceglie il prossimo sottopasso confrontando `electricalTimeout` e `thermalTimeout`. A parità iniziale privilegia l'elettrico (`<=`), perciò il primo tick include un solve a tempo zero e uno al limite del tick; dai tick successivi il ritmo si assesta. Prima e dopo il loop esegue, nell'ordine, slow-pre, termico slow fisso a 0,05 s, slow, distruzioni differite e slow-post. Il `Simulator` moderno conserva questa sequenza senza dipendere dall'evento server; un adapter NeoForge dovrà soltanto invocare `tick()` nella fase server corretta.
+
 ### 2. Sistema dei nodi
 
 Il gameplay si basa su tre famiglie:

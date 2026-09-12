@@ -31,8 +31,9 @@ Criteri di uscita:
 - [x] lifecycle base del simulatore comandabile senza event bus tramite un `RootSystem` posseduto esplicitamente;
 - [x] dipendenza matematica e packaging definiti per il primo slice.
 - [x] primo strato fisico puro: carichi e connessioni elettriche/termiche, conversione Joule→calore e passo termico deterministico.
+- [x] scheduler multi-rate puro con inizializzatori termici, fasi slow e validazione di stabilità.
 
-Prossimo slice: inizializzatori termici e processi energetici puri superiori, quindi scheduler multi-rate controllabile nei test.
+Prossimo slice: batterie, curve numeriche e regolatori puri con stato persistente separato dagli adapter NeoForge.
 
 ## M2 — Primo SixNode verticale
 

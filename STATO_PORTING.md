@@ -4,7 +4,7 @@ Aggiornato: 12 settembre 2026
 
 ## Stato generale
 
-**Fase corrente: milestone M1 in corso; primo strato elettrico/termico puro completato.**
+**Fase corrente: milestone M1 in corso; scheduler multi-rate puro e inizializzazione termica completati.**
 
 Target confermato:
 
@@ -101,6 +101,9 @@ Avanzamento M1 verificato:
 - portati `ElectricalLoad`, `ElectricalConnection`, carichi/connessioni/resistori termici e i tre processi base di conversione Joule→calore;
 - estratto il passo termico nell'esecutore puro `ThermalSimulator`, conservando ordine delle fasi, formule e accumulatori legacy e isolando lo scambio termico con la stanza dietro un adapter;
 - aggiunte 19 fixture fisiche; la suite completa raggiunge 68 test superati;
+- portato lo scheduler `Simulator` senza event bus, con periodi elettrico/termico, fasi slow, coda distruzioni e classificazione fast/slow;
+- portati gli inizializzatori termici con validazione di stabilità posseduta dallo scheduler, `FurnaceProcess`, `DiodeProcess`, conversione resistiva legacy, `Integrator` e `Differentiator`;
+- fissate con fixture le sequenze multi-rate e le particolarità di startup/reset; la suite completa raggiunge 86 test superati;
 - dedicated server avviato con caricamento effettivo del runtime Kotlin 2.4.20.
 
 Il dettaglio tecnico e la roadmap completa sono in [ANALISI_PORTING.md](./ANALISI_PORTING.md).

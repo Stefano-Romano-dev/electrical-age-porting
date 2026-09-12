@@ -113,3 +113,13 @@ Punto di ripresa: analizzare i chiamanti puri in `mods.eln.sim` e portare il pri
 - Aggiunte 19 fixture; suite da 68 test e clean build entrambe superate.
 
 Punto di ripresa: portare inizializzatori termici e processi energetici puri successivi, poi ricostruire lo scheduler multi-rate del `Simulator` senza event bus.
+
+## 12 settembre 2026 — M1, scheduler multi-rate puro
+
+- Portato il `Simulator` come owner indipendente dall'event bus, conservando accumulatori temporali, oversampling MNA e ordine delle fasi legacy.
+- Collegata la validazione degli inizializzatori al periodo termico dello scheduler, eliminando il precedente accesso globale a `Eln.simulator`.
+- Portati forno, diodo, conversione resistiva e utility di integrazione/derivazione.
+- Fissati P-013 sul doppio solve del primo tick e P-014 sul reset incompleto del differenziatore, entrambi preservati per fedeltà.
+- Aggiunte 18 fixture; suite da 86 test e clean build superate.
+
+Punto di ripresa: portare curve numeriche, batteria, invecchiamento configurabile e regolatori, separando lo stato persistente dagli adapter NeoForge.
