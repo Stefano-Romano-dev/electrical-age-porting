@@ -64,6 +64,8 @@ La batteria legacy usa `Q` come carica normalizzata rispetto a `QNominal`, ricav
 
 Il regolatore analogico non è un PID convenzionale: il termine derivativo moltiplica per `time`, il clamp inferiore dell'integrale usa `-1 + fP` e la riconfigurazione dei guadagni azzera l'integrale soltanto dopo il boot. Queste formule sono state mantenute. `RegulatorState` separa `errorIntegrated` e `target` dalla codifica NBT, conservando le chiavi composte legacy.
 
+I watchdog legacy accumulano il danno come `time * overflow * random(0,5; 1,5)`, ignorano il primo campione consecutivo fuori soglia tramite il flag `joker` e ricaricano il timeout quando il valore rientra. Policy di abilitazione, generatore casuale, distruzione del mondo e dump diagnostico erano globali; nel port sono confini iniettati, mentre soglie, ordine e ripetizione dei trip restano invariati. `WorldExplosion` e il watchdog degli alberi meccanici sono correttamente rimandati ai layer mondo e meccanico.
+
 ### 2. Sistema dei nodi
 
 Il gameplay si basa su tre famiglie:

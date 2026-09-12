@@ -51,6 +51,7 @@ Le tolleranze numeriche devono essere motivate e sufficientemente strette da non
 | Primo strato elettrico/termico | resistenze seriali, trasferimenti termici, dispersione e calore Joule coperti | ordine del passo e integrazione a `dt` coperti | non applicabile | non applicabile | adapter stanza e persistenza da integrare | 19 test automatici M1 | parziale |
 | Scheduler e inizializzazione termica | formule di stabilità, forno, diodo e utility numeriche coperti | multi-rate, fasi slow e startup coperti | non applicabile | non applicabile | tick NeoForge e stato persistente da integrare | 18 test automatici M1 | parziale |
 | Curve, batteria e regolatori | curve, carica, vita, calore, PID/on-off e soglie coperti | aging e integrazione energia coperti | non applicabile | distruzione concreta da integrare | snapshot/schema verificati; adapter NBT da integrare | 22 test automatici M1 | parziale |
+| Watchdog e timer | soglie, categorie, callback e diagnostica coperti | casualità, timeout, joker, delay e autorimozione coperti | non applicabile | esplosione/rimozione blocco da integrare | policy server da collegare | 18 test automatici M1 | parziale |
 
 `parziale` significa che l'area coperta è equivalente per le prove indicate, ma il sistema complessivo non è ancora completo.
 

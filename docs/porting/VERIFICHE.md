@@ -174,6 +174,17 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 - Schemi preservati: batteria `NBPQ`/`NBPlife`; regolatore `prefix + name + errorIntegrated/target`.
 - Limiti dichiarati: codec `CompoundTag`, distruzione del nodo, configurazione server e prove su dispositivi nel mondo non fanno parte di questa slice.
 
+## 12 settembre 2026 — Watchdog, timer e audit processi
+
+- Revisione/stato: working tree successivo a `f785dec`.
+- Portata verificata: `ValueWatchdog`, watchdog tensione/bipolo/resistore/termico, `IDestructible`, `DelayedDestruction`, `TimeRemover` e relativi confini di policy/diagnostica.
+- Comando `$env:GRADLE_USER_HOME = (Resolve-Path '.\.gradle').Path; .\gradlew.bat test`: superato, 126 test e 0 fallimenti/errori; rimossi successivamente cinque warning non funzionali nella fixture termica.
+- Comando finale `$env:GRADLE_USER_HOME = (Resolve-Path '.\.gradle').Path; .\gradlew.bat clean build --no-daemon`, con accesso coerente alla cache: superato in 14 s, 11 task (8 eseguiti e 3 da cache), 126 test e 0 fallimenti/errori.
+- Parità coperta: primo overflow ignorato, timeout e recupero, policy per categoria, ripetizione del trip, limiti nominali, temperatura assoluta/ambiente, derivata termica, dump, delay e timer osservabile.
+- Audit strutturale: 42 tipi legacy esaminati, 32 controparti pure presenti, 10 rimandati con destinazione esplicita in `PROCESS_AUDIT.md`.
+- Isolamento statico: nessun import Minecraft/NeoForge nei root puri `mods/eln/sim` e `mods/eln/misc`.
+- Limiti dichiarati: `WorldExplosion`, `ShaftSpeedWatchdog`, adapter di configurazione/dump e teardown di nodi reali non fanno parte di questa slice.
+
 ## Modello di registrazione
 
 ```text

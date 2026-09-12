@@ -141,6 +141,17 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Conseguenze: i costruttori moderni ricevono esplicitamente la policy; gli adapter futuri devono conservare suffissi, chiavi e riparazione dei valori non finiti documentati nell'inventario.
 - Verifica eseguita: aging abilitato/disabilitato, snapshot validi/non finiti e composizione esatta delle chiavi legacy.
 
+## D-015 — Effetti dei watchdog come confini iniettati
+
+- Stato: accettata
+- Data: 12 settembre 2026
+- Contesto: `ValueWatchdog` legge flag globali e casualità da `Eln/Utils`; il watchdog termico scrive log/dump, mentre `WorldExplosion` modifica direttamente il mondo.
+- Scelta: conservare nel core la decisione temporale del guasto e iniettare `WatchdogPolicy`, `WatchdogRandomFactor`, `IDestructible`, sink diagnostico e observer del trip. `WorldExplosion` resta un adapter NeoForge futuro.
+- Alternative considerate: importare configurazione e mondo nel core; disabilitare provvisoriamente i guasti; sostituire le esplosioni con callback vuote nei contenuti.
+- Motivo: soglie, distribuzione e tempi possono essere verificati deterministicamente senza perdere gli effetti finali, che richiedono ownership e API del livello.
+- Conseguenze: ogni nodo moderno deve fornire esplicitamente policy e distruttore; l'assenza di un distruttore replica il target nullo legacy ma non soddisfa la vertical slice del contenuto.
+- Verifica eseguita: categorie, policy off, fattore deterministico, trip termico, dump riuscito/fallito e callback distruttiva.
+
 ## Modello per nuove decisioni
 
 ```text

@@ -52,7 +52,11 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 | `RegulatorProcess` e adapter termici | `mods.eln.sim` | verificato, core | None/Manual/OnOff/Analog, reset guadagni, clamp e soglie resistenza |
 | Persistenza batteria | `BatteryState` + futuro codec/adapter | schema mappato, adapter rimandato | suffissi legacy `NBPQ`, `NBPlife`; valori non finiti riparati come in origine |
 | Persistenza regolatore | `RegulatorState` + futuro codec/adapter | schema mappato, adapter rimandato | chiavi `prefix + name + errorIntegrated/target`; solo integrale NaN riparato |
-| Simulazione termica | `mods.eln.sim` | core indipendente + adapter ambiente | implementato, parità parziale | Watchdog, adapter stanza e persistenza concreta restano aperti |
+| Watchdog elettrici/termici | `mods.eln.sim.process.destruct` + policy/sink | verificato, core | soglie, primo overflow ignorato, timeout casuale, categorie e telemetria trip |
+| `DelayedDestruction`, `TimeRemover` | stesso package logico + owner `Simulator` | verificato, core | registrazione, scadenza, autorimozione e callback |
+| `WorldExplosion` | adapter mondo NeoForge | rimandato | nessun placeholder: forza, rimozione blocco ed effetti verranno portati con il nodo |
+| `ShaftSpeedWatchdog` | futuro core meccanico | rimandato | richiede rete shaft e velocità angolare |
+| Simulazione termica | `mods.eln.sim` | core indipendente + adapter ambiente | implementato, parità parziale | Adapter stanza, persistenza concreta e chiamanti nel mondo restano aperti |
 | SixNode | `mods.eln.node.six` | block entity host + component registry | mappato | Priorità M2 |
 | TransparentNode | `mods.eln.node.transparent` | block/block entity moderni | da analizzare | Port per famiglie |
 | SimpleNode | `mods.eln.node.simple`, `simplenode` | blocchi/capability moderni | da analizzare | Include integrazioni |

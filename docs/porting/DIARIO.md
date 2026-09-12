@@ -134,3 +134,14 @@ Punto di ripresa: portare curve numeriche, batteria, invecchiamento configurabil
 - Aggiunte 22 fixture; suite da 108 test e clean build superate.
 
 Punto di ripresa: portare watchdog/distruzione puri, auditare i processi M1 ancora mancanti e progettare gli adapter `CompoundTag` fuori dal core.
+
+## 12 settembre 2026 — M1, watchdog e audit processi
+
+- Portata la logica comune dei watchdog con policy e casualità iniettate, preservando joker, timeout, recupero e trip ripetuti.
+- Portati watchdog elettrici, resistivi e termici con telemetria/dump astratti, più distruzione ritardata e `TimeRemover` con owner esplicito.
+- Rimandati senza placeholder `WorldExplosion` e watchdog meccanico ai rispettivi layer.
+- Creato `PROCESS_AUDIT.md`: 32 dei 42 tipi legacy esaminati hanno ora una controparte pura; i 10 restanti hanno una destinazione motivata.
+- Registrati P-018 e P-019 per reset incompleto e ripetizione della distruzione.
+- Aggiunte 18 fixture; suite da 126 test e clean build superate.
+
+Punto di ripresa: implementare codec `CompoundTag` esterni al core, collegare il tick server NeoForge a un owner esplicito e verificare il lifecycle su dedicated server.

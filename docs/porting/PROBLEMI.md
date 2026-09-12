@@ -173,6 +173,28 @@ Gli elementi ricevono un id stabile. Quando risolti, conservarli con stato `riso
 - Impatto: eventuali chiamanti che mutano la scala possono osservare una curva incoerente con il campo pubblico.
 - Mitigazione prevista: preservare e auditare i chiamanti prima di decidere se rendere immutabile o sincronizzare il campo.
 
+## P-018 — `ValueWatchdog.reset` non ripristina il joker
+
+- Stato: aperto, comportamento legacy preservato
+- Gravità: media
+- Area: watchdog
+- Rilevato: 12 settembre 2026
+- Descrizione: `reset()` imposta soltanto `boot=true`; se il watchdog era già fuori soglia, `joker` resta falso e il primo campione dopo il reset non riceve la normale tolleranza iniziale.
+- Riproduzione/evidenza: fixture `reset retains legacy joker state` distrugge al primo processo successivo al reset.
+- Impatto: riarmare un dispositivo ancora sovraccarico può causare distruzione immediata.
+- Mitigazione prevista: preservare per D-011 e verificare i flussi reali di riarmo prima di qualunque correzione.
+
+## P-019 — Un watchdog scaduto ripete trip e distruzione
+
+- Stato: aperto, comportamento legacy preservato
+- Gravità: media
+- Area: watchdog/lifecycle
+- Rilevato: 12 settembre 2026
+- Descrizione: dopo `timeout < 0` il watchdog non si disarma né ripristina il timeout; finché resta registrato e fuori soglia richiama `onDestroy` e `destructImpl` a ogni processo.
+- Riproduzione/evidenza: la fixture del primo overflow osserva due trip e due distruzioni su due campioni successivi alla scadenza.
+- Impatto: il corretto teardown del nodo deve rimuovere rapidamente il processo; altrimenti effetti e diagnostica possono ripetersi.
+- Mitigazione prevista: conservare la logica e coprire l'autorimozione/teardown nella vertical slice dei nodi.
+
 ## Modello
 
 ```text

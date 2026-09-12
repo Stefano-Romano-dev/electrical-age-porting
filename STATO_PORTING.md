@@ -4,7 +4,7 @@ Aggiornato: 12 settembre 2026
 
 ## Stato generale
 
-**Fase corrente: milestone M1 in corso; batterie, curve e regolatori puri completati.**
+**Fase corrente: milestone M1 in corso; watchdog/distruzione pura e audit dei processi completati.**
 
 Target confermato:
 
@@ -107,6 +107,9 @@ Avanzamento M1 verificato:
 - portate `FunctionTable`/`FunctionTableYProtect`, batteria, invecchiamento configurabile, regolatore on-off/analogico e adapter puri forno/resistore;
 - introdotti snapshot puri per batteria e regolatore con schema legacy conservato, rimandando la codifica NBT al layer di persistenza moderno;
 - aggiunte 22 fixture per curve, carica, energia, aging, distruzione e regolazione; la suite completa raggiunge 108 test superati;
+- portati watchdog generico, elettrico, resistivo e termico, distruzione ritardata e `TimeRemover`, con policy, casualità e diagnostica iniettate;
+- auditati 42 tipi tra `mods.eln.sim` e `sim.process`: 32 hanno una controparte pura, 10 sono instradati alle vertical slice che ne possiedono le dipendenze;
+- aggiunte 18 fixture per soglie, timeout, isteresi di guasto, categorie, diagnostica e timer; la suite completa raggiunge 126 test superati;
 - dedicated server avviato con caricamento effettivo del runtime Kotlin 2.4.20.
 
 Il dettaglio tecnico e la roadmap completa sono in [ANALISI_PORTING.md](./ANALISI_PORTING.md).

@@ -33,8 +33,9 @@ Criteri di uscita:
 - [x] primo strato fisico puro: carichi e connessioni elettriche/termiche, conversione Joule→calore e passo termico deterministico.
 - [x] scheduler multi-rate puro con inizializzatori termici, fasi slow e validazione di stabilità.
 - [x] curve numeriche, batteria, aging e regolatori con snapshot persistenti puri.
+- [x] watchdog, timer e distruzione astratta; audit strutturale dei processi M1.
 
-Prossimo slice: watchdog e distruzione pura, quindi audit di completezza dei processi M1 e definizione del confine di persistenza NeoForge.
+Prossimo slice: codec `CompoundTag` esterni al core e adapter tick server NeoForge; poi verifica dedicated server del lifecycle M1.
 
 ## M2 — Primo SixNode verticale
 
