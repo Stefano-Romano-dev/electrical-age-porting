@@ -1,10 +1,10 @@
 # Stato del porting di Electrical Age
 
-Aggiornato: 12 settembre 2026
+Aggiornato: 13 settembre 2026
 
 ## Stato generale
 
-**Fase corrente: milestone M1 in chiusura; persistenza di piattaforma e lifecycle server collegati.**
+**Fase corrente: milestone M1 completata; M2 avviata con identità e persistenza dello shell SixNode.**
 
 Target confermato:
 
@@ -42,7 +42,7 @@ Toolchain fissata:
 - [x] Ottenuta una clean build riproducibile e un test JUnit 5 minimale.
 - [x] Avviati client e dedicated server con caricamento del mod `eln`.
 - [x] Estrarre e portare il core di simulazione M1 con test di parità, scheduler, processi fisici essenziali e codec persistenti esterni.
-- [ ] Implementare il primo SixNode verticale.
+- [ ] Implementare il primo SixNode verticale (catalogo identità e shell persistente completati; blocco e block entity non ancora registrati).
 
 ## Decisioni registrate
 
@@ -71,7 +71,7 @@ Toolchain fissata:
 - La macchina dispone già di Java 21 a 64 bit (Temurin 21.0.11).
 - `original/` non ha un `.git` proprio; il repository Git effettivo è la radice del workspace e contiene modifiche/cancellazioni preesistenti che non devono essere alterate.
 
-## Prossimo milestone: core di simulazione
+## Milestone M1 completata: core di simulazione
 
 Deliverable previsto per M1:
 
@@ -114,7 +114,16 @@ Avanzamento M1 verificato:
 - aggiunti codec `CompoundTag` esterni al core per batteria, regolatore, stati elettrici/termici, forno e componenti MNA persistenti, conservando chiavi e precisione della 1.24.8;
 - abilitato il runner unit test ModDevGradle per verificare i codec contro il vero `CompoundTag`; suite completa a 134 test superati;
 - collegato `Simulator.tick()` a `ServerTickEvent.Pre` tramite un owner per identità di `MinecraftServer`, creato all'avvio e rimosso allo stop senza singleton del server corrente;
-- dedicated server verificato fino a `Done` con creazione dell'owner; il callback di stop resta da osservare in una successiva prova con console interattiva affidabile.
+- dedicated server verificato fino a `Done` con creazione dell'owner; start, tick e cleanup dello stesso handler sono inoltre coperti con le classi evento NeoForge reali.
+
+## Milestone M2 avviata: primo SixNode verticale
+
+- catalogo canonico iniziale con id moderni stabili e mapping esatto degli id legacy: sorgente `192`, cavo bassa tensione `2052`, resistore di potenza `6180`;
+- shell SixNode con sei slot indipendenti e corrispondenza esplicita degli indici legacy `WEST, EAST, DOWN, UP, NORTH, SOUTH`;
+- rotazioni LRDU conservate nei codici legacy `0..3`, incluso il fallback storico a `LEFT` per valori non validi;
+- codec `CompoundTag` moderno versionato per identità e orientamento delle facce, con preservazione dei tipi namespaced validi non ancora conosciuti dal catalogo;
+- suite completa salita a 147 test e build completa superata;
+- nessun asset copiato e nessun placeholder estetico introdotto: blocco, block entity, item, grafo nel mondo e rendering restano il prossimo slice.
 
 Il dettaglio tecnico e la roadmap completa sono in [ANALISI_PORTING.md](./ANALISI_PORTING.md).
 

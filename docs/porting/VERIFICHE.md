@@ -198,6 +198,19 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 - Parità coperta: nomi esatti delle chiavi, uso float/double legacy, riparazione dei valori non finiti prevista dall'originale, limiti delle sorgenti, restore dello switch e anomalia `NbtResistor` `prefix + R`.
 - Limite dichiarato: la console del task Gradle non ha inoltrato `stop` al processo Minecraft; il callback `ServerStoppingEvent` e il relativo log di rimozione non sono quindi dichiarati verificati in questa revisione. Le istanze di prova sono state arrestate e la porta 25565 risulta libera.
 
+## 13 settembre 2026 — Chiusura M1 e fondazione SixNode M2
+
+- Revisione/stato: working tree successivo a `51bfe59`.
+- Riferimenti legacy verificati in `SixNodeRegistration.kt`: sorgente elettrica `192`, cavo bassa tensione `2052`, resistore di potenza `6180`; asset associati registrati in `RISORSE.md`.
+- Lifecycle: testato lo stesso `ServerSimulationLifecycle` usato dall'event bus invocando start, tick e stop con le classi evento NeoForge reali; l'owner viene creato, avanzato e rimosso. Questa prova chiude il contratto dell'handler, ma non dichiara osservato il log di stop in un processo dedicated interattivo.
+- Primo comando `.\gradlew.bat test --no-daemon`: superato dopo catalogo e test lifecycle.
+- Secondo comando `.\gradlew.bat test --no-daemon`: superato dopo shell SixNode e codec persistente.
+- Comando finale `$env:GRADLE_USER_HOME = (Resolve-Path '.\.gradle').Path; .\gradlew.bat build --no-daemon`: superato in 28 s, 13 task (9 eseguiti e 4 aggiornati).
+- Risultato suite finale ricavato dai report XML: 147 test, 0 fallimenti, 0 errori, 30 suite.
+- Parità coperta: sei facce indipendenti, ordine degli indici legacy, rifiuto della sostituzione su faccia occupata, codici LRDU e fallback storico, id canonici, collisioni catalogo e round-trip dello schema versionato.
+- Robustezza persistente: gli id namespaced validi sconosciuti sopravvivono al round-trip; una versione non supportata lascia intatto lo stato corrente.
+- Limiti dichiarati: non sono ancora registrati blocco, block entity o item; non è stato eseguito save/reload nel mondo, chunk reload, rendering, GameTest o multiplayer. Nessun asset e nessun placeholder estetico è stato aggiunto.
+
 ## Modello di registrazione
 
 ```text

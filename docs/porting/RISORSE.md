@@ -16,6 +16,16 @@
 
 Dimensione complessiva delle risorse: circa 107,88 MiB. La directory `model` rappresenta circa 95 MiB.
 
+## Asset canonici della prima vertical slice M2
+
+| Contenuto | Percorsi originali | Stato |
+|---|---|---|
+| Sorgente elettrica | `model/voltagesource/voltagesource.obj`, `model/voltagesource/voltagesource.png` | identificati, non ancora copiati o convertiti |
+| Cavo bassa tensione | `sprites/cable.png` | identificato, non ancora copiato o convertito |
+| Resistore di potenza | `model/PowerElectricPrimitives/PowerElectricPrimitives.obj`, `model/PowerElectricPrimitives/PowerElectricPrimitives.png`, `textures/blocks/powerresistor.png` | identificati, non ancora copiati o convertiti |
+
+Il percorso `PowerElectricPrimitives` richiederà una rinomina tracciata in lowercase prima di diventare una resource location moderna. In questo slice non sono stati introdotti né asset copiati né placeholder: la verifica estetica inizierà quando il rendering userà geometrie e texture canoniche.
+
 ## Licenze
 
 - Codice: LGPL v3 secondo `original/LICENSE.md`.

@@ -1,6 +1,6 @@
 # Roadmap
 
-Aggiornata: 12 settembre 2026
+Aggiornata: 13 settembre 2026
 
 ## M0 — Baseline NeoForge
 
@@ -19,15 +19,15 @@ Criteri di uscita:
 
 ## M1 — Core di simulazione
 
-Stato: **in corso dal 12 settembre 2026**.
+Stato: **completato il 13 settembre 2026 per il perimetro M1; i tipi dipendenti dal gameplay restano assegnati alle rispettive vertical slice**.
 
 Obiettivo: solver MNA e processi fisici essenziali indipendenti dal gioco.
 
 Criteri di uscita:
 
 - [x] nessun import Minecraft/NeoForge nel core iniziale;
-- [ ] test originali rilevanti portati (baseline MNA coperta; audit e processi fisici esterni restanti);
-- [ ] fixture numeriche di confronto con la 1.24.8 (DC, inter-system, RC/RL, trasformazione e regolazione di potenza presenti);
+- [x] test originali rilevanti per il perimetro M1 portati; i tipi dipendenti da nodo, inventario, mondo e meccanica sono instradati e non simulati con placeholder;
+- [x] fixture numeriche di confronto con la 1.24.8 per DC, inter-system, RC/RL, trasformazione, potenza, termica, scheduler, batteria, regolazione e watchdog;
 - [x] lifecycle base del simulatore comandabile senza event bus tramite un `RootSystem` posseduto esplicitamente;
 - [x] dipendenza matematica e packaging definiti per il primo slice.
 - [x] primo strato fisico puro: carichi e connessioni elettriche/termiche, conversione Joule→calore e passo termico deterministico.
@@ -37,9 +37,11 @@ Criteri di uscita:
 - [x] codec `CompoundTag` legacy fuori dal core, testati con il runtime NeoForge.
 - [x] owner `Simulator` per istanza server e collegamento a `ServerTickEvent.Pre`.
 
-Prossimo slice: chiudere l'audit M1 con una prova osservabile del callback di arresto, quindi iniziare M2 definendo id canonici e scheletro del SixNode host.
+Il lifecycle è coperto sia nel core sia sugli handler start/tick/stop con eventi NeoForge reali; la prova dedicated ha inoltre raggiunto `Done` e osservato la creazione dell'owner.
 
 ## M2 — Primo SixNode verticale
+
+Stato: **in corso dal 13 settembre 2026**.
 
 Obiettivo: rete DC minima costruibile e persistente nel mondo.
 
@@ -60,6 +62,16 @@ Criteri di uscita:
 - save/reload e chunk unload/reload superati;
 - test unitari e GameTest principali superati;
 - prova client e dedicated server superata.
+
+Avanzamento verificato:
+
+- [x] catalogo iniziale dei tipi con id namespaced e mapping numerico legacy;
+- [x] modello a sei facce e rotazione LRDU fedele;
+- [x] codec versionato dello shell persistente con round-trip e compatibilità conservativa;
+- [ ] registrazione del blocco host e della block entity;
+- [ ] item, interazione nel mondo, rete, rendering e verifiche save/chunk/multiplayer.
+
+Prossimo slice: registrare `eln:six_node` e la sua block entity, componendo lo shell già testato senza ancora introdurre sostituzioni estetiche provvisorie spacciate per definitive.
 
 ## M3 — Networking, menu e strumenti
 

@@ -28,19 +28,21 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 
 ## D-004 — Identità dei componenti
 
-- Stato: proposta da validare nel milestone M2
+- Stato: accettata
 - Data: 11 settembre 2026
 - Scelta: registro ELN con `ResourceLocation` stabile per i tipi di componente; data component sugli item e stato nel block entity.
 - Motivo: metadata e ItemStack damage non sono un sistema di sottotipi moderno.
 - Conseguenza: occorre una tabella esplicita dagli id numerici legacy agli id moderni.
+- Verifica eseguita: il 13 settembre 2026 il catalogo iniziale associa esattamente `192 -> eln:electrical_source`, `2052 -> eln:low_voltage_cable` e `6180 -> eln:power_resistor`; lookup e collisioni sono coperti da test. Il data component dell'item resta parte del prossimo slice.
 
 ## D-005 — Architettura SixNode
 
-- Stato: proposta da validare nel milestone M2
+- Stato: accettata
 - Data: 11 settembre 2026
 - Scelta: conservare un blocco host capace di contenere componenti indipendenti sulle sei facce.
 - Motivo: è una caratteristica fondamentale di Electrical Age e limita la proliferazione di blocchi registrati.
 - Conseguenza: selezione, collisione, supporto, persistenza, rendering e networking devono funzionare per singola faccia.
+- Verifica eseguita: lo shell M2 rappresenta sei slot indipendenti, rifiuta la sostituzione di una faccia occupata come `createSubBlock` legacy e conserva la mappa esatta degli indici delle facce. La composizione con block entity e mondo resta da verificare.
 
 ## D-006 — Fedeltà estetica
 
@@ -162,6 +164,17 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Motivo: mantiene puro il modello numerico, conserva le chiavi 1.24.8 e rende esplicito il confine del lifecycle prima dell'introduzione di livelli, chunk e nodi.
 - Conseguenze: i block entity M2 comporranno questi codec; l'eventuale partizionamento per livello/chunk sarà deciso con la topologia reale. Lo schema anomalo di `NbtResistor`, `prefix + "R"` senza nome, resta intenzionalmente conservato.
 - Verifica eseguita: 8 test con il vero `CompoundTag`, suite totale da 134 test, build completa e dedicated server fino a `Done` con creazione dell'owner.
+
+## D-017 — Persistenza versionata dello shell SixNode
+
+- Stato: accettata
+- Data: 13 settembre 2026
+- Contesto: il SixNode deve conservare identità e orientamento di ogni faccia senza riutilizzare damage/metadata, mentre il caricamento non deve perdere dati soltanto perché un tipo è temporaneamente assente dal catalogo corrente.
+- Scelta: salvare nel block entity uno schema versionato con una voce per faccia, `ResourceLocation` del tipo e codice di rotazione LRDU; mantenere in memoria anche id namespaced validi sconosciuti e lasciare intatto lo stato corrente se la versione dello schema non è supportata.
+- Alternative considerate: serializzare indici del catalogo moderno; scartare tipi non registrati; riutilizzare direttamente l'array NBT legacy non versionato.
+- Motivo: gli id testuali sono stabili tra build, consentono espansione del catalogo e rendono esplicita l'evoluzione dello schema senza promettere il caricamento diretto dei mondi 1.7.10.
+- Conseguenze: un futuro importer userà separatamente gli id e gli indici legacy; i payload specifici dei componenti saranno aggiunti in campi annidati senza cambiare l'identità dello shell; la block entity deve rifiutare in modo conservativo versioni future.
+- Verifica eseguita: round-trip di tre facce, conservazione di un tipo valido sconosciuto, fallback LRDU legacy e mancata sovrascrittura con versione non supportata.
 
 ## Modello per nuove decisioni
 

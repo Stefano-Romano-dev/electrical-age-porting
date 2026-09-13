@@ -156,3 +156,14 @@ Punto di ripresa: implementare codec `CompoundTag` esterni al core, collegare il
 - La rimozione allo stop non è stata osservata perché la console Gradle non inoltrava il comando al processo Minecraft; questa verifica resta esplicitamente aperta.
 
 Punto di ripresa: osservare il callback di stop con un harness affidabile, poi iniziare M2 dalla mappa degli id e dallo scheletro persistente del SixNode host.
+
+## 13 settembre 2026 — M1 chiusa, M2 avviata con lo shell SixNode
+
+- Coperti start, tick e stop di `ServerSimulationLifecycle` con gli oggetti evento NeoForge reali, verificando la rimozione dell'owner.
+- Ricavati dalla registrazione 1.24.8 gli id esatti dei tre componenti della prima vertical slice e associati a id moderni stabili.
+- Implementato uno shell SixNode a sei facce con mappa direzioni e rotazioni LRDU esplicite, senza dipendenze dal renderer o dal networking.
+- Aggiunto un codec `CompoundTag` versionato e conservativo per identità e orientamento; payload specifici e importer legacy restano separati.
+- Registrati gli asset canonici necessari, senza copiarli né introdurre placeholder estetici.
+- Build completa superata con 147 test, 0 fallimenti e 0 errori.
+
+Punto di ripresa: registrare il blocco host `eln:six_node` e la relativa block entity, collegare lo shell al lifecycle del livello e verificarne il save/reload reale prima di montare i tre dispositivi.

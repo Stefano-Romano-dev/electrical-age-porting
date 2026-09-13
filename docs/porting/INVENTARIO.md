@@ -43,7 +43,7 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 | `ThermalLoad`, `ThermalConnection`, `ThermalResistor` | `mods.eln.sim` | verificato, core | trasferimenti, segni, accumulatori, coordinate e flag fast/slow |
 | `Simulator.thermalStep` | `ThermalSimulator` + `ThermalAmbientExchange` | verificato, core | ordine connessioni/processi/ambiente/integrazione e reset accumulatori |
 | Processi heater base | `mods.eln.sim.process.heater` | verificato, core | resistore, diodo e resistenza seriale di `ElectricalLoad` |
-| `Simulator` | `mods.eln.sim.Simulator` puro + `ServerSimulationLifecycle` | verificato, scheduler + avvio server | sequenza multi-rate e owner per identità server; callback stop ancora da osservare |
+| `Simulator` | `mods.eln.sim.Simulator` puro + `ServerSimulationLifecycle` | verificato, scheduler + lifecycle server | sequenza multi-rate, owner per identità server, avvio dedicated e handler start/tick/stop |
 | Inizializzatori termici | stesso package logico, validator esplicito | verificato, core | formule `Rs`/`Rp`/`C`, copia, applicazione e rifiuto instabile |
 | `FurnaceProcess`, `DiodeProcess`, conversione resistiva | stesso package logico | verificato, core | consumo combustibile, clamp gain, segno del diodo e potenza Joule |
 | `Integrator`, `Differentiator` | stesso package logico | verificato, core | sequenze campione-per-campione e reset legacy |
@@ -57,7 +57,7 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 | `WorldExplosion` | adapter mondo NeoForge | rimandato | nessun placeholder: forza, rimozione blocco ed effetti verranno portati con il nodo |
 | `ShaftSpeedWatchdog` | futuro core meccanico | rimandato | richiede rete shaft e velocità angolare |
 | Simulazione termica | `mods.eln.sim` | core indipendente + adapter ambiente | implementato, parità parziale | Adapter stanza, persistenza concreta e chiamanti nel mondo restano aperti |
-| SixNode | `mods.eln.node.six` | block entity host + component registry | mappato | Priorità M2 |
+| SixNode | `mods.eln.node.six` | block entity host + component registry | in porting | catalogo iniziale, sei facce, LRDU e codec shell verificati; block entity e mondo da integrare |
 | TransparentNode | `mods.eln.node.transparent` | block/block entity moderni | da analizzare | Port per famiglie |
 | SimpleNode | `mods.eln.node.simple`, `simplenode` | blocchi/capability moderni | da analizzare | Include integrazioni |
 | GridNode | `mods.eln.gridnode` | rete/multiblocco | rimandato | M5 |
@@ -71,10 +71,12 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 
 | Contenuto | Id legacy | Id moderno proposto | Stato | Test richiesti |
 |---|---:|---|---|---|
-| Host SixNode | da rilevare | `eln:six_node` | mappato | più facce, save/reload, chunk reload |
-| Cavo base | da rilevare | da decidere | da analizzare | connettività e drop |
-| Resistore base | da rilevare | da decidere | da analizzare | resistenza, potenza e orientamento |
-| Sorgente DC | da rilevare | da decidere | da analizzare | polarità e tensione |
+| Host SixNode | blocco contenitore legacy `Eln.SixNode` | `eln:six_node` | in porting | shell a sei facce e codec verificati; registrazione block/block entity, save reale e chunk reload aperti |
+| Cavo bassa tensione | `2052` (`32 << 6` + `4`) | `eln:low_voltage_cable` | mappato e verificato nel catalogo | connettività, geometria, drop e asset `sprites/cable.png` |
+| Resistore di potenza | `6180` (`96 << 6` + `36`) | `eln:power_resistor` | mappato e verificato nel catalogo | resistenza, potenza, orientamento e asset `PowerElectricPrimitives`/`powerresistor.png` |
+| Sorgente elettrica | `192` (`3 << 6` + `0`) | `eln:electrical_source` | mappato e verificato nel catalogo | polarità, tensione, orientamento e asset `model/voltagesource/*` |
+
+Lo shell moderno conserva inoltre la mappa delle direzioni legacy: `0 WEST`, `1 EAST`, `2 DOWN`, `3 UP`, `4 NORTH`, `5 SOUTH`; le rotazioni LRDU usano rispettivamente `0 LEFT`, `1 RIGHT`, `2 DOWN`, `3 UP`. Questa informazione è mantenuta per parità e per un eventuale importer, ma non implica compatibilità diretta dei mondi 1.7.10.
 
 ## Regola per gli id
 

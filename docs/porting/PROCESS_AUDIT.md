@@ -56,4 +56,4 @@ Questo conteggio misura la copertura strutturale, non dichiara completa la simul
 
 ## Criterio di ripresa
 
-Il prossimo audit deve partire dai tipi rimandati seguendo le relative vertical slice, non copiandoli anticipatamente nel core. I codec `CompoundTag` e l'adapter tick sono ora presenti; resta da osservare il callback di arresto in una console interattiva affidabile e poi la verifica passa alla composizione save/reload del SixNode M2.
+Il prossimo audit deve partire dai tipi rimandati seguendo le relative vertical slice, non copiandoli anticipatamente nel core. I codec `CompoundTag`, l'adapter tick e gli handler start/tick/stop sono coperti; il dedicated server ha verificato separatamente caricamento e creazione dell'owner. La verifica passa ora alla composizione dello shell SixNode con block entity, save/reload e chunk lifecycle in M2.

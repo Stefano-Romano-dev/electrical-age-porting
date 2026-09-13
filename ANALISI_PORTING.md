@@ -98,6 +98,8 @@ Questo schema non è portabile direttamente. In Minecraft moderno il damage non 
 
 Questa scelta evita sia centinaia di classi duplicate sia il ritorno nascosto ai metadata legacy.
 
+Il primo slice M2 ha validato questa architettura con un catalogo canonico minimo: `192 -> eln:electrical_source`, `2052 -> eln:low_voltage_cable` e `6180 -> eln:power_resistor`. Lo shell SixNode moderno conserva sei slot indipendenti, la mappa storica delle facce `WEST, EAST, DOWN, UP, NORTH, SOUTH` e i quattro codici LRDU. L'identità e l'orientamento vengono serializzati in uno schema `CompoundTag` versionato; un id namespaced valido ma non ancora presente nel catalogo viene mantenuto, mentre una versione di schema non supportata non sovrascrive lo stato vivo. Questo è soltanto lo strato di identità/persistenza: blocco, block entity, payload dei singoli componenti e gameplay nel mondo non sono ancora dichiarati implementati.
+
 ### 4. Lifecycle, registri ed eventi
 
 L'entry point `Eln.java` è un service locator globale molto grande. Usa `@Mod`, `@SidedProxy`, tre fasi FML, `GameRegistry`, due event bus legacy e registrazioni imperative.
