@@ -35,6 +35,7 @@ bin/
 
 ### Minecraft Modding ###
 run/
+run-six-node-persistence/
 !**/src/**/run/
 **/src/generated/**/.cache/
 repo/

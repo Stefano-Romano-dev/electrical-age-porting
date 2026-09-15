@@ -73,6 +73,20 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
+        sixNodePersistenceWrite {
+            server()
+            gameDirectory = project.file('run-six-node-persistence')
+            programArgument '--nogui'
+            systemProperty 'eln.sixNodePersistenceProbe', 'write'
+        }
+
+        sixNodePersistenceVerify {
+            server()
+            gameDirectory = project.file('run-six-node-persistence')
+            programArgument '--nogui'
+            systemProperty 'eln.sixNodePersistenceProbe', 'verify'
+        }
+
         data {
             data()
             // example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
@@ -212,6 +226,43 @@ tasks.withType(JavaCompile).configureEach {
 tasks.named('test', Test).configure {
     useJUnitPlatform()
     systemProperty 'eln.projectDir', project.projectDir.absolutePath
+}
+
+def prepareGameTestStructures = tasks.register('prepareGameTestStructures', Copy) {
+    from('gameteststructures')
+    into(layout.projectDirectory.dir('run/gameteststructures'))
+}
+
+tasks.named('prepareGameTestServerRun').configure {
+    dependsOn(prepareGameTestStructures)
+}
+
+def prepareSixNodePersistenceRun = tasks.register('prepareSixNodePersistenceRun') {
+    def eulaFile = layout.projectDirectory.file('run-six-node-persistence/eula.txt')
+    outputs.file(eulaFile)
+    doLast {
+        eulaFile.asFile.parentFile.mkdirs()
+        eulaFile.asFile.text = 'eula=true\n'
+    }
+}
+
+tasks.named('prepareSixNodePersistenceWriteRun').configure {
+    dependsOn(prepareSixNodePersistenceRun)
+}
+
+tasks.named('prepareSixNodePersistenceVerifyRun').configure {
+    dependsOn(prepareSixNodePersistenceRun)
+}
+
+tasks.named('runSixNodePersistenceVerify').configure {
+    mustRunAfter(tasks.named('runSixNodePersistenceWrite'))
+}
+
+tasks.register('verifySixNodeDiskPersistence') {
+    group = 'verification'
+    description = 'Writes a SixNode in one dedicated server process and verifies it after reopening the world.'
+    dependsOn(tasks.named('runSixNodePersistenceWrite'))
+    dependsOn(tasks.named('runSixNodePersistenceVerify'))
 }
 
 def bundledLicenseName = "LICENSE_${mod_id}.md"

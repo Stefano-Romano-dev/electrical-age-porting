@@ -167,3 +167,107 @@ Punto di ripresa: osservare il callback di stop con un harness affidabile, poi i
 - Build completa superata con 147 test, 0 fallimenti e 0 errori.
 
 Punto di ripresa: registrare il blocco host `eln:six_node` e la relativa block entity, collegare lo shell al lifecycle del livello e verificarne il save/reload reale prima di montare i tre dispositivi.
+
+## 13 settembre 2026 — Host SixNode registrato nel mondo
+
+- Registrati blocco e block entity con l'id stabile `eln:six_node` e collegati all'entry point NeoForge.
+- Il block entity possiede `SixNodeContents`, espone mutazioni controllate che chiamano `setChanged()` e delega lettura/scrittura al codec versionato.
+- L'host vuoto non ha ancora item, collisione o rendering: evita un modello provvisorio e resta accessibile soltanto a comandi e test finché non esistono componenti montabili.
+- I test usano i registri NeoForge reali e verificano id, round-trip di due facce, rifiuto della sostituzione e conservazione dello stato con schema futuro.
+- Suite da 149 test, build completa e avvio dedicated server fino a `Done` superati.
+
+Punto di ripresa: aggiungere una prova reale di save/reload e chunk reload del block entity, quindi introdurre l'identità item/data component e il montaggio server-side del primo componente.
+
+## 13 settembre 2026 — GameTest SixNode e sostituzione del damage item
+
+- Aggiunto un GameTest con struttura SNBT minima, copiato nella directory runtime da un task Gradle dedicato.
+- Verificato nel `ServerLevel` il ciclo piazzamento, montaggio, metadata completi, rimozione e ricostruzione vanilla del block entity; 1/1 GameTest superato.
+- Registrati l'item generico `eln:six_node_component` e il data component persistente/sincronizzato `eln:six_node_component_type`.
+- Aggiunta una factory di stack tipizzati che mantiene separata l'identità moderna dal catalogo e conserva id futuri sconosciuti.
+- Suite salita a 152 test; GameTest server, cleanup, salvataggio chunk e build completa superati.
+- Nessun modello o asset provvisorio aggiunto; item e host restano fuori dai normali flussi di gioco finché non viene portata l'interazione fedele.
+- Auditato `SixNodeItem` legacy: offset della coordinata, faccia inversa, supporto opaco, rifiuto faccia occupata, esecuzione server-side, consumo solo su successo e orientamento LRDU dipendente dal giocatore per pavimento/soffitto.
+
+Punto di ripresa: auditare il piazzamento 1.24.8 e implementare il montaggio server-authoritative del cavo con consumo stack e gestione atomica della faccia occupata, quindi aggiungere una prova di riapertura del mondo da disco.
+
+## 13 settembre 2026 — Primo cavo montabile
+
+- Sostituito l'item contenitore passivo con `SixNodeComponentItem`, mantenendo invariati registry id e data component.
+- Portata per il cavo bassa tensione la sequenza legacy: offset sul blocco non sostituibile, faccia inversa, supporto non-air/opaco, controllo faccia libera, mutazione solo server e consumo dopo il successo.
+- Portato il mapping di rotazione base LRDU: `UP` sui lati e orientamento dipendente dalla vista del giocatore su pavimento/soffitto.
+- Le identità di sorgente e resistore restano persistibili ma vengono rifiutate all'uso finché non esiste la loro implementazione completa.
+- Suite salita a 154 test; 4/4 GameTest e build completa superati. Il primo tentativo positivo ha inoltre rilevato e corretto un setup errato dell'helper, senza mascherare il fallimento.
+- Nessun asset provvisorio aggiunto; feedback audio/visivo, rimozione/drop, grafo e sincronizzazione restano da portare.
+
+Punto di ripresa: automatizzare la riapertura da disco e il chunk unload/reload con un cavo montato, poi portare rimozione/drop e ricostruzione del grafo.
+
+## 13 settembre 2026 — Persistenza mondo verificata tra processi
+
+- Creato il task `verifySixNodeDiskPersistence`, composto da due processi dedicated sulla stessa directory di prova isolata.
+- Il primo processo crea e salva un cavo montato in un chunk lontano; il secondo riapre il file regione e ne verifica blocco, block entity, faccia, tipo e rotazione.
+- Nel secondo processo il chunk viene inoltre tolto dal force-load, osservato realmente scaricato e ricaricato prima di ripetere la verifica.
+- Il probe è registrato soltanto in ambiente non-production, si attiva tramite proprietà JVM di sviluppo e termina autonomamente il server; il normale runtime non espone i listener.
+- La prova è passata più volte, anche riusando il mondo già creato; build completa e 154 test restano verdi.
+
+Punto di ripresa: portare la rimozione con drop fedele e il lifecycle load/unload del componente, quindi costruire la prima rappresentazione del grafo elettrico server-side.
+
+## 13 settembre 2026 — Rimozione e drop SixNode fedeli per faccia
+
+- Centralizzata la regola legacy del supporto e aggiunte le sei lastre canoniche di selezione per le facce occupate.
+- Portato il resolver di rottura a otto blocchi con ordine, intervalli diretti e fallback della 1.24.8, conservando intenzionalmente la selezione possibile della faccia di uscita.
+- La rottura survival restituisce l'item tipizzato della sola faccia, creative non produce drop e l'host sopravvive finché contiene altri componenti.
+- La perdita del supporto rimuove soltanto le facce non valide; la sostituzione esterna dell'host rilascia tutte le facce residue.
+- Aggiunti update tag/packet del block entity affinché il client riceva le facce necessarie alle sagome dinamiche.
+- Suite salita a 156 test; 8/8 GameTest, harness dedicated a due processi e build completa superati. Nessun asset o placeholder visivo aggiunto.
+
+Punto di ripresa: definire ownership del grafo elettrico per livello/chunk e ricostruire il componente durante load/unload, quindi chiudere il primo circuito DC nel mondo collegandolo al solver.
+
+## 15 settembre 2026 — Primo grafo elettrico SixNode nel mondo
+
+- Creato un grafo runtime distinto per `ServerLevel`, posseduto dal contesto della simulazione server e popolato dai block entity SixNode caricati.
+- Ogni faccia di cavo LV possiede un `ElectricalLoad` da `0,0125 Ω`; due estremità collegate formano la tratta legacy da `0,025 Ω`.
+- Ricostruite adiacenze complanari, connessioni interne fra facce ortogonali e passaggi diagonali attorno agli spigoli senza scansione quadratica dell'intera rete.
+- Collegati montaggio, rimozione, load, unload e stop server; il teardown rimuove le connessioni prima dei carichi per rispettare la semantica MNA preservata.
+- L'harness a due processi ha fatto emergere l'ordine reale del lifecycle chunk: la soluzione finale accoda i chunk caricati e li riconcilia al `Post` tick stabile, eliminando inoltre runtime di chunk non più caricati.
+- Suite finale a 162 test, 9/9 GameTest, harness dedicated con ricostruzione del grafo e build completa tutti superati.
+
+Punto di ripresa: introdurre terminali orientati, runtime della sorgente elettrica e del resistore di potenza, quindi verificare il primo circuito DC chiuso nel mondo.
+
+## 15 settembre 2026 — Primo circuito DC SixNode chiuso
+
+- Reso il grafo consapevole delle porte tangenti: cavo e sorgente condividono un carico sui quattro lati, il resistore espone i soli terminali legacy destro e sinistro.
+- Portati i runtime della sorgente monopolo e del resistore, con resistenze originali `0,0125 Ω`, `1e-9 Ω` e valore vuoto E12 `0,01 Ω`.
+- Esteso lo stato persistente della faccia con parametri numerici opzionali e verificato il round-trip della tensione `voltage`.
+- Abilitato il piazzamento degli altri due descriptor della vertical slice, conservando il `left()` specifico del resistore.
+- Chiuso nel GameTest un circuito 50 V → resistore → 0 V e verificata la corrente analitica `1428,5713469 A`.
+- Il reload dedicated ha scoperto un teardown tardivo del vecchio block entity: il lifecycle ora conserva l'identità dell'istanza caricata e ignora callback stantie senza forzare accessi al chunk durante l'unload.
+- Verifica finale: 165 test, 10/10 GameTest, harness dedicated a due processi e build completa superati.
+
+Punto di ripresa: portare geometrie e texture canoniche dei tre componenti, avviare il client e acquisire il primo confronto visivo con la 1.24.8; lasciare menu e networking di configurazione a M3.
+
+## 16 settembre 2026 — Primo renderer client SixNode
+
+- Registrato un block entity renderer esclusivamente client per tutte le sei facce, con le trasformazioni `glRotateXnRef` e LRDU ricostruite dalla 1.24.8.
+- Integrati OBJ, MTL e texture originali della sorgente e del resistore; la visibilità dei gruppi conserva soltanto le parti usate dai rispettivi descriptor legacy.
+- Portato il cavo come geometria procedurale con larghezza `1,95/16`, altezza `0,95/16` e texture originale; i bracci usano lo stesso contratto dei terminali del grafo per le topologie complanare, interna e diagonale.
+- Il primo caricamento client ha scoperto il riferimento interno con maiuscole a `PowerElectricPrimitives.mtl`; il path è stato normalizzato e il secondo caricamento non mostra errori OBJ/MTL o blockstate ELN.
+- Build completa e suite da 167 test superate; 10/10 GameTest dedicated superati senza caricare classi client.
+- L'automazione UI non ha esposto la finestra Java del client, quindi non è stato acquisito né dichiarato un confronto visivo. Registrato P-021 per il modello dinamico dell'item ancora mancante.
+- Gli screenshot forniti dall'utente hanno poi mostrato la tinta troppo chiara dei tratti, i cap bianchi presenti anche sui segmenti rettilinei e il raccordo assente fra sorgente e rete. Il confronto con `CableRender` ed `ElectricalSourceRender` ha portato la tinta predefinita a `0,2`, ripristinato la condizione legacy dei cap e aggiunto gli spezzoni automatici della sorgente.
+- Risolto P-021 con una proprietà item client legata al tipo persistente, tre modelli/texture canonici, nomi italiano/inglese e tre stack nella scheda Redstone e nella ricerca creativa.
+- Verifica aggiornata: 168 test unitari, caricamento client senza warning del modello item e 10/10 GameTest dedicated.
+- Ricevuto lo screenshot post-correzione: nella scena provata i cavi sono continui e scuri, i cap compaiono solo nei punti previsti e i raccordi verso sorgente e resistore risultano chiusi. Registrato come smoke test visivo positivo, non ancora come confronto completo affiancato sulle sei facce.
+
+Punto di ripresa: costruire una scena client riproducibile con i tre componenti sulle sei facce, confrontarla nuovamente con la 1.24.8 e procedere alla verifica multiplayer.
+
+## 16 settembre 2026 — Correzione della curva su spigolo esterno
+
+- Uno screenshot dell'utente ha mostrato due cavi non uniti fra piano orizzontale e verticale sullo stesso spigolo esterno.
+- L'audit di `NodeBase.connectJob` e `CableRender.connectionType` ha confermato che il vicino diagonale deve esporre `edge.opposite`; il port usava erroneamente `edge` sia nel grafo sia nel renderer.
+- Corretti target elettrico e ricerca visiva e riallineato il test della topologia diagonale.
+- Il primo test mirato non è partito perché il client Minecraft aperto teneva bloccato `build/moddev/artifacts/neoforge-21.1.250.jar`; nessuna asserzione è stata eseguita e la verifica resta in attesa del riavvio client.
+- Dopo la chiusura del client, test mirati e build completa sono superati; il dedicated conferma 10/10 GameTest. La prova ora distingue esplicitamente la faccia diagonale corretta da quella errata precedente.
+- Il primo screenshot dopo la connessione mostra ancora un gradino: portata la selezione legacy `Extend/Internal` basata sull'ordine storico `WEST, EAST, DOWN, UP, NORTH, SOUTH`, con un solo braccio esteso o accorciato di `0,95/16`.
+- Il test di questa rifinitura non è partito perché il client era stato riaperto e il nuovo processo Minecraft (`PID 43340`) bloccava nuovamente il JAR NeoForge.
+- Dopo la seconda chiusura del client, il test mirato della scelta `Extend/Internal`, la suite completa da 169 test, la build e i 10/10 GameTest sono superati. Resta soltanto il controllo visivo aggiornato dello spigolo.
+- Lo screenshot finale dell'utente conferma una curva continua e senza gradino visibile tra piano superiore, parete e piano inferiore; P-022 è chiuso.

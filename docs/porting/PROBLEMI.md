@@ -28,6 +28,7 @@ Gli elementi ricevono un id stabile. Quando risolti, conservarli con stato `riso
 - Descrizione: `NodeManager` è singleton e `NodeManagerNbt.writeToNBT` non salva lo stato perché la chiamata è commentata.
 - Impatto: non è un modello affidabile da trasporre fra dimensioni, chunk e lifecycle server moderni.
 - Mitigazione prevista: block entity per stato locale, servizi level/server-scoped e `SavedData` soltanto per dati realmente globali.
+- Avanzamento: M2 usa block entity per lo stato locale e un grafo runtime distinto per `ServerLevel`, posseduto dal contesto identificato del server; il lifecycle traccia anche l'identità dell'istanza caricata per ignorare teardown stantii dopo il reload. La persistenza globale completa resta aperta per i sistemi futuri.
 
 ## P-004 — Catalogo basato su damage/metadata
 
@@ -205,6 +206,30 @@ Gli elementi ricevono un id stabile. Quando risolti, conservarli con stato `riso
 - Riproduzione/evidenza: il codec moderno usa intenzionalmente `pfxR`; il test verifica l'assenza di `pfx<name>R` e il restore con un nome differente.
 - Impatto: la composizione dei prefissi nei futuri block entity deve replicare gli schemi esistenti senza creare collisioni accidentali nuove.
 - Mitigazione prevista: conservare il formato 1.24.8 per parità; assegnare prefissi univoci a livello di componente e documentare separatamente un eventuale schema moderno versionato.
+
+## P-021 — L'item contenitore SixNode non ha ancora un modello dinamico
+
+- Stato: risolto il 16 settembre 2026
+- Gravità: media
+- Area: rendering item/catalogo
+- Rilevato: 16 settembre 2026
+- Descrizione: `eln:six_node_component` rappresenta descriptor diversi tramite il data component del tipo, ma non dispone ancora di una selezione client del modello basata su quel valore.
+- Riproduzione/evidenza: il secondo avvio client carica correttamente blockstate, OBJ e MTL della vertical slice; resta il warning per `eln:item/six_node_component` mancante.
+- Impatto: inventario e mano non possono ancora mostrare fedelmente cavo, sorgente e resistore.
+- Soluzione: registrata una proprietà item client basata sul data component, aggiunti override verso le tre texture canoniche, nomi localizzati e stack distinti nella scheda Redstone/ricerca creativa.
+- Verifica di chiusura: il successivo caricamento client non segnala più `eln:item/six_node_component` mancante; resta aperto il confronto visivo in prima e terza persona e in multiplayer come verifica generale M2.
+
+## P-022 — La curva esterna fra piani ortogonali cercava la faccia errata
+
+- Stato: risolto
+- Gravità: alta
+- Area: grafo elettrico/rendering SixNode
+- Rilevato: 16 settembre 2026
+- Descrizione: per il vicino diagonale oltre uno spigolo, posizione e terminale erano corretti ma il componente veniva cercato su `edge` anziché su `edge.opposite`.
+- Riproduzione/evidenza: screenshot in-world con due cavi sulle facce superiore e laterale dello stesso spigolo esterno, entrambi terminati prima della curva.
+- Impatto: la rete appariva interrotta e anche il grafo MNA non creava la connessione, nonostante la topologia fosse valida nella 1.24.8.
+- Soluzione implementata: usare `edge.opposite` sia nei target del grafo sia nella ricerca client del renderer; riallineata la fixture diagonale alla geometria fisica. Dopo il primo screenshot connesso è stata portata anche la regola legacy `Extend/Internal`, che allunga o accorcia un solo braccio dello spessore dell'altro cavo per chiudere lo spigolo senza gradino.
+- Verifica di chiusura: test mirati del grafo e della selezione geometrica superati; suite completa a 169 test, build completa e 10/10 GameTest verdi. Lo screenshot in-world successivo mostra il cavo continuo sui tre piani e lo spigolo esterno chiuso senza il gradino precedente.
 
 ## Modello
 

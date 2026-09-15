@@ -1,3 +1,6 @@
 {
-  "mod.eln.name": "Electrical Age"
+  "mod.eln.name": "Electrical Age",
+  "item.eln.low_voltage_cable": "Low Voltage Cable",
+  "item.eln.electrical_source": "Electrical Source",
+  "item.eln.power_resistor": "Power Resistor"
 }

@@ -1,3 +1,6 @@
 {
-  "mod.eln.name": "Electrical Age"
+  "mod.eln.name": "Electrical Age",
+  "item.eln.low_voltage_cable": "Cavo a bassa tensione",
+  "item.eln.electrical_source": "Sorgente elettrica",
+  "item.eln.power_resistor": "Resistore di potenza"
 }

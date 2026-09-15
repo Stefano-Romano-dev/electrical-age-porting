@@ -33,7 +33,7 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Scelta: registro ELN con `ResourceLocation` stabile per i tipi di componente; data component sugli item e stato nel block entity.
 - Motivo: metadata e ItemStack damage non sono un sistema di sottotipi moderno.
 - Conseguenza: occorre una tabella esplicita dagli id numerici legacy agli id moderni.
-- Verifica eseguita: il 13 settembre 2026 il catalogo iniziale associa esattamente `192 -> eln:electrical_source`, `2052 -> eln:low_voltage_cable` e `6180 -> eln:power_resistor`; lookup e collisioni sono coperti da test. Il data component dell'item resta parte del prossimo slice.
+- Verifica eseguita: il 13 settembre 2026 il catalogo iniziale associa esattamente `192 -> eln:electrical_source`, `2052 -> eln:low_voltage_cable` e `6180 -> eln:power_resistor`; lookup e collisioni sono coperti da test. L'item generico `eln:six_node_component` usa il data component persistente e sincronizzato `eln:six_node_component_type`; id, lookup, tipi sconosciuti e round-trip `ItemStack` sono verificati.
 
 ## D-005 — Architettura SixNode
 
@@ -175,6 +175,72 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Motivo: gli id testuali sono stabili tra build, consentono espansione del catalogo e rendono esplicita l'evoluzione dello schema senza promettere il caricamento diretto dei mondi 1.7.10.
 - Conseguenze: un futuro importer userà separatamente gli id e gli indici legacy; i payload specifici dei componenti saranno aggiunti in campi annidati senza cambiare l'identità dello shell; la block entity deve rifiutare in modo conservativo versioni future.
 - Verifica eseguita: round-trip di tre facce, conservazione di un tipo valido sconosciuto, fallback LRDU legacy e mancata sovrascrittura con versione non supportata.
+
+## D-018 — Montaggio SixNode validato e autoritativo sul server
+
+- Stato: accettata
+- Data: 13 settembre 2026
+- Contesto: l'item contenitore può rappresentare più descriptor, ma soltanto il cavo bassa tensione ha iniziato la vertical slice; creare host o consumare lo stack prima della validazione produrrebbe stati parziali e componenti segnaposto.
+- Scelta: risolvere il tipo dal data component, accettare soltanto definizioni con runtime effettivamente portato, validare bersaglio, faccia libera e supporto opaco prima di mutare il mondo, quindi creare l'host e montare lato server; consumare un item solo dopo il successo. Dal 15 settembre 2026 cavo, sorgente e resistore soddisfano questo vincolo; il resistore applica inoltre il `left()` del descriptor legacy.
+- Alternative considerate: rendere piazzabili subito tutte le identità del catalogo; creare sempre l'host e correggerlo dopo; delegare il consumo alla previsione client.
+- Motivo: conserva il contratto di `SixNodeItem`/`createSubBlock` senza esporre implementazioni incomplete e mantiene il server autorevole sulla persistenza.
+- Conseguenze: su faccia occupata o supporto non opaco il mondo e lo stack restano invariati; nuove definizioni non vanno aggiunte al catalogo piazzabile senza un runtime reale. Rendering e suono restano slice successive.
+- Verifica eseguita: mapping LRDU unitario e GameTest su successo, faccia inversa, consumo singolo, rifiuto faccia occupata, vetro non opaco e rotazione specifica del resistore.
+
+## D-019 — Harness dedicated a due processi per la persistenza mondo
+
+- Stato: accettata
+- Data: 13 settembre 2026
+- Contesto: la ricostruzione con `BlockEntity.loadStatic` dimostra il codec, ma non prova che chunk storage, arresto, file regione e successivo avvio dedicated conservino realmente il SixNode.
+- Scelta: usare due run server ModDevGradle sulla stessa directory isolata, attivate da una proprietà JVM di sviluppo. La fase `write` crea e salva un cavo in un chunk lontano; la fase `verify` riapre il mondo, controlla lo stato completo, forza un ciclo unload/reload e termina automaticamente.
+- Alternative considerate: trattare il round-trip NBT come save/reload completo; manipolare direttamente i file regione in JUnit; usare il normale mondo di sviluppo del client.
+- Motivo: esercita il percorso Minecraft/NeoForge reale senza contaminare mondi dell'utente e produce un singolo task riproducibile con esito non-zero in caso di divergenza.
+- Conseguenze: i listener del probe vengono registrati soltanto quando `FMLEnvironment.production` è falso e restano inattivi senza `eln.sixNodePersistenceProbe`; la directory `run-six-node-persistence` è solo output locale ignorato da Git; il test non sostituisce ancora la prova multiplayer.
+- Verifica eseguita: `verifySixNodeDiskPersistence` superato più volte, inclusa la ripetizione sul mondo già esistente, con marker di scrittura, riapertura e unload/reload.
+
+## D-020 — Rimozione SixNode per faccia e selezione legacy conservativa
+
+- Stato: accettata
+- Data: 13 settembre 2026
+- Contesto: il blocco host contiene fino a sei componenti; la normale rottura Minecraft agisce invece sul blocco intero. La 1.24.8 risolve la faccia con un ray test proprio, conserva l'host quando restano altre facce e differenzia i drop survival/creative.
+- Scelta: mantenere la sagoma di selezione come unione delle lastre canoniche occupate, risolvere server-side una sola faccia con lo stesso ordine e gli stessi intervalli diretti legacy, rimuovere soltanto quella faccia e consentire la rimozione dell'host solo quando vuoto. Perdita supporto e sostituzione esterna dell'host usano percorsi espliciti che rilasciano rispettivamente le facce non più valide o tutte quelle residue.
+- Alternative considerate: lasciare che vanilla rompa sempre l'host; usare il normale clip della sagoma e la prima intersezione; creare un'entità o blocco distinto per ogni faccia.
+- Motivo: preserva il comportamento percepito e la struttura multi-faccia senza reinterpretare la particolarità legacy per cui il ray test diretto può scegliere la faccia di uscita.
+- Conseguenze: lo stato del block entity viene inviato ai client tramite update tag/packet per le sagome dinamiche; il drop ricrea uno stack dal type id anche se valido ma non ancora noto al catalogo. La geometria di selezione non è un sostituto del renderer finale.
+- Verifica eseguita: due test puri del resolver e GameTest per sagoma, perdita sequenziale dei supporti, host con facce residue, survival, creative e sostituzione esterna dell'host.
+
+## D-021 — Grafo SixNode posseduto per livello e ricostruito dai chunk
+
+- Stato: accettata
+- Data: 15 settembre 2026
+- Contesto: lo stato persistente del SixNode appartiene al block entity, mentre carichi e connessioni MNA devono esistere soltanto per chunk caricati e non possono attraversare implicitamente dimensioni. `BlockEntity.onLoad` e la mappa dei block entity esposta all'evento chunk non risultano da soli affidabili in ogni fase della riapertura dedicated.
+- Scelta: il contesto identificato per `MinecraftServer` continua a possedere il `Simulator` e possiede inoltre un `SixNodeElectricalGraph` distinto per identità di `ServerLevel`. Il block entity notifica le mutazioni immediate; load/unload chunk alimentano una coda di ricostruzione e il `Post` tick riconcilia sia i chunk appena caricati sia quelli non più presenti. Il grafo contiene solo runtime derivati e rimuove le connessioni prima dei carichi.
+- Alternative considerate: un singleton globale `NodeManager`; un simulatore separato e persistente per chunk; affidarsi soltanto a `onLoad`/`setRemoved`; scansione globale dei block entity a ogni tick.
+- Motivo: l'ownership resta esplicita per server e livello, i chunk governano la presenza del runtime senza diventare proprietari di stato persistente e il core MNA non acquisisce dipendenze Minecraft.
+- Conseguenze: le reti di dimensioni diverse non si connettono; la ricostruzione può stabilizzarsi al `Post` tick successivo al caricamento; la ricerca delle connessioni visita soltanto vicini geometrici possibili. Il punto d'accesso statico espone il lifecycle del mod, non un server corrente né uno stato server-global non indicizzato.
+- Verifica eseguita: sei test del grafo, GameTest di montaggio/rimozione della tratta, harness dedicated a due processi con riapertura, unload effettivo, assenza del runtime durante unload e ricostruzione al reload.
+
+## D-022 — Terminali SixNode espliciti e runtime derivato dai parametri persistenti
+
+- Stato: accettata
+- Data: 15 settembre 2026
+- Contesto: il cavo usa un solo carico su tutti i lati, la sorgente legacy è un monopolo verso massa esposto su tutti i lati, mentre il resistore collega soltanto `front.right()` e `front.left()`. Una connessione indicizzata solo per faccia non può conservare questa distinzione né la rotazione LRDU.
+- Scelta: identificare ogni porta runtime con `(posizione host, faccia montata, direzione tangente)` e ricostruire connessioni complanari, interne e diagonali soltanto fra terminali compatibili. Il payload persistente della faccia accetta una mappa opzionale di parametri numerici finiti; `voltage` conserva la chiave legacy della sorgente e `resistance` consente lo snapshot del valore resistivo, con fallback vuoto legacy `0,01 Ω`.
+- Alternative considerate: un carico unico per ogni faccia indipendentemente dal descriptor; serializzare direttamente oggetti MNA; introdurre subito inventario e menu del resistore; usare un ground block moderno aggiuntivo nel circuito di prova.
+- Motivo: preserva polarità, orientamento e valori del modello 1.24.8 mantenendo MNA e stato mondo separati; due sorgenti monopolo da 50 V e 0 V chiudono inoltre il circuito senza inventare contenuti non legacy.
+- Conseguenze: il runtime viene ricreato quando cambia identità, rotazione o parametri della faccia; connessioni e bipoli interni vengono rimossi prima dei carichi. Il lifecycle conserva l'identità dell'istanza block entity caricata, così un `setRemoved` tardivo non può eliminare il runtime della sostituzione. Inventario, termica e distruzione del resistore non sono ancora implementati.
+- Verifica eseguita: test su porte destra/sinistra, persistenza di `voltage`, circuito unitario e GameTest con `50 / (0,01 + 2×0,0125 + 2×10⁻⁹) = 1428,5713469 A`; 165 test, 10/10 GameTest e reload chunk dedicated superati.
+
+## D-023 — Renderer SixNode separato lato client con trasformazioni legacy
+
+- Stato: accettata
+- Data: 16 settembre 2026
+- Contesto: il SixNode è un singolo host con fino a sei componenti orientati; il rendering 1.24.8 applica una trasformazione per faccia, una rotazione LRDU e geometrie diverse per cavo, sorgente e resistore. Il dedicated server non deve caricare classi di rendering.
+- Scelta: registrare un solo block entity renderer esclusivamente sul bus client; applicare le trasformazioni legacy con `PoseStack`; usare modelli OBJ baked aggiuntivi per sorgente e resistore e geometria procedurale per il cavo. La decisione sulla presenza dei bracci del cavo condivide il contratto pubblico dei terminali del grafo server, senza condividere oggetti runtime MNA.
+- Alternative considerate: sei blockstate per faccia; modelli JSON statici per tutte le combinazioni; duplicare nel renderer le regole topologiche; sostituire temporaneamente gli asset con cubi o icone vanilla.
+- Motivo: conserva l'host multi-faccia e le proporzioni/texture originali, evita una crescita combinatoria degli stati e mantiene netta la separazione client/common.
+- Conseguenze: il blockstate dell'host è intenzionalmente invisibile e la presentazione dipende dal block entity renderer; gli asset runtime hanno path lowercase. Le varianti item sono risolte da una proprietà client derivata dal data component. Il confronto visivo affiancato e il LED della sorgente restano requisiti aperti.
+- Verifica eseguita: 169 test unitari, inclusa la selezione geometrica `Extend/Internal` dello spigolo; caricamento client completo senza errori OBJ/MTL, blockstate o modello item ELN dopo le correzioni; 10/10 GameTest dedicated senza classloading client. La parità estetica non è ancora dichiarata.
 
 ## Modello per nuove decisioni
 

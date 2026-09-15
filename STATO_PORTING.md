@@ -1,10 +1,10 @@
 # Stato del porting di Electrical Age
 
-Aggiornato: 13 settembre 2026
+Aggiornato: 16 settembre 2026
 
 ## Stato generale
 
-**Fase corrente: milestone M1 completata; M2 avviata con identità e persistenza dello shell SixNode.**
+**Fase corrente: milestone M1 completata; M2 in corso con primo circuito DC e primo renderer SixNode caricati e verificati.**
 
 Target confermato:
 
@@ -42,7 +42,7 @@ Toolchain fissata:
 - [x] Ottenuta una clean build riproducibile e un test JUnit 5 minimale.
 - [x] Avviati client e dedicated server con caricamento del mod `eln`.
 - [x] Estrarre e portare il core di simulazione M1 con test di parità, scheduler, processi fisici essenziali e codec persistenti esterni.
-- [ ] Implementare il primo SixNode verticale (catalogo identità e shell persistente completati; blocco e block entity non ancora registrati).
+- [ ] Implementare il primo SixNode verticale (runtime server e caricamento del renderer completati; confronto visivo in gioco, item dinamico e multiplayer ancora aperti).
 
 ## Decisioni registrate
 
@@ -123,7 +123,45 @@ Avanzamento M1 verificato:
 - rotazioni LRDU conservate nei codici legacy `0..3`, incluso il fallback storico a `LEFT` per valori non validi;
 - codec `CompoundTag` moderno versionato per identità e orientamento delle facce, con preservazione dei tipi namespaced validi non ancora conosciuti dal catalogo;
 - suite completa salita a 147 test e build completa superata;
-- nessun asset copiato e nessun placeholder estetico introdotto: blocco, block entity, item, grafo nel mondo e rendering restano il prossimo slice.
+- registrati blocco host e block entity con id `eln:six_node`, senza `BlockItem` né modello provvisorio;
+- il block entity possiede lo shell, marca le mutazioni persistenti e compone il codec versionato già verificato;
+- round-trip e rifiuto di schemi futuri verificati sul tipo realmente registrato; suite completa salita a 149 test;
+- build completa e caricamento dedicated server fino a `Done` superati;
+- aggiunto un GameTest server-side che piazza l'host, monta una faccia, serializza con metadata completi, rimuove e ricostruisce il block entity tramite il dispatcher vanilla; 1/1 test superato;
+- registrati l'item contenitore `eln:six_node_component` e il data component persistente/sincronizzato `eln:six_node_component_type`, equivalente moderno del damage value legacy;
+- portato il montaggio server-authoritative del cavo bassa tensione: offset del bersaglio sostituibile, faccia inversa, supporto non-air/opaco, rotazione LRDU base e consumo solo dopo il successo;
+- facce occupate, supporti trasparenti e definizioni non ancora portate vengono rifiutati senza creare host né consumare item;
+- la suite completa raggiunge 154 test, 4/4 GameTest passano e la build completa è superata;
+- aggiunto un harness dedicated riproducibile a due processi: il primo salva il cavo nel file regione, il secondo riapre lo stesso mondo e verifica blocco, BE, faccia, tipo e rotazione;
+- verificato inoltre unload e reload effettivo dello stesso chunk nel secondo processo; il task è ripetibile su un mondo di prova già esistente;
+- portate le sagome di selezione canoniche per faccia e la selezione legacy del componente da rompere, compresa la particolarità del ray test diretto che può scegliere la faccia di uscita;
+- portati rimozione e drop server-side: una faccia rimossa lascia l'host finché contiene altri componenti, la perdita del supporto rimuove soltanto le facce coinvolte e la sostituzione esterna dell'host rilascia tutte le facce;
+- survival restituisce l'item tipizzato, creative non produce drop; gli id namespaced validi sconosciuti restano rappresentabili anche nel drop;
+- gli aggiornamenti del block entity vengono sincronizzati ai client con update tag/packet per rendere disponibile lo stato delle sagome dinamiche;
+- la suite completa raggiunge 156 test, 8/8 GameTest passano, il controllo dedicated a due processi resta verde e la build completa è superata;
+- nessun asset copiato e nessun placeholder estetico introdotto: a quel punto grafo, lifecycle elettrico load/unload, verifica multiplayer e rendering restavano aperti;
+- introdotto `SixNodeElectricalGraph`, posseduto per `ServerLevel` dal contesto della simulazione server, con un `ElectricalLoad` per faccia di cavo caricata;
+- derivata e fissata la resistenza legacy del cavo LV: `0,0125 Ω` per carico e `0,025 Ω` per tratta fra due cavi;
+- ricostruite le tre topologie legacy iniziali: adiacenza complanare, collegamento interno fra facce ortogonali e passaggio diagonale attorno a uno spigolo;
+- montaggio, rimozione, sostituzione, chunk unload e reload aggiornano ora il runtime MNA, rimuovendo sempre le connessioni prima dei carichi;
+- la ricostruzione da file regione usa una coda dei chunk caricati elaborata al successivo `Post` tick, mentre una riconciliazione finale elimina gli host di chunk non più presenti;
+- suite completa salita a 162 test, 9/9 GameTest superati, harness dedicated a due processi verde anche per teardown/ricostruzione del grafo e build completa superata;
+- il grafo è ora consapevole dei terminali orientati: cavo e sorgente espongono i quattro lati, il resistore soltanto i lati legacy `front.right()`/`front.left()`;
+- portati i runtime MNA della sorgente elettrica e del resistore di potenza, inclusi `0,0125 Ω` seriali della sorgente e il valore legacy vuoto `0,01 Ω` del resistore;
+- sorgente e resistore sono piazzabili tramite l'item tipizzato; il resistore applica la rotazione aggiuntiva `left()` del descriptor 1.24.8;
+- aggiunti parametri numerici finiti opzionali al payload persistente della faccia; la tensione usa la chiave legacy `voltage` e il formato 1 resta retrocompatibile perché il campo è opzionale;
+- il GameTest chiude un circuito fra sorgenti da `50 V` e `0 V` attraverso il resistore e verifica `1428,5713469 A`, includendo le due impedenze terminali `1e-9 Ω`;
+- il lifecycle traccia l'identità dei block entity caricati per impedire a un `setRemoved` stantio di eliminare il runtime appena ricostruito dopo un reload chunk;
+- suite completa salita a 165 test, 10/10 GameTest superati, harness dedicated a due processi e build completa nuovamente verdi;
+- aggiunto un renderer client-only del SixNode con le trasformazioni legacy per le sei facce e le quattro rotazioni LRDU;
+- integrati gli OBJ/MTL e le texture originali di sorgente e resistore, filtrando i gruppi legacy pertinenti, senza introdurre geometrie sostitutive;
+- integrato il cavo procedurale con le misure canoniche `1,95/16` × `0,95/16`, usando lo stesso contratto dei terminali del grafo per i bracci complanari, interni e diagonali;
+- un primo avvio client ha rilevato il riferimento case-sensitive `PowerElectricPrimitives.mtl`; dopo la normalizzazione lowercase, il secondo caricamento risorse non ha prodotto errori OBJ/MTL o blockstate ELN;
+- un primo screenshot in-world ha evidenziato tre scostamenti dal renderer legacy: tinta del cavo assente, nodo bianco disegnato anche sui tratti rettilinei e raccordi della sorgente mancanti; tutti sono stati corretti dalle regole originali (`20%` di tinta, cap solo su estremità/curve/diramazioni e spezzoni automatici verso i terminali connessi);
+- aggiunti modelli item dinamici con le tre texture canoniche, nomi localizzati e tre stack distinti nella scheda Redstone/ricerca creativa;
+- suite completa salita a 169 test e build/test superati; i 10/10 GameTest dedicati restano verdi e il dedicated server non carica classi client;
+- un nuovo caricamento client non produce più il warning del modello item; uno screenshot in-world post-correzione conferma continuità, tinta e cap attesi per la configurazione provata. Il confronto completo sulle sei facce con la 1.24.8, configurazione GUI/inventario del resistore, audio e verifica multiplayer restano aperti.
+- corretto inoltre il vicino diagonale sullo spigolo esterno: grafo e renderer cercano ora `edge.opposite` come la 1.24.8 e la geometria applica la scelta legacy `Extend/Internal` a un solo braccio; test mirati, suite da 169 test, build completa e 10/10 GameTest sono verdi, e lo screenshot finale conferma la curva continua senza gradino visibile.
 
 Il dettaglio tecnico e la roadmap completa sono in [ANALISI_PORTING.md](./ANALISI_PORTING.md).
 

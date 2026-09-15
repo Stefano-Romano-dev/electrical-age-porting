@@ -11,15 +11,30 @@ enum class SixNodeRotation(val legacyCode: Int) {
     UP(3),
     ;
 
+    fun right(): SixNodeRotation = when (this) {
+        DOWN -> LEFT
+        LEFT -> UP
+        RIGHT -> DOWN
+        UP -> RIGHT
+    }
+
+    fun left(): SixNodeRotation = when (this) {
+        DOWN -> RIGHT
+        LEFT -> DOWN
+        RIGHT -> UP
+        UP -> LEFT
+    }
+
     companion object {
         @JvmStatic
         fun fromLegacyCode(code: Int): SixNodeRotation = entries.firstOrNull { it.legacyCode == code } ?: LEFT
     }
 }
 
-data class MountedSixNodeComponent(
+data class MountedSixNodeComponent @JvmOverloads constructor(
     val typeId: ResourceLocation,
     val rotation: SixNodeRotation,
+    val parameters: Map<String, Double> = emptyMap(),
 )
 
 object SixNodeLegacyFacing {

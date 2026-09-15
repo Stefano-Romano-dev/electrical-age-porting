@@ -20,11 +20,11 @@ Dimensione complessiva delle risorse: circa 107,88 MiB. La directory `model` rap
 
 | Contenuto | Percorsi originali | Stato |
 |---|---|---|
-| Sorgente elettrica | `model/voltagesource/voltagesource.obj`, `model/voltagesource/voltagesource.png` | identificati, non ancora copiati o convertiti |
-| Cavo bassa tensione | `sprites/cable.png` | identificato, non ancora copiato o convertito |
-| Resistore di potenza | `model/PowerElectricPrimitives/PowerElectricPrimitives.obj`, `model/PowerElectricPrimitives/PowerElectricPrimitives.png`, `textures/blocks/powerresistor.png` | identificati, non ancora copiati o convertiti |
+| Sorgente elettrica | `model/voltagesource/voltagesource.obj`, `model/voltagesource/voltagesource.png` | copiati e caricati dal renderer; confronto visivo aperto |
+| Cavo bassa tensione | `sprites/cable.png` | copiato e usato dalla geometria procedurale; confronto visivo aperto |
+| Resistore di potenza | `model/PowerElectricPrimitives/PowerElectricPrimitives.obj`, `model/PowerElectricPrimitives/PowerElectricPrimitives.png`, `textures/blocks/powerresistor.png` | OBJ e texture condivisa copiati e caricati; icona item separata ancora aperta |
 
-Il percorso `PowerElectricPrimitives` richiederà una rinomina tracciata in lowercase prima di diventare una resource location moderna. In questo slice non sono stati introdotti né asset copiati né placeholder: la verifica estetica inizierà quando il rendering userà geometrie e texture canoniche.
+Il percorso `PowerElectricPrimitives` è stato normalizzato in lowercase, incluso il riferimento `mtllib` interno case-sensitive. Il renderer usa gli asset canonici senza placeholder; i sorgenti `.blend` non sono copiati nel runtime. Il caricamento client è verificato, mentre il confronto estetico in gioco resta aperto.
 
 ## Licenze
 
@@ -68,13 +68,22 @@ Un contenuto non passa allo stato `verificato` finché il confronto estetico non
 
 | Percorso originale | Percorso moderno | Contenuto associato | Stato | Note/licenza |
 |---|---|---|---|---|
-| — | — | — | non iniziato | — |
+| `model/voltagesource/voltagesource.obj` | `models/six_node/voltagesource.obj` | sorgente elettrica | integrato | CC BY-NC-SA 3.0, provenienza legacy |
+| `model/voltagesource/voltagesource.mtl` | `models/six_node/voltagesource.mtl` | sorgente elettrica | integrato | riferimenti texture normalizzati |
+| `model/voltagesource/voltagesource.png` | `textures/block/six_node/voltagesource.png` | sorgente elettrica | integrato | texture canonica |
+| `sprites/cable.png` | `textures/six_node/cable.png` | cavo bassa tensione | integrato | texture canonica |
+| `model/PowerElectricPrimitives/PowerElectricPrimitives.obj` | `models/six_node/power_electric_primitives.obj` | resistore di potenza | integrato | path e `mtllib` lowercase |
+| `model/PowerElectricPrimitives/PowerElectricPrimitives.mtl` | `models/six_node/power_electric_primitives.mtl` | resistore di potenza | integrato | riferimenti texture normalizzati |
+| `model/PowerElectricPrimitives/PowerElectricPrimitives.png` | `textures/block/six_node/power_electric_primitives.png` | resistore di potenza | integrato | texture canonica condivisa |
 
 ## Registro delle conversioni
 
 | Asset | Metodo/strumento | Input | Output | Verifica visiva | Note |
 |---|---|---|---|---|---|
-| — | — | — | — | — | — |
+| Sorgente elettrica OBJ | copia selettiva + loader OBJ NeoForge | OBJ/MTL/PNG legacy | modello baked `six_node/electrical_source` | aperta | mostrato il gruppo `main`; LED dinamico ancora aperto |
+| Cavo bassa tensione | geometria procedurale del renderer | dimensioni descriptor + `sprites/cable.png` | quads dinamici SixNode | aperta | larghezza `1,95/16`, altezza `0,95/16` |
+| Resistore di potenza OBJ | copia selettiva + visibilità gruppi | OBJ/MTL/PNG legacy condivisi | modello baked `six_node/power_resistor` | aperta | visibili solo i quattro gruppi del resistore |
+| Item della vertical slice | override per proprietà del data component | tre PNG item legacy | tre varianti di `six_node_component` | caricamento verificato; confronto aperto | nessuna icona provvisoria; nomi localizzati |
 
 ## Controlli automatici da introdurre
 

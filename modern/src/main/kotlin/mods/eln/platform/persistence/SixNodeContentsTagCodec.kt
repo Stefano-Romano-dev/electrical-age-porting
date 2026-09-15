@@ -15,6 +15,7 @@ object SixNodeContentsTagCodec {
     private const val FACES_KEY = "faces"
     private const val TYPE_KEY = "type"
     private const val ROTATION_KEY = "rotation"
+    private const val PARAMETERS_KEY = "parameters"
 
     fun write(tag: CompoundTag, contents: SixNodeContents) {
         tag.putInt(VERSION_KEY, FORMAT_VERSION)
@@ -23,6 +24,14 @@ object SixNodeContentsTagCodec {
             val faceTag = CompoundTag()
             faceTag.putString(TYPE_KEY, component.typeId.toString())
             faceTag.putByte(ROTATION_KEY, component.rotation.legacyCode.toByte())
+            if (component.parameters.isNotEmpty()) {
+                val parameters = CompoundTag()
+                component.parameters.entries
+                    .filter { (_, value) -> value.isFinite() }
+                    .sortedBy { (key, _) -> key }
+                    .forEach { (key, value) -> parameters.putDouble(key, value) }
+                if (!parameters.isEmpty) faceTag.put(PARAMETERS_KEY, parameters)
+            }
             faces.put(face.serializedName, faceTag)
         }
         tag.put(FACES_KEY, faces)
@@ -39,7 +48,11 @@ object SixNodeContentsTagCodec {
             val faceTag = faces.getCompound(face.serializedName)
             val typeId = ResourceLocation.tryParse(faceTag.getString(TYPE_KEY)) ?: return@forEach
             val rotation = SixNodeRotation.fromLegacyCode(faceTag.getByte(ROTATION_KEY).toInt())
-            restored[face] = MountedSixNodeComponent(typeId, rotation)
+            val parametersTag = faceTag.getCompound(PARAMETERS_KEY)
+            val parameters = parametersTag.allKeys
+                .associateWith(parametersTag::getDouble)
+                .filterValues(Double::isFinite)
+            restored[face] = MountedSixNodeComponent(typeId, rotation, parameters)
         }
         contents.replaceFromPersistence(restored)
         return true

@@ -57,7 +57,7 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 | `WorldExplosion` | adapter mondo NeoForge | rimandato | nessun placeholder: forza, rimozione blocco ed effetti verranno portati con il nodo |
 | `ShaftSpeedWatchdog` | futuro core meccanico | rimandato | richiede rete shaft e velocità angolare |
 | Simulazione termica | `mods.eln.sim` | core indipendente + adapter ambiente | implementato, parità parziale | Adapter stanza, persistenza concreta e chiamanti nel mondo restano aperti |
-| SixNode | `mods.eln.node.six` | block entity host + component registry | in porting | catalogo iniziale, sei facce, LRDU e codec shell verificati; block entity e mondo da integrare |
+| SixNode | `mods.eln.node.six` | block entity host + component registry + grafo per livello + renderer client | in porting | host/BE, shell, item, montaggio, selezione, rimozione/drop, terminali orientati, runtime cavo/sorgente/resistore, circuito DC, ricostruzione disco/chunk e caricamento asset verificati; confronto visivo aperto |
 | TransparentNode | `mods.eln.node.transparent` | block/block entity moderni | da analizzare | Port per famiglie |
 | SimpleNode | `mods.eln.node.simple`, `simplenode` | blocchi/capability moderni | da analizzare | Include integrazioni |
 | GridNode | `mods.eln.gridnode` | rete/multiblocco | rimandato | M5 |
@@ -71,12 +71,16 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 
 | Contenuto | Id legacy | Id moderno proposto | Stato | Test richiesti |
 |---|---:|---|---|---|
-| Host SixNode | blocco contenitore legacy `Eln.SixNode` | `eln:six_node` | in porting | shell a sei facce e codec verificati; registrazione block/block entity, save reale e chunk reload aperti |
-| Cavo bassa tensione | `2052` (`32 << 6` + `4`) | `eln:low_voltage_cable` | mappato e verificato nel catalogo | connettività, geometria, drop e asset `sprites/cable.png` |
-| Resistore di potenza | `6180` (`96 << 6` + `36`) | `eln:power_resistor` | mappato e verificato nel catalogo | resistenza, potenza, orientamento e asset `PowerElectricPrimitives`/`powerresistor.png` |
-| Sorgente elettrica | `192` (`3 << 6` + `0`) | `eln:electrical_source` | mappato e verificato nel catalogo | polarità, tensione, orientamento e asset `model/voltagesource/*` |
+| Host SixNode | blocco contenitore legacy `Eln.SixNode` | `eln:six_node` | in porting | block/BE registrati; ricostruzione nel `ServerLevel`, riapertura file regione, chunk unload/reload, sopravvivenza con facce residue e drop completo su sostituzione verificati |
+| Cavo bassa tensione | `2052` (`32 << 6` + `4`) | `eln:low_voltage_cable` | interazione, runtime e primo rendering integrati | carico `0,0125 Ω`, tratte complanari/interne/diagonali, circuito, load/unload e ricostruzione verificati; geometria, tinta e regola dei cap legacy portate, texture mondo/item caricate, nuovo confronto visivo aperto |
+| Resistore di potenza | `6180` (`96 << 6` + `36`) | `eln:power_resistor` | runtime e primo rendering integrati | terminali LRDU e resistenza vuota `0,01 Ω` portati; gruppi canonici dell'OBJ caricati, confronto visivo, inventario, termica e distruzione aperti |
+| Sorgente elettrica | `192` (`3 << 6` + `0`) | `eln:electrical_source` | runtime e primo rendering integrati | sorgente monopolo, chiave `voltage`, resistenza seriale e piazzamento portati; gruppo `main` dell'OBJ e texture mondo/item originali caricati, configurazione, LED e confronto visivo aperti |
 
 Lo shell moderno conserva inoltre la mappa delle direzioni legacy: `0 WEST`, `1 EAST`, `2 DOWN`, `3 UP`, `4 NORTH`, `5 SOUTH`; le rotazioni LRDU usano rispettivamente `0 LEFT`, `1 RIGHT`, `2 DOWN`, `3 UP`. Questa informazione è mantenuta per parità e per un eventuale importer, ma non implica compatibilità diretta dei mondi 1.7.10.
+
+Audit del piazzamento legacy: `SixNodeItem` sposta la coordinata verso la faccia cliccata quando il blocco bersaglio non è sostituibile, monta sulla faccia inversa dell'host e opera soltanto lato server. Un nuovo host richiede un blocco adiacente non-air e opaco; un host esistente accetta soltanto una faccia libera con lo stesso requisito di supporto. Lo stack viene decrementato solo dopo il successo. La rotazione base è `UP` sulle facce laterali; su pavimento e soffitto dipende dalla direzione orizzontale del giocatore, e alcuni descriptor applicano ulteriori rotazioni. Questi vincoli sono ora implementati per il cavo bassa tensione; le definizioni non ancora portate vengono rifiutate per non creare componenti segnaposto.
+
+Audit della rimozione legacy: il ray test usa un raggio di otto blocchi, l'ordine fisso `WEST, EAST, DOWN, UP, NORTH, SOUTH` e intervalli diretti; questa particolarità può selezionare la faccia di uscita ed è conservata. Se il ray test non trova una faccia occupata, viene scelta quella più opposta alla vista. La faccia rimossa produce il proprio item salvo creative, l'host resta finché contiene altre facce, la perdita del supporto applica la stessa rimozione selettiva e la sostituzione esterna dell'host rilascia tutte le facce. Le sagome di selezione non-volume usano gli spessori canonici legacy `0.02..0.20` e `0.80..0.98`; la collisione del cavo resta vuota.
 
 ## Regola per gli id
 

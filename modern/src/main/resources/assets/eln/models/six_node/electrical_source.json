@@ -1,0 +1,12 @@
+{
+  "loader": "neoforge:obj",
+  "model": "eln:models/six_node/voltagesource.obj",
+  "automatic_culling": false,
+  "shade_quads": true,
+  "flip_v": true,
+  "visibility": {
+    "Minecraft_2_Edge_Connectivity_Cube.002": false,
+    "Minecraft_4_Edge_Connectivity_Cube.001": false,
+    "Minecraft_Block_Cube": false
+  }
+}

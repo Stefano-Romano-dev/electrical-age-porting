@@ -60,6 +60,26 @@ class SixNodeContentsTagCodecTest {
     }
 
     @Test
+    fun `finite electrical parameters survive a round trip`() {
+        val source = SixNodeContents().apply {
+            mount(
+                Direction.DOWN,
+                MountedSixNodeComponent(
+                    SixNodeComponentCatalog.ELECTRICAL_SOURCE.id,
+                    SixNodeRotation.LEFT,
+                    mapOf("voltage" to 50.0),
+                ),
+            )
+        }
+        val tag = CompoundTag()
+        SixNodeContentsTagCodec.write(tag, source)
+        val restored = SixNodeContents()
+
+        assertTrue(SixNodeContentsTagCodec.read(tag, restored))
+        assertEquals(mapOf("voltage" to 50.0), restored.get(Direction.DOWN)?.parameters)
+    }
+
+    @Test
     fun `unsupported schema cannot erase live contents`() {
         val contents = SixNodeContents().apply {
             mount(

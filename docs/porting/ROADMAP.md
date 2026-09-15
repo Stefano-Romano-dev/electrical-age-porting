@@ -1,6 +1,6 @@
 # Roadmap
 
-Aggiornata: 13 settembre 2026
+Aggiornata: 16 settembre 2026
 
 ## M0 — Baseline NeoForge
 
@@ -68,10 +68,19 @@ Avanzamento verificato:
 - [x] catalogo iniziale dei tipi con id namespaced e mapping numerico legacy;
 - [x] modello a sei facce e rotazione LRDU fedele;
 - [x] codec versionato dello shell persistente con round-trip e compatibilità conservativa;
-- [ ] registrazione del blocco host e della block entity;
-- [ ] item, interazione nel mondo, rete, rendering e verifiche save/chunk/multiplayer.
+- [x] registrazione del blocco host e della block entity;
+- [x] item contenitore e data component con identità namespaced persistente e sincronizzata;
+- [x] GameTest di piazzamento e ricostruzione vanilla del block entity nel `ServerLevel`;
+- [x] montaggio server-authoritative del cavo con faccia inversa, rotazione base, supporto opaco e consumo atomico;
+- [x] riapertura dello stesso mondo in un secondo processo dedicated e chunk unload/reload;
+- [x] selezione, rimozione per faccia, perdita supporto e drop survival/creative del primo cavo;
+- [x] primo grafo elettrico server-side del cavo con ownership per livello, topologie legacy e lifecycle load/unload verificato;
+- [x] terminali orientati, runtime MNA di sorgente/resistore, piazzamento e primo circuito DC numerico verificato nel mondo;
+- [x] primo renderer client con geometrie e texture canoniche caricato senza errori di risorsa;
+- [x] modello dinamico dell'item, nomi localizzati e varianti nella ricerca creativa;
+- [ ] nuovo confronto visivo in gioco dopo le correzioni e verifica multiplayer.
 
-Prossimo slice: registrare `eln:six_node` e la sua block entity, componendo lo shell già testato senza ancora introdurre sostituzioni estetiche provvisorie spacciate per definitive.
+Prossimo slice: preparare una scena client riproducibile sulle sei facce e acquisire il confronto visivo aggiornato con la 1.24.8; networking di configurazione e GUI restano in M3.
 
 ## M3 — Networking, menu e strumenti
 
