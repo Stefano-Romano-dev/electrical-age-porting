@@ -271,3 +271,4 @@ Punto di ripresa: costruire una scena client riproducibile con i tre componenti 
 - Il test di questa rifinitura non è partito perché il client era stato riaperto e il nuovo processo Minecraft (`PID 43340`) bloccava nuovamente il JAR NeoForge.
 - Dopo la seconda chiusura del client, il test mirato della scelta `Extend/Internal`, la suite completa da 169 test, la build e i 10/10 GameTest sono superati. Resta soltanto il controllo visivo aggiornato dello spigolo.
 - Lo screenshot finale dell'utente conferma una curva continua e senza gradino visibile tra piano superiore, parete e piano inferiore; P-022 è chiuso.
+- Creati i README pubblici inglese e italiano del repository e riallineato il README tecnico di `modern/` allo stato M2 verificato.

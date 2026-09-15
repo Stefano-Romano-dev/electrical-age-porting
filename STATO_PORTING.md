@@ -162,6 +162,7 @@ Avanzamento M1 verificato:
 - suite completa salita a 169 test e build/test superati; i 10/10 GameTest dedicati restano verdi e il dedicated server non carica classi client;
 - un nuovo caricamento client non produce più il warning del modello item; uno screenshot in-world post-correzione conferma continuità, tinta e cap attesi per la configurazione provata. Il confronto completo sulle sei facce con la 1.24.8, configurazione GUI/inventario del resistore, audio e verifica multiplayer restano aperti.
 - corretto inoltre il vicino diagonale sullo spigolo esterno: grafo e renderer cercano ora `edge.opposite` come la 1.24.8 e la geometria applica la scelta legacy `Extend/Internal` a un solo braccio; test mirati, suite da 169 test, build completa e 10/10 GameTest sono verdi, e lo screenshot finale conferma la curva continua senza gradino visibile.
+- aggiunti README pubblici in inglese e italiano con obiettivo, stato verificato, limiti correnti e accesso alla documentazione tecnica; aggiornato anche il README del sottoprogetto moderno.
 
 Il dettaglio tecnico e la roadmap completa sono in [ANALISI_PORTING.md](./ANALISI_PORTING.md).
 

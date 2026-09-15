@@ -331,6 +331,7 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 - Comando `build --no-daemon`: superato in 16 s; report XML con 169 test, 0 fallimenti/errori.
 - Comando `runGameTestServer --no-daemon`: superato in 17 s; tutti i 10 GameTest richiesti passano. La conferma visiva in-world della curva rifinita resta aperta.
 - Smoke test visivo finale dello spigolo esterno: superato. Lo screenshot dell'utente mostra continuità sui tre segmenti, raccordi aderenti allo spigolo e assenza del precedente gradino; P-022 chiuso per la configurazione provata.
+- Verifica documentale README: `README.md`, `README.it.md` e `modern/README.md` presenti; tutti i collegamenti locali dichiarati verso licenze, stato e indice tecnico risolti con `Test-Path`; conteggi riallineati a 169 test unitari e 10 GameTest. `git diff --check` non segnala errori, soltanto gli avvisi attesi LF→CRLF.
 
 ## Modello di registrazione
 

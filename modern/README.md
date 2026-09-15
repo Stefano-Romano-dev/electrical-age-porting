@@ -1,6 +1,6 @@
 # Electrical Age — NeoForge port
 
-Clean port of Electrical Age 1.24.8 to Minecraft 1.21.1 and NeoForge.
+Modern implementation of the Electrical Age 1.24.8 port. The repository overview is available in [English](../README.md) and [Italian](../README.it.md).
 
 ## Current baseline
 
@@ -12,11 +12,12 @@ Clean port of Electrical Age 1.24.8 to Minecraft 1.21.1 and NeoForge.
 - Mod id `eln`
 - Version `0.1.0-alpha.1`
 
-Milestone M0 provides the verified NeoForge walking skeleton. Milestone M1 is now porting the platform-independent simulation core; its first DC MNA slice includes states, resistors, current sources and voltage sources. Kotlin stdlib and Commons Math are bundled through NeoForge Jar-in-Jar. The original 1.7.10 source remains in `../original/` as a read-only behavioral and visual reference.
+Milestones M0 and M1 are complete. M2 currently provides the first playable SixNode vertical slice with low-voltage cables, an electrical source, a power resistor, persistence, server-owned MNA runtime, canonical rendering assets, and dedicated GameTests. The baseline passes 169 unit tests and 10 GameTests. The complete catalog, GUIs, audio, multiplayer validation, and integrations remain in development.
 
 From this directory on Windows:
 
 ```powershell
+$env:GRADLE_USER_HOME = (Resolve-Path '.gradle').Path
 .\gradlew.bat test
 .\gradlew.bat build
 .\gradlew.bat runClient
