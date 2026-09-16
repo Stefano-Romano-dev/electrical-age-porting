@@ -12,6 +12,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
+import java.util.Map;
 
 class SixNodeBlockEntityPersistenceTest {
     @Test
@@ -58,5 +59,43 @@ class SixNodeBlockEntityPersistenceTest {
         entity.loadAdditional(future, RegistryAccess.EMPTY);
 
         assertEquals(component, entity.contentsSnapshot().get(Direction.NORTH));
+    }
+
+    @Test
+    void electricalSourceVoltageConfigurationIsFiniteAndTypeSafe() {
+        SixNodeBlock block = ElnContent.SIX_NODE.get();
+        SixNodeBlockEntity entity = new SixNodeBlockEntity(BlockPos.ZERO, block.defaultBlockState());
+        MountedSixNodeComponent source = new MountedSixNodeComponent(
+                SixNodeComponentCatalog.ELECTRICAL_SOURCE.getId(),
+                SixNodeRotation.UP,
+                Map.of(SixNodeElectricalGraph.VOLTAGE_PARAMETER, 50.0));
+        assertTrue(entity.mount(Direction.NORTH, source));
+
+        assertTrue(entity.setElectricalSourceVoltage(Direction.NORTH, 123.5));
+        assertEquals(
+                123.5,
+                entity.contentsSnapshot()
+                        .get(Direction.NORTH)
+                        .getParameters()
+                        .get(SixNodeElectricalGraph.VOLTAGE_PARAMETER));
+        assertFalse(entity.setElectricalSourceVoltage(Direction.NORTH, Double.NaN));
+        assertFalse(entity.setElectricalSourceVoltage(Direction.SOUTH, 10.0));
+
+        assertTrue(entity.mount(
+                Direction.UP,
+                new MountedSixNodeComponent(
+                        SixNodeComponentCatalog.LOW_VOLTAGE_CABLE.getId(), SixNodeRotation.LEFT)));
+        assertFalse(entity.setElectricalSourceVoltage(Direction.UP, 10.0));
+
+        CompoundTag saved = new CompoundTag();
+        entity.saveAdditional(saved, RegistryAccess.EMPTY);
+        SixNodeBlockEntity restored = new SixNodeBlockEntity(BlockPos.ZERO, block.defaultBlockState());
+        restored.loadAdditional(saved, RegistryAccess.EMPTY);
+        assertEquals(
+                123.5,
+                restored.contentsSnapshot()
+                        .get(Direction.NORTH)
+                        .getParameters()
+                        .get(SixNodeElectricalGraph.VOLTAGE_PARAMETER));
     }
 }

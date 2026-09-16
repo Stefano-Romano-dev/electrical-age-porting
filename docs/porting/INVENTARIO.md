@@ -57,7 +57,7 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 | `WorldExplosion` | adapter mondo NeoForge | rimandato | nessun placeholder: forza, rimozione blocco ed effetti verranno portati con il nodo |
 | `ShaftSpeedWatchdog` | futuro core meccanico | rimandato | richiede rete shaft e velocità angolare |
 | Simulazione termica | `mods.eln.sim` | core indipendente + adapter ambiente | implementato, parità parziale | Adapter stanza, persistenza concreta e chiamanti nel mondo restano aperti |
-| SixNode | `mods.eln.node.six` | block entity host + component registry + grafo per livello + renderer client | in porting | host/BE, shell, item, montaggio, selezione, rimozione/drop, terminali orientati, runtime cavo/sorgente/resistore, circuito DC, ricostruzione disco/chunk e caricamento asset verificati; confronto visivo aperto |
+| SixNode | `mods.eln.node.six` | block entity host + component registry + grafo per livello + renderer client | M2 completata | host/BE, shell, item, montaggio, selezione, rimozione/drop, terminali orientati, runtime cavo/sorgente/resistore, circuito DC, ricostruzione disco/chunk, asset e sync multiplayer verificati nel perimetro M2 |
 | TransparentNode | `mods.eln.node.transparent` | block/block entity moderni | da analizzare | Port per famiglie |
 | SimpleNode | `mods.eln.node.simple`, `simplenode` | blocchi/capability moderni | da analizzare | Include integrazioni |
 | GridNode | `mods.eln.gridnode` | rete/multiblocco | rimandato | M5 |
@@ -71,10 +71,10 @@ Questo documento diventerà la fonte autorevole per sapere cosa esiste nella 1.2
 
 | Contenuto | Id legacy | Id moderno proposto | Stato | Test richiesti |
 |---|---:|---|---|---|
-| Host SixNode | blocco contenitore legacy `Eln.SixNode` | `eln:six_node` | in porting | block/BE registrati; ricostruzione nel `ServerLevel`, riapertura file regione, chunk unload/reload, sopravvivenza con facce residue e drop completo su sostituzione verificati |
-| Cavo bassa tensione | `2052` (`32 << 6` + `4`) | `eln:low_voltage_cable` | interazione, runtime e primo rendering integrati | carico `0,0125 Ω`, tratte complanari/interne/diagonali, circuito, load/unload e ricostruzione verificati; geometria, tinta e regola dei cap legacy portate, texture mondo/item caricate, nuovo confronto visivo aperto |
-| Resistore di potenza | `6180` (`96 << 6` + `36`) | `eln:power_resistor` | runtime e primo rendering integrati | terminali LRDU e resistenza vuota `0,01 Ω` portati; gruppi canonici dell'OBJ caricati, confronto visivo, inventario, termica e distruzione aperti |
-| Sorgente elettrica | `192` (`3 << 6` + `0`) | `eln:electrical_source` | runtime e primo rendering integrati | sorgente monopolo, chiave `voltage`, resistenza seriale e piazzamento portati; gruppo `main` dell'OBJ e texture mondo/item originali caricati, configurazione, LED e confronto visivo aperti |
+| Host SixNode | blocco contenitore legacy `Eln.SixNode` | `eln:six_node` | verificato per M2 | block/BE registrati; ricostruzione nel `ServerLevel`, riapertura file regione, chunk unload/reload, facce residue, drop completo e sincronizzazione client verificati |
+| Cavo bassa tensione | `2052` (`32 << 6` + `4`) | `eln:low_voltage_cable` | verificato per M2 | carico `0,0125 Ω`, tratte complanari/interne/diagonali, circuito, load/unload e ricostruzione verificati; geometria, tinta, cap, texture e montaggio sulle sei facce coperti |
+| Resistore di potenza | `6180` (`96 << 6` + `36`) | `eln:power_resistor` | verificato per M2 | terminali LRDU, resistenza vuota `0,01 Ω`, gruppi OBJ e montaggio sulle sei facce coperti; inventario, termica e distruzione restano nelle slice successive |
+| Sorgente elettrica | `192` (`3 << 6` + `0`) | `eln:electrical_source` | M2 verificata, configurazione M3 integrata | sorgente monopolo, chiave `voltage`, resistenza seriale, gruppo `main`, texture e montaggio sulle sei facce coperti; menu/payload server-authoritative verificati, LED resta nel catalogo M4 |
 
 Lo shell moderno conserva inoltre la mappa delle direzioni legacy: `0 WEST`, `1 EAST`, `2 DOWN`, `3 UP`, `4 NORTH`, `5 SOUTH`; le rotazioni LRDU usano rispettivamente `0 LEFT`, `1 RIGHT`, `2 DOWN`, `3 UP`. Questa informazione è mantenuta per parità e per un eventuale importer, ma non implica compatibilità diretta dei mondi 1.7.10.
 

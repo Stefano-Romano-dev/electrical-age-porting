@@ -19,10 +19,12 @@ Currently working:
 - multi-face placement, removal, drops, save/reload, and chunk reload;
 - original OBJ models, textures, item variants, and cable rendering;
 - coplanar, internal, and outer-corner cable connections.
+- dedicated-to-client synchronization for the M2 SixNode slice.
+- first server-authoritative configuration menu for the electrical source.
 
-The current baseline passes **169 unit tests** and **10 NeoForge GameTests**, including dedicated-server and persistence checks.
+The current baseline passes **171 unit tests** and **11 NeoForge GameTests**, including dedicated-server, persistence, and real client/server configuration checks.
 
-Still in progress: the full device catalog, configuration GUIs and inventories, audio and particles, multiplayer validation, and optional integrations with other mods.
+Still in progress: the full device catalog, configuration GUIs and inventories, audio and particles, multiplayer validation for future interactive payloads, and optional integrations with other mods.
 
 ## Development
 

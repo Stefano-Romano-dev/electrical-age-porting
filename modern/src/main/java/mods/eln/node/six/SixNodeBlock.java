@@ -16,6 +16,9 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.InteractionResult;
+import mods.eln.menu.ElectricalSourceMenu;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -65,6 +68,22 @@ public final class SixNodeBlock extends BaseEntityBlock {
     protected VoxelShape getCollisionShape(
             BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return Shapes.empty();
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(
+            BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if (!(level.getBlockEntity(pos) instanceof SixNodeBlockEntity host)) return InteractionResult.PASS;
+        Direction face = hitResult.getDirection();
+        MountedSixNodeComponent component = host.contentsSnapshot().get(face);
+        if (component == null
+                || !component.getTypeId().equals(SixNodeComponentCatalog.ELECTRICAL_SOURCE.getId())) {
+            return InteractionResult.PASS;
+        }
+        if (!level.isClientSide) {
+            ElectricalSourceMenu.open(player, pos, face, component);
+        }
+        return InteractionResult.SUCCESS;
     }
 
     @Override

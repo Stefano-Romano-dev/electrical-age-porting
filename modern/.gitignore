@@ -36,6 +36,8 @@ bin/
 ### Minecraft Modding ###
 run/
 run-six-node-persistence/
+run-six-node-multiplayer/
+run-six-node-multiplayer-client/
 !**/src/**/run/
 **/src/generated/**/.cache/
 repo/

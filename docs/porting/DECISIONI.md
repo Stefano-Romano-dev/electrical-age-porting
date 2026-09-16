@@ -242,6 +242,28 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Conseguenze: il blockstate dell'host è intenzionalmente invisibile e la presentazione dipende dal block entity renderer; gli asset runtime hanno path lowercase. Le varianti item sono risolte da una proprietà client derivata dal data component. Il confronto visivo affiancato e il LED della sorgente restano requisiti aperti.
 - Verifica eseguita: 169 test unitari, inclusa la selezione geometrica `Extend/Internal` dello spigolo; caricamento client completo senza errori OBJ/MTL, blockstate o modello item ELN dopo le correzioni; 10/10 GameTest dedicated senza classloading client. La parità estetica non è ancora dichiarata.
 
+## D-024 — Probe multiplayer M2 isolato e attivo solo in sviluppo
+
+- Stato: accettata
+- Data: 16 settembre 2026
+- Contesto: update tag e packet del block entity erano coperti indirettamente, ma M2 richiedeva una prova con processi dedicated e client reali e una scena riproducibile dei tre componenti sulle sei facce.
+- Scelta: aggiungere due run ModDevGradle con directory separate e un probe abilitato dalla proprietà `eln.sixNodeMultiplayerProbe`. Il server crea 18 host e imposta spawn/scena; il client si collega, confronta lo stato ricevuto con l'atteso per 60 tick, acquisisce uno screenshot e termina. I listener comuni sono registrati soltanto fuori produzione.
+- Alternative considerate: affidarsi ai soli GameTest; prova manuale non riproducibile; includere logica di test nel runtime di produzione; simulare il client nello stesso processo.
+- Motivo: verifica il percorso di rete e il classloading reale senza aggiungere comportamento, dipendenze o stato persistente alla distribuzione del mod.
+- Conseguenze: le directory di run e lo screenshot sono artifact locali ignorati; server e client devono essere avviati in parallelo; il probe non sostituisce i test futuri dei payload di configurazione M3 né la parità visiva dell'intero catalogo.
+- Verifica eseguita: login sul dedicated, 18 stati esatti sul client, screenshot diurno e marker di sync dopo 60 tick; client exit code 0, 11/11 GameTest e build completa superati.
+
+## D-025 — Configurazione SixNode vincolata al menu server-authoritative
+
+- Stato: accettata
+- Data: 16 settembre 2026
+- Contesto: la GUI legacy della sorgente inviava un id comando, la posizione implicita del render e un float liberamente scelto; il port moderno deve impedire che un client configuri una faccia arbitraria o lontana senza cambiare la semantica del valore.
+- Scelta: registrare un `MenuType` che identifica posizione e faccia e un `CustomPacketPayload` server-bound con posizione, faccia e float. Il server applica il comando soltanto se il menu aperto coincide, il player è entro otto blocchi, la faccia contiene ancora una sorgente e il valore è finito. Il parametro persistente resta il double `voltage` e il normale update packet del block entity sincronizza il risultato.
+- Alternative considerate: payload generico con id comando legacy; modifica diretta client-side; clamp moderno della tensione; menu privo di identità del target; un packet client-bound separato che duplichi il codec del block entity.
+- Motivo: mantiene il server autorevole, riduce la superficie di spoofing e riusa persistenza/sync già verificate senza introdurre limiti di gameplay assenti dalla 1.24.8.
+- Conseguenze: altri menu SixNode potranno riusare il pattern ma non un payload generico non tipizzato; il campo numerico comune deve ancora essere estratto; il valore client continua a transitare come float per fedeltà al protocollo legacy.
+- Verifica eseguita: round-trip del codec, rifiuto di NaN/faccia assente/tipo errato, persistenza del nuovo valore e prova dedicated→client con menu reale, aggiornamento `50 → 123,5 V` e stato restituito al client.
+
 ## Modello per nuove decisioni
 
 ```text

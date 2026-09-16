@@ -5,6 +5,7 @@ import mods.eln.PortingBaseline;
 import mods.eln.node.six.MountedSixNodeComponent;
 import mods.eln.node.six.SixNodeBlockEntity;
 import mods.eln.node.six.SixNodeComponentCatalog;
+import mods.eln.node.six.SixNodeComponentDefinition;
 import mods.eln.node.six.SixNodeComponentStack;
 import mods.eln.node.six.SixNodeElectricalGraph;
 import mods.eln.node.six.SixNodePlacementOrientation;
@@ -25,6 +26,7 @@ import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import java.util.Map;
+import java.util.List;
 
 @GameTestHolder(PortingBaseline.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -324,6 +326,50 @@ public final class SixNodeGameTests {
                     Math.abs(Math.abs(current) - expected) < 1.0E-5,
                     "Expected legacy DC current " + expected + " A, got " + current);
         });
+    }
+
+    @GameTest(template = "showcase")
+    public static void allThreeComponentsMountOnEveryFaceForVisualParity(GameTestHelper helper) {
+        List<SixNodeComponentDefinition> components = List.of(
+                SixNodeComponentCatalog.LOW_VOLTAGE_CABLE,
+                SixNodeComponentCatalog.ELECTRICAL_SOURCE,
+                SixNodeComponentCatalog.POWER_RESISTOR);
+        SixNodeRotation[] rotations = {
+            SixNodeRotation.UP, SixNodeRotation.RIGHT, SixNodeRotation.DOWN
+        };
+
+        int directionColumn = 0;
+        for (Direction face : List.of(
+                Direction.WEST,
+                Direction.EAST,
+                Direction.DOWN,
+                Direction.UP,
+                Direction.NORTH,
+                Direction.SOUTH)) {
+            for (int componentRow = 0; componentRow < components.size(); componentRow++) {
+                BlockPos hostPos = new BlockPos(3 + directionColumn * 4, 4, 3 + componentRow * 4);
+                BlockPos supportPos = hostPos.relative(face);
+                helper.setBlock(supportPos, Blocks.SMOOTH_STONE);
+                helper.setBlock(hostPos, ElnContent.SIX_NODE.get());
+
+                SixNodeBlockEntity host = helper.getBlockEntity(hostPos);
+                SixNodeComponentDefinition definition = components.get(componentRow);
+                Map<String, Double> parameters = definition == SixNodeComponentCatalog.ELECTRICAL_SOURCE
+                        ? Map.of(SixNodeElectricalGraph.VOLTAGE_PARAMETER, 50.0)
+                        : Map.of();
+                MountedSixNodeComponent component = new MountedSixNodeComponent(
+                        definition.getId(), rotations[componentRow], parameters);
+                helper.assertTrue(
+                        host.mount(face, component),
+                        "Showcase host must accept " + definition.getId() + " on " + face);
+                helper.assertValueEqual(
+                        host.contentsSnapshot().get(face),
+                        component,
+                        "Showcase state must preserve type, face, rotation and parameters");
+            }
+            directionColumn++;
+        }
+        helper.succeed();
     }
 
     private static void assertTypedCableDropCount(GameTestHelper helper, BlockPos relativePos, int expectedCount) {

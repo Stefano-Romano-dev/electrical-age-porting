@@ -55,6 +55,7 @@ neoForge {
     runs {
         client {
             client()
+            programArguments.addAll '--width', '1920', '--height', '1080'
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
@@ -85,6 +86,20 @@ neoForge {
             gameDirectory = project.file('run-six-node-persistence')
             programArgument '--nogui'
             systemProperty 'eln.sixNodePersistenceProbe', 'verify'
+        }
+
+        sixNodeMultiplayerServer {
+            server()
+            gameDirectory = project.file('run-six-node-multiplayer')
+            programArgument '--nogui'
+            systemProperty 'eln.sixNodeMultiplayerProbe', 'server'
+        }
+
+        sixNodeMultiplayerClient {
+            client()
+            gameDirectory = project.file('run-six-node-multiplayer-client')
+            programArguments.addAll '--server', 'localhost', '--port', '25565', '--width', '1920', '--height', '1080'
+            systemProperty 'eln.sixNodeMultiplayerProbe', 'client'
         }
 
         data {
@@ -252,6 +267,21 @@ tasks.named('prepareSixNodePersistenceWriteRun').configure {
 
 tasks.named('prepareSixNodePersistenceVerifyRun').configure {
     dependsOn(prepareSixNodePersistenceRun)
+}
+
+def prepareSixNodeMultiplayerServerRun = tasks.register('prepareSixNodeMultiplayerServerFiles') {
+    def eulaFile = layout.projectDirectory.file('run-six-node-multiplayer/eula.txt')
+    def propertiesFile = layout.projectDirectory.file('run-six-node-multiplayer/server.properties')
+    outputs.files(eulaFile, propertiesFile)
+    doLast {
+        eulaFile.asFile.parentFile.mkdirs()
+        eulaFile.asFile.text = 'eula=true\n'
+        propertiesFile.asFile.text = 'online-mode=false\nlevel-name=world-superflat\nlevel-type=minecraft:flat\ngenerator-settings={}\nspawn-protection=0\n'
+    }
+}
+
+tasks.named('prepareSixNodeMultiplayerServerRun').configure {
+    dependsOn(prepareSixNodeMultiplayerServerRun)
 }
 
 tasks.named('runSixNodePersistenceVerify').configure {

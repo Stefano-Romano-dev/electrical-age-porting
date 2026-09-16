@@ -333,6 +333,31 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 - Smoke test visivo finale dello spigolo esterno: superato. Lo screenshot dell'utente mostra continuità sui tre segmenti, raccordi aderenti allo spigolo e assenza del precedente gradino; P-022 chiuso per la configurazione provata.
 - Verifica documentale README: `README.md`, `README.it.md` e `modern/README.md` presenti; tutti i collegamenti locali dichiarati verso licenze, stato e indice tecnico risolti con `Test-Path`; conteggi riallineati a 169 test unitari e 10 GameTest. `git diff --check` non segnala errori, soltanto gli avvisi attesi LF→CRLF.
 
+## 16 settembre 2026 — Chiusura M2 con scena completa e multiplayer
+
+- Portata verificata: cavo LV, sorgente e resistore montati su ciascuna delle sei facce; sincronizzazione block entity da un dedicated server reale a un client reale, incluse identità, faccia, rotazione e parametri.
+- Aggiunto il GameTest `allThreeComponentsMountOnEveryFaceForVisualParity` con 18 host e una struttura vuota dedicata; il comando `$env:GRADLE_USER_HOME = (Resolve-Path '.gradle').Path; .\gradlew.bat test runGameTestServer build --no-daemon` è superato in 23 s con 169 test unitari, 11/11 GameTest e build completa.
+- Comando `$env:GRADLE_USER_HOME = (Resolve-Path '.gradle').Path; .\gradlew.bat verifySixNodeDiskPersistence --no-daemon`: superato in 26 s con riapertura del file regione e marker `SIX_NODE_PERSISTENCE_VERIFY_OK` e `SIX_NODE_CHUNK_UNLOAD_RELOAD_OK`.
+- Prima esecuzione del probe multiplayer: server pronto, login client e 18 stati sincronizzati verificati; lo screenshot era notturno e troppo distante, quindi è stato conservato come prova tecnica ma non accettato come evidenza visiva finale.
+- Esecuzione finale: `runSixNodeMultiplayerServer --no-daemon` sulla directory isolata `run-six-node-multiplayer`, seguita in parallelo da `runSixNodeMultiplayerClient --no-daemon` sulla directory client isolata; client superato in 26 s con exit code 0.
+- Marker osservati: `SIX_NODE_MULTIPLAYER_SERVER_SCENE_READY`, `SIX_NODE_MULTIPLAYER_SERVER_PLAYER_JOINED`, `SIX_NODE_MULTIPLAYER_CLIENT_SCREENSHOT` e `SIX_NODE_MULTIPLAYER_CLIENT_SYNC_OK` dopo 60 tick sincronizzati.
+- Artifact locale: `modern/run-six-node-multiplayer-client/screenshots/six-node-multiplayer.png`, scena diurna senza HUD con tutti i 18 montaggi; le directory runtime restano ignorate da Git.
+- Esito: M2 superata per il perimetro dichiarato. La scena prova montaggio/rendering e sync dei tre componenti sulle sei facce, ma non viene presentata come confronto pixel-perfect dell'intero catalogo 1.24.8.
+- Standard di esecuzione aggiornato su richiesta dell'utente: le run client `client` e `sixNodeMultiplayerClient` ricevono `--width 1920 --height 1080`; il server del probe usa `level-name=world-superflat` e `level-type=minecraft:flat`.
+- Verifica successiva: il log client riporta gli argomenti `--width, 1920, --height, 1080`, il server prepara `world-superflat`, il client termina con `SIX_NODE_MULTIPLAYER_CLIENT_SYNC_OK` ed exit code 0. Lo screenshot prodotto misura 1920×1080 e mostra la scena alla quota del terreno piano.
+
+## 16 settembre 2026 — Primo menu e payload server-authoritative M3
+
+- Riferimento legacy verificato: `ElectricalSourceGui` contiene un solo campo, usa il parser numerico locale e invia un float con comando `setVoltageId`; `ElectricalSourceElement` salva il valore nella chiave double `voltage` senza clamp.
+- Implementati `ElectricalSourceMenu`, `ElectricalSourceScreen` e il payload server-bound `SetElectricalSourceVoltagePayload`; apertura con mano vuota sulla faccia della sorgente, localizzazioni inglese/italiano e applicazione server con controllo di menu, target, distanza, tipo e valore finito.
+- Comando mirato `$env:GRADLE_USER_HOME = (Resolve-Path '.gradle').Path; .\gradlew.bat test --tests mods.eln.node.six.SixNodeBlockEntityPersistenceTest --no-daemon`: superato in 19 s.
+- Comando `$env:GRADLE_USER_HOME = (Resolve-Path '.gradle').Path; .\gradlew.bat test runGameTestServer build --no-daemon`: superato in 22 s; 170 test al momento dell'esecuzione, 11/11 GameTest e build completa.
+- Prima prova multiplayer M3: fallita per timeout perché il menu veniva aperto nel callback di login prima che il client fosse pronto; nessun payload applicato. Apertura spostata a un tick server successivo e aggiunto timeout esplicito.
+- Seconda prova: fallita per timeout; il server apriva il menu, ma la posizione panoramica era oltre gli otto blocchi e `stillValid` lo chiudeva correttamente. Il probe ora posiziona il player vicino alla sorgente durante la configurazione e lo teletrasporta alla camera soltanto dopo l'applicazione.
+- Prova finale Superflat 1920×1080: superata, client exit code 0. Marker `SIX_NODE_MULTIPLAYER_SERVER_MENU_OPENED`, `SIX_NODE_MULTIPLAYER_CLIENT_CONFIGURATION_SENT`, `SIX_NODE_MULTIPLAYER_CLIENT_CONFIGURATION_SYNC_OK`, `SIX_NODE_MULTIPLAYER_SERVER_CAMERA_READY` e sync finale di 18 facce con `123,5 V`.
+- Artifact locali: `electrical-source-menu.png` mostra il primo menu con valore iniziale `50 V`; `six-node-multiplayer.png` conserva la scena finale. Il toast vanilla del server offline è visibile nell'immagine del menu e non appartiene al mod.
+- Aggiunti successivamente il test del codec payload e l'asserzione di persistenza del valore configurato. Build conclusiva con lo stesso comando superata in 18 s: 171 test, 0 fallimenti/errori, 11/11 GameTest e build completa.
+
 ## Modello di registrazione
 
 ```text

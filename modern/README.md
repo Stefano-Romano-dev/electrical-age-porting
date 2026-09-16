@@ -12,7 +12,7 @@ Modern implementation of the Electrical Age 1.24.8 port. The repository overview
 - Mod id `eln`
 - Version `0.1.0-alpha.1`
 
-Milestones M0 and M1 are complete. M2 currently provides the first playable SixNode vertical slice with low-voltage cables, an electrical source, a power resistor, persistence, server-owned MNA runtime, canonical rendering assets, and dedicated GameTests. The baseline passes 169 unit tests and 10 GameTests. The complete catalog, GUIs, audio, multiplayer validation, and integrations remain in development.
+Milestones M0, M1, and M2 are complete. M3 has started with a typed, server-authoritative electrical-source configuration payload and the first localized menu. The baseline passes 171 unit tests and 11 GameTests, including a real dedicated-to-client `50 → 123.5 V` configuration probe. The complete catalog, remaining GUIs and tools, audio, and integrations remain in development.
 
 From this directory on Windows:
 

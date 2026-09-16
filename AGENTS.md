@@ -62,3 +62,4 @@ Annotare sempre il comando esatto e l'esito. Non descrivere una verifica come su
 - Impostare `GRADLE_USER_HOME` su `modern/.gradle` durante le esecuzioni locali dell'agente.
 - La compilazione Kotlin usa `kotlin.compiler.execution.strategy=in-process`: il daemon Kotlin tenta altrimenti di scrivere marcatori sotto `AppData` e può causare `AccessDeniedException` o lock persistenti nella sandbox Windows.
 - Se output sotto `modern/build` sono stati creati da un'esecuzione elevata, anche `clean` può richiedere lo stesso livello di accesso per rimuoverli.
+- Avviare i client usati per test e prove visive a `1920x1080`; le scene di test in-world devono usare un mondo Superflat salvo che la verifica richieda esplicitamente terreno o worldgen normali.

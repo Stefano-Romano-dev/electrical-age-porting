@@ -3,6 +3,7 @@ package mods.eln;
 import com.mojang.logging.LogUtils;
 import kotlin.KotlinVersion;
 import mods.eln.gametest.SixNodeDiskPersistenceProbe;
+import mods.eln.gametest.SixNodeMultiplayerProbe;
 import mods.eln.platform.ServerSimulationLifecycle;
 import mods.eln.registry.ElnContent;
 import net.neoforged.bus.api.IEventBus;
@@ -18,6 +19,7 @@ public final class ElectricalAge {
     public static final Logger LOGGER = LogUtils.getLogger();
     private static ServerSimulationLifecycle simulations;
     private final SixNodeDiskPersistenceProbe sixNodeDiskPersistenceProbe = new SixNodeDiskPersistenceProbe();
+    private final SixNodeMultiplayerProbe sixNodeMultiplayerProbe = new SixNodeMultiplayerProbe();
 
     public ElectricalAge(IEventBus modBus, ModContainer modContainer) {
         simulations = new ServerSimulationLifecycle();
@@ -31,6 +33,9 @@ public final class ElectricalAge {
         if (!FMLEnvironment.production) {
             NeoForge.EVENT_BUS.addListener(sixNodeDiskPersistenceProbe::onServerStarted);
             NeoForge.EVENT_BUS.addListener(sixNodeDiskPersistenceProbe::onServerTick);
+            NeoForge.EVENT_BUS.addListener(sixNodeMultiplayerProbe::onServerStarted);
+            NeoForge.EVENT_BUS.addListener(sixNodeMultiplayerProbe::onPlayerLoggedIn);
+            NeoForge.EVENT_BUS.addListener(sixNodeMultiplayerProbe::onServerTick);
         }
         LOGGER.info(
                 "Starting {} port for Minecraft {} on {} with Kotlin {}",

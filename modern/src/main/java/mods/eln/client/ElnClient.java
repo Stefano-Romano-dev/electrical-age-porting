@@ -14,6 +14,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import mods.eln.client.screen.ElectricalSourceScreen;
 
 /** Client-only registration boundary. No client class is referenced by common initialization. */
 @EventBusSubscriber(modid = PortingBaseline.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -32,6 +34,11 @@ public final class ElnClient {
     public static void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
         event.register(SixNodeBlockEntityRenderer.ELECTRICAL_SOURCE_MODEL);
         event.register(SixNodeBlockEntityRenderer.POWER_RESISTOR_MODEL);
+    }
+
+    @SubscribeEvent
+    public static void registerMenuScreens(RegisterMenuScreensEvent event) {
+        event.register(ElnContent.ELECTRICAL_SOURCE_MENU.get(), ElectricalSourceScreen::new);
     }
 
     @SubscribeEvent

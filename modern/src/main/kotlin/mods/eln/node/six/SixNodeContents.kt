@@ -77,6 +77,12 @@ class SixNodeContents {
         return true
     }
 
+    fun replace(face: Direction, component: MountedSixNodeComponent): Boolean {
+        if (!components.containsKey(face)) return false
+        components[face] = component
+        return true
+    }
+
     fun snapshot(): Map<Direction, MountedSixNodeComponent> = components.toMap()
 
     internal fun replaceFromPersistence(restored: Map<Direction, MountedSixNodeComponent>) {

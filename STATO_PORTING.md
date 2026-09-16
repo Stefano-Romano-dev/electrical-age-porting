@@ -4,7 +4,7 @@ Aggiornato: 16 settembre 2026
 
 ## Stato generale
 
-**Fase corrente: milestone M1 completata; M2 in corso con primo circuito DC e primo renderer SixNode caricati e verificati.**
+**Fase corrente: milestone M2 completata; M3 avviata con il primo menu e payload di configurazione server-authoritative.**
 
 Target confermato:
 
@@ -42,7 +42,8 @@ Toolchain fissata:
 - [x] Ottenuta una clean build riproducibile e un test JUnit 5 minimale.
 - [x] Avviati client e dedicated server con caricamento del mod `eln`.
 - [x] Estrarre e portare il core di simulazione M1 con test di parità, scheduler, processi fisici essenziali e codec persistenti esterni.
-- [ ] Implementare il primo SixNode verticale (runtime server e caricamento del renderer completati; confronto visivo in gioco, item dinamico e multiplayer ancora aperti).
+- [x] Implementare il primo SixNode verticale con runtime server, persistenza, rendering, item dinamici e prova multiplayer dedicated→client.
+- [ ] Completare M3 networking, menu e strumenti (configurazione della sorgente verificata end-to-end; widget comuni e primo strumento ancora aperti).
 
 ## Decisioni registrate
 
@@ -116,7 +117,7 @@ Avanzamento M1 verificato:
 - collegato `Simulator.tick()` a `ServerTickEvent.Pre` tramite un owner per identità di `MinecraftServer`, creato all'avvio e rimosso allo stop senza singleton del server corrente;
 - dedicated server verificato fino a `Done` con creazione dell'owner; start, tick e cleanup dello stesso handler sono inoltre coperti con le classi evento NeoForge reali.
 
-## Milestone M2 avviata: primo SixNode verticale
+## Milestone M2 completata: primo SixNode verticale
 
 - catalogo canonico iniziale con id moderni stabili e mapping esatto degli id legacy: sorgente `192`, cavo bassa tensione `2052`, resistore di potenza `6180`;
 - shell SixNode con sei slot indipendenti e corrispondenza esplicita degli indici legacy `WEST, EAST, DOWN, UP, NORTH, SOUTH`;
@@ -160,9 +161,21 @@ Avanzamento M1 verificato:
 - un primo screenshot in-world ha evidenziato tre scostamenti dal renderer legacy: tinta del cavo assente, nodo bianco disegnato anche sui tratti rettilinei e raccordi della sorgente mancanti; tutti sono stati corretti dalle regole originali (`20%` di tinta, cap solo su estremità/curve/diramazioni e spezzoni automatici verso i terminali connessi);
 - aggiunti modelli item dinamici con le tre texture canoniche, nomi localizzati e tre stack distinti nella scheda Redstone/ricerca creativa;
 - suite completa salita a 169 test e build/test superati; i 10/10 GameTest dedicati restano verdi e il dedicated server non carica classi client;
-- un nuovo caricamento client non produce più il warning del modello item; uno screenshot in-world post-correzione conferma continuità, tinta e cap attesi per la configurazione provata. Il confronto completo sulle sei facce con la 1.24.8, configurazione GUI/inventario del resistore, audio e verifica multiplayer restano aperti.
+- un nuovo caricamento client non produce più il warning del modello item; uno screenshot in-world post-correzione conferma continuità, tinta e cap attesi per la configurazione provata. Configurazione GUI/inventario del resistore e feedback audiovisivo restano fuori dal perimetro M2.
 - corretto inoltre il vicino diagonale sullo spigolo esterno: grafo e renderer cercano ora `edge.opposite` come la 1.24.8 e la geometria applica la scelta legacy `Extend/Internal` a un solo braccio; test mirati, suite da 169 test, build completa e 10/10 GameTest sono verdi, e lo screenshot finale conferma la curva continua senza gradino visibile.
 - aggiunti README pubblici in inglese e italiano con obiettivo, stato verificato, limiti correnti e accesso alla documentazione tecnica; aggiornato anche il README del sottoprogetto moderno.
+- aggiunto un GameTest di presentazione che monta cavo, sorgente e resistore su tutte le sei facce; la batteria dedicated sale a 11/11 GameTest.
+- aggiunto un probe di sviluppo dedicated→client: il server genera 18 host, il client verifica faccia, tipo, rotazione e parametri ricevuti, acquisisce uno screenshot diurno e termina solo dopo 60 tick sincronizzati.
+- la prova multiplayer reale è superata con i marker `SIX_NODE_MULTIPLAYER_SERVER_PLAYER_JOINED` e `SIX_NODE_MULTIPLAYER_CLIENT_SYNC_OK`; build, 169 test unitari, 11/11 GameTest e persistenza a due processi sono verdi.
+
+## Milestone M3 avviata: networking, menu e strumenti
+
+- registrato il primo `MenuType` slotless per la sorgente elettrica e una screen client localizzata con il singolo campo `Output voltage` della 1.24.8;
+- introdotto il payload tipizzato server-bound `eln:set_electrical_source_voltage`, conservando il valore float trasmesso dal client e la chiave persistente double `voltage`;
+- il server accetta l'aggiornamento soltanto dal menu corretto, per posizione/faccia corrispondenti, entro otto blocchi, sulla sorgente prevista e con valore finito;
+- la modifica ricostruisce immediatamente il runtime elettrico, marca il block entity persistente e usa il normale update packet per restituire lo stato ai client;
+- probe dedicated→client Superflat verificato con apertura menu, invio di `123,5 V`, ritorno dello stato configurato e successiva coerenza delle 18 facce;
+- suite salita a 171 test unitari; build completa e 11/11 GameTest restano verdi.
 
 Il dettaglio tecnico e la roadmap completa sono in [ANALISI_PORTING.md](./ANALISI_PORTING.md).
 

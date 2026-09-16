@@ -19,10 +19,12 @@ Sono attualmente funzionanti:
 - piazzamento multi-faccia, rimozione, drop, salvataggio e ricaricamento dei chunk;
 - modelli OBJ, texture, varianti degli item e rendering dei cavi originali;
 - connessioni dei cavi complanari, interne e attorno agli spigoli esterni.
+- sincronizzazione dedicated→client della vertical slice SixNode M2.
+- primo menu server-authoritative per configurare la sorgente elettrica.
 
-La baseline attuale supera **169 test unitari** e **10 GameTest NeoForge**, comprese le verifiche su dedicated server e persistenza.
+La baseline attuale supera **171 test unitari** e **11 GameTest NeoForge**, comprese le verifiche su dedicated server, persistenza e configurazione client/server reale.
 
-Restano in sviluppo il catalogo completo dei dispositivi, le GUI e gli inventari di configurazione, audio e particelle, la verifica multiplayer e le integrazioni opzionali con altre mod.
+Restano in sviluppo il catalogo completo dei dispositivi, le GUI e gli inventari di configurazione, audio e particelle, la verifica multiplayer dei futuri payload interattivi e le integrazioni opzionali con altre mod.
 
 ## Sviluppo
 

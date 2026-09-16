@@ -41,7 +41,7 @@ Il lifecycle è coperto sia nel core sia sugli handler start/tick/stop con event
 
 ## M2 — Primo SixNode verticale
 
-Stato: **in corso dal 13 settembre 2026**.
+Stato: **completato il 16 settembre 2026 per il perimetro M2**.
 
 Obiettivo: rete DC minima costruibile e persistente nel mondo.
 
@@ -78,20 +78,26 @@ Avanzamento verificato:
 - [x] terminali orientati, runtime MNA di sorgente/resistore, piazzamento e primo circuito DC numerico verificato nel mondo;
 - [x] primo renderer client con geometrie e texture canoniche caricato senza errori di risorsa;
 - [x] modello dinamico dell'item, nomi localizzati e varianti nella ricerca creativa;
-- [ ] nuovo confronto visivo in gioco dopo le correzioni e verifica multiplayer.
+- [x] scena visiva riproducibile dei tre componenti sulle sei facce e verifica multiplayer dedicated→client.
 
-Prossimo slice: preparare una scena client riproducibile sulle sei facce e acquisire il confronto visivo aggiornato con la 1.24.8; networking di configurazione e GUI restano in M3.
+Esito: 169 test unitari, 11/11 GameTest, build completa, persistenza su file regione/chunk e probe multiplayer reale superati. Lo screenshot automatizzato copre i 18 montaggi del perimetro M2; non sostituisce la futura validazione dell'intero catalogo.
+
+Prossimo slice: avviare M3 con payload tipizzati per la configurazione server-authoritative e il primo menu, mantenendo la scena M2 come regressione multiplayer.
 
 ## M3 — Networking, menu e strumenti
 
+Stato: **in corso dal 16 settembre 2026**.
+
 Obiettivo: interazione completa server-authoritative.
 
-- payload tipizzati e validati;
-- sincronizzazione client minima;
-- primo menu macchina;
-- multimetro o strumento equivalente;
-- widget comuni;
-- prova multiplayer.
+- [x] primo payload tipizzato e validato: configurazione della tensione della sorgente;
+- [x] sincronizzazione client minima tramite stato persistente del block entity;
+- [x] primo menu macchina: campo singolo della sorgente elettrica;
+- [ ] multimetro o strumento equivalente;
+- [ ] widget comuni riutilizzabili oltre il primo campo numerico;
+- [x] prima prova multiplayer del percorso menu→server→stato client.
+
+Prossimo slice: estrarre il campo numerico in un widget comune fedele e scegliere il primo strumento di misura, senza anticipare l'inventario/termica del resistore.
 
 ## M4 — Catalogo fondamentale
 

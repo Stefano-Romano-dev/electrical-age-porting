@@ -272,3 +272,30 @@ Punto di ripresa: costruire una scena client riproducibile con i tre componenti 
 - Dopo la seconda chiusura del client, il test mirato della scelta `Extend/Internal`, la suite completa da 169 test, la build e i 10/10 GameTest sono superati. Resta soltanto il controllo visivo aggiornato dello spigolo.
 - Lo screenshot finale dell'utente conferma una curva continua e senza gradino visibile tra piano superiore, parete e piano inferiore; P-022 è chiuso.
 - Creati i README pubblici inglese e italiano del repository e riallineato il README tecnico di `modern/` allo stato M2 verificato.
+
+## 16 settembre 2026 — M2 chiusa con prova multiplayer riproducibile
+
+- Aggiunta una scena GameTest con cavo, sorgente e resistore montati su tutte le sei facce: 18 combinazioni controllate e batteria dedicated salita a 11/11.
+- Creato un probe solo sviluppo con due run isolate: il dedicated genera e salva la scena, mentre il client si collega automaticamente, verifica il payload sincronizzato di ogni faccia, acquisisce lo screenshot e termina dopo 60 tick validi.
+- Il primo screenshot era tecnicamente valido ma poco leggibile; fissati luce diurna, meteo, camera e HUD e ripetuta l'intera prova, senza usare il primo artifact come evidenza visiva finale.
+- Auditata la ripresa dopo l'esaurimento dei crediti: tre correzioni presenti negli artefatti ma non nei sorgenti sono state riapplicate e convalidate da build completa, evitando di documentare uno stato non riproducibile.
+- Verifica finale: 169 test unitari, 11/11 GameTest, persistenza dedicated a due processi, build e multiplayer dedicated→client tutti superati.
+
+Punto di ripresa: iniziare M3 dal payload tipizzato e validato per la configurazione server-authoritative della sorgente o del resistore, quindi collegare il primo menu senza indebolire la regressione M2.
+
+## 16 settembre 2026 — Standard client Superflat 1920×1080
+
+- Configurate sia la run client ordinaria sia la run del probe multiplayer per aprirsi a 1920×1080.
+- Spostato il mondo del probe su un save dedicato `world-superflat` con generatore `minecraft:flat`, preservando il vecchio save senza cancellazioni.
+- Riallineate scena e camera alla quota del terreno Superflat; la ripetizione dedicated→client è verde e lo screenshot effettivo è 1920×1080.
+- Registrata la convenzione in `AGENTS.md` affinché le future prove client e visive la mantengano, salvo test espliciti di terreno o worldgen.
+
+## 16 settembre 2026 — M3 avviata con la configurazione della sorgente
+
+- Portato il contratto legacy della sorgente: un campo numerico localizzato, trasmissione float e persistenza double nella chiave `voltage`, senza introdurre un clamp non presente nella 1.24.8.
+- Registrati il primo `MenuType` e il primo payload tipizzato del port; il server valida menu corrente, posizione, faccia, distanza, tipo e finitezza prima di ricostruire il runtime elettrico.
+- Esteso il probe multiplayer per aprire il menu, acquisirne uno screenshot 1920×1080, configurare `123,5 V` e attendere il ritorno del block entity aggiornato.
+- I primi due tentativi hanno esposto rispettivamente l'apertura troppo precoce nel login e la distanza invalida dalla posizione panoramica; il test ora apre dopo 20 tick vicino alla sorgente e sposta la camera lato server solo dopo la configurazione.
+- Prova end-to-end finale verde, senza affidarsi a modifiche client-side dello stato.
+
+Punto di ripresa: estrarre il campo numerico in un widget comune e portare il primo strumento di misura previsto da M3.

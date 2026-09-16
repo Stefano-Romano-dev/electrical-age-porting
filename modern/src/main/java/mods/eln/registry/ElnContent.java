@@ -13,12 +13,15 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.inventory.MenuType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
+import mods.eln.menu.ElectricalSourceMenu;
 
 /** NeoForge registry boundary for the modern port. */
 public final class ElnContent {
@@ -28,6 +31,8 @@ public final class ElnContent {
             DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, PortingBaseline.MOD_ID);
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES =
             DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, PortingBaseline.MOD_ID);
+    public static final DeferredRegister<MenuType<?>> MENU_TYPES =
+            DeferredRegister.create(Registries.MENU, PortingBaseline.MOD_ID);
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ResourceLocation>>
             SIX_NODE_COMPONENT_TYPE = DATA_COMPONENT_TYPES.registerComponentType(
@@ -46,6 +51,9 @@ public final class ElnContent {
                     "six_node",
                     () -> BlockEntityType.Builder.of(SixNodeBlockEntity::new, SIX_NODE.get()).build(null));
 
+    public static final DeferredHolder<MenuType<?>, MenuType<ElectricalSourceMenu>> ELECTRICAL_SOURCE_MENU =
+            MENU_TYPES.register("electrical_source", () -> IMenuTypeExtension.create(ElectricalSourceMenu::fromNetwork));
+
     private ElnContent() {}
 
     public static void register(IEventBus modBus) {
@@ -53,6 +61,7 @@ public final class ElnContent {
         BLOCKS.register(modBus);
         ITEMS.register(modBus);
         BLOCK_ENTITY_TYPES.register(modBus);
+        MENU_TYPES.register(modBus);
         modBus.addListener(ElnContent::addCreativeTabContents);
     }
 

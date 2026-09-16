@@ -1,6 +1,7 @@
 package mods.eln.node.six;
 
 import java.util.Map;
+import java.util.HashMap;
 import mods.eln.ElectricalAge;
 import mods.eln.platform.persistence.SixNodeContentsTagCodec;
 import mods.eln.registry.ElnContent;
@@ -41,6 +42,20 @@ public final class SixNodeBlockEntity extends BlockEntity {
 
     public boolean rotate(Direction face, SixNodeRotation rotation) {
         if (!contents.rotate(face, rotation)) return false;
+        contentsChanged();
+        return true;
+    }
+
+    public boolean setElectricalSourceVoltage(Direction face, double voltage) {
+        if (!Double.isFinite(voltage)) return false;
+        MountedSixNodeComponent current = contents.get(face);
+        if (current == null || !current.getTypeId().equals(SixNodeComponentCatalog.ELECTRICAL_SOURCE.getId())) {
+            return false;
+        }
+        Map<String, Double> parameters = new HashMap<>(current.getParameters());
+        parameters.put(SixNodeElectricalGraph.VOLTAGE_PARAMETER, voltage);
+        if (!contents.replace(face, new MountedSixNodeComponent(
+                current.getTypeId(), current.getRotation(), Map.copyOf(parameters)))) return false;
         contentsChanged();
         return true;
     }
