@@ -22,7 +22,7 @@ Sono attualmente funzionanti:
 - sincronizzazione dedicated→client della vertical slice SixNode M2.
 - primo menu server-authoritative per configurare la sorgente elettrica.
 
-La baseline attuale supera **171 test unitari** e **11 GameTest NeoForge**, comprese le verifiche su dedicated server, persistenza e configurazione client/server reale.
+La baseline attuale supera **177 test unitari** e **11 GameTest NeoForge**, comprese le verifiche su dedicated server, persistenza e configurazione client/server reale. Il multimetro è implementato; resta aperta la prova finale del clic client→server.
 
 Restano in sviluppo il catalogo completo dei dispositivi, le GUI e gli inventari di configurazione, audio e particelle, la verifica multiplayer dei futuri payload interattivi e le integrazioni opzionali con altre mod.
 

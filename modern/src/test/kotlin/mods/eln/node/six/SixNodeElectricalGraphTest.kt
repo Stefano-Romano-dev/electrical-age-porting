@@ -183,6 +183,31 @@ class SixNodeElectricalGraphTest {
         assertEquals(50.0, requireNotNull(graph.loadAt(high, Direction.DOWN)).state, 1.0e-9)
         assertEquals(0.0, requireNotNull(graph.loadAt(ground, Direction.DOWN)).state, 1.0e-9)
         assertEquals(2, graph.connectionCount)
+
+        val sourceReading = requireNotNull(graph.measurementAt(high, Direction.DOWN))
+        assertEquals(SixNodeElectricalMeasurement.Kind.SOURCE, sourceReading.kind)
+        assertEquals(50.0, sourceReading.voltage, 1.0e-9)
+        assertEquals(expectedCurrent, kotlin.math.abs(sourceReading.current), 1.0e-5)
+
+        val resistorReading = requireNotNull(graph.measurementAt(resistor, Direction.DOWN))
+        assertEquals(SixNodeElectricalMeasurement.Kind.RESISTOR, resistorReading.kind)
+        assertEquals(-expectedCurrent * SixNodeElectricalGraph.EMPTY_RESISTOR_RESISTANCE, resistorReading.voltage, 1.0e-5)
+        assertEquals(expectedCurrent, resistorReading.current, 1.0e-5)
+        assertEquals(SixNodeElectricalGraph.EMPTY_RESISTOR_RESISTANCE, resistorReading.resistance, 0.0)
+    }
+
+    @Test
+    fun `cable measurement includes the legacy serial power loss`() {
+        val pos = BlockPos.ZERO
+        graph.attachHost(pos, mapOf(Direction.DOWN to cable()))
+        simulator.tick()
+
+        val reading = requireNotNull(graph.measurementAt(pos, Direction.DOWN))
+        assertEquals(SixNodeElectricalMeasurement.Kind.CABLE, reading.kind)
+        assertEquals(0.0, reading.voltage, 0.0)
+        assertEquals(0.0, reading.current, 0.0)
+        assertEquals(0.0, reading.cablePowerLoss, 0.0)
+        assertNull(graph.measurementAt(pos, Direction.UP))
     }
 
     private fun cable() = MountedSixNodeComponent(

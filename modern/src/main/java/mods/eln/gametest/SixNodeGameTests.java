@@ -17,12 +17,16 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import java.util.Map;
@@ -319,12 +323,22 @@ public final class SixNodeGameTests {
                 / (SixNodeElectricalGraph.EMPTY_RESISTOR_RESISTANCE
                         + 2.0 * SixNodeElectricalGraph.LOW_VOLTAGE_CABLE_RESISTANCE_PER_LOAD
                         + 2.0E-9);
+        var meterPlayer = helper.makeMockPlayer(GameType.SURVIVAL);
+        ItemStack multimeter = new ItemStack(ElnContent.MULTIMETER.get());
+        meterPlayer.setItemInHand(InteractionHand.MAIN_HAND, multimeter);
         helper.succeedWhen(() -> {
             Double current = graph.resistorCurrentAt(resistorAbsolute, Direction.DOWN);
             helper.assertTrue(current != null, "The resistor runtime must exist");
             helper.assertTrue(
                     Math.abs(Math.abs(current) - expected) < 1.0E-5,
                     "Expected legacy DC current " + expected + " A, got " + current);
+            var hit = new BlockHitResult(
+                    Vec3.atCenterOf(resistorAbsolute), Direction.DOWN, resistorAbsolute, false);
+            InteractionResult result = ElnContent.MULTIMETER.get().useOn(new UseOnContext(
+                    helper.getLevel(), meterPlayer, InteractionHand.MAIN_HAND, multimeter, hit));
+            helper.assertValueEqual(
+                    result, InteractionResult.SUCCESS, "The multimeter must consume the mounted-face interaction");
+            helper.assertValueEqual(multimeter.getCount(), 1, "Measurement must not consume or damage the tool");
         });
     }
 

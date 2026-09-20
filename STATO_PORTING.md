@@ -1,6 +1,6 @@
 # Stato del porting di Electrical Age
 
-Aggiornato: 16 settembre 2026
+Aggiornato: 20 settembre 2026
 
 ## Stato generale
 
@@ -43,7 +43,7 @@ Toolchain fissata:
 - [x] Avviati client e dedicated server con caricamento del mod `eln`.
 - [x] Estrarre e portare il core di simulazione M1 con test di parità, scheduler, processi fisici essenziali e codec persistenti esterni.
 - [x] Implementare il primo SixNode verticale con runtime server, persistenza, rendering, item dinamici e prova multiplayer dedicated→client.
-- [ ] Completare M3 networking, menu e strumenti (configurazione della sorgente verificata end-to-end; widget comuni e primo strumento ancora aperti).
+- [ ] Completare M3 networking, menu e strumenti (configurazione e widget verificati end-to-end; multimetro implementato e verificato in GameTest, prova multiplayer dell'interazione finale ancora aperta).
 
 ## Decisioni registrate
 
@@ -175,7 +175,12 @@ Avanzamento M1 verificato:
 - il server accetta l'aggiornamento soltanto dal menu corretto, per posizione/faccia corrispondenti, entro otto blocchi, sulla sorgente prevista e con valore finito;
 - la modifica ricostruisce immediatamente il runtime elettrico, marca il block entity persistente e usa il normale update packet per restituire lo stato ai client;
 - probe dedicated→client Superflat verificato con apertura menu, invio di `123,5 V`, ritorno dello stato configurato e successiva coerenza delle 18 facce;
-- suite salita a 171 test unitari; build completa e 11/11 GameTest restano verdi.
+- estratto `ElnNumericEditBox`, riutilizzabile per i menu successivi: parsing locale, precisione visiva legacy, commit soltanto su Invio/perdita focus e ripristino dell'ultimo valore per input non valido;
+- il probe configura ora la sorgente passando dal widget e dalla perdita di focus, incluso il locale host `it_IT`, anziché inviare direttamente il payload;
+- suite salita a 174 test unitari; build completa, 11/11 GameTest e probe multiplayer 1920×1080 su Superflat restano verdi.
+- aggiunto `eln:multimeter` con id legacy `896`, texture originale 16×16 e lettura server-side di cavo, sorgente e resistore attraverso il grafo; i valori sono mostrati nella chat con la formattazione ingegneristica legacy;
+- il blocco SixNode dà precedenza al multimetro rispetto all'apertura del menu, riproducendo l'ordine dell'interazione legacy;
+- suite salita a 177 test unitari, 11/11 GameTest e build completa superati; un primo probe client ha sincronizzato l'item ma non ha attivato la misura a causa della precedenza del blocco, corretta nel codice corrente. La prova multiplayer dopo tale correzione non è ancora registrata come superata.
 
 Il dettaglio tecnico e la roadmap completa sono in [ANALISI_PORTING.md](./ANALISI_PORTING.md).
 

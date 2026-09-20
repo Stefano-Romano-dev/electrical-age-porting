@@ -264,6 +264,17 @@ Ogni decisione ha un id stabile. Non cancellare le decisioni superate: marcarle 
 - Conseguenze: altri menu SixNode potranno riusare il pattern ma non un payload generico non tipizzato; il campo numerico comune deve ancora essere estratto; il valore client continua a transitare come float per fedeltà al protocollo legacy.
 - Verifica eseguita: round-trip del codec, rifiuto di NaN/faccia assente/tipo errato, persistenza del nuovo valore e prova dedicated→client con menu reale, aggiornamento `50 → 123,5 V` e stato restituito al client.
 
+## D-026 — Misura SixNode dal runtime server con precedenza dello strumento
+
+- Stato: accettata
+- Data: 20 settembre 2026
+- Contesto: nella 1.24.8 `NodeBase.onBlockActivated` intercetta il multimetro prima dell'azione del componente; in NeoForge 1.21.1 il blocco host può consumare il clic aprendo il menu prima che `Item.useOn` venga chiamato.
+- Scelta: l'host instrada esplicitamente il multimetro al suo item quando la faccia è montata; l'item legge il grafo posseduto dal `ServerLevel` e invia la stringa di misura alla chat del giocatore. Nessuna misura è ricavata dal block entity sincronizzato o calcolata lato client.
+- Alternative considerate: payload client-bound contenente valori MNA; misura dal solo stato persistente; priorità al menu della sorgente; duplicazione delle formule nel renderer.
+- Motivo: preserva l'ordine d'interazione e i valori effettivi del solver legacy senza esporre il runtime al client.
+- Conseguenze: gli altri strumenti di misura potranno usare lo stesso dispatch esplicito; la prova multiplayer del clic dopo la correzione resta da chiudere e non è dichiarata superata.
+- Verifica eseguita: test unitari di formattazione e lettura dei tre runtime, GameTest di uso dell'item e build completa con 177 test e 11/11 GameTest.
+
 ## Modello per nuove decisioni
 
 ```text

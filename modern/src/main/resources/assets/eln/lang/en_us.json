@@ -4,5 +4,6 @@
   "item.eln.electrical_source": "Electrical Source",
   "item.eln.power_resistor": "Power Resistor",
   "menu.eln.electrical_source": "Electrical Source",
-  "gui.eln.output_voltage": "Output voltage"
+  "gui.eln.output_voltage": "Output voltage",
+  "item.eln.multimeter": "Multimeter"
 }

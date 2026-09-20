@@ -4,5 +4,6 @@
   "item.eln.electrical_source": "Sorgente elettrica",
   "item.eln.power_resistor": "Resistore di potenza",
   "menu.eln.electrical_source": "Sorgente elettrica",
-  "gui.eln.output_voltage": "Tensione di uscita"
+  "gui.eln.output_voltage": "Tensione di uscita",
+  "item.eln.multimeter": "Multimetro"
 }

@@ -15,6 +15,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -28,6 +30,7 @@ public final class SixNodeMultiplayerProbe {
     private int pendingMenuTicks;
     private ServerPlayer probePlayer;
     private boolean cameraTeleported;
+    private int cameraTeleportDelay = -1;
     public static final String MODE_PROPERTY = "eln.sixNodeMultiplayerProbe";
     public static final String SERVER_MODE = "server";
     public static final String CLIENT_MODE = "client";
@@ -88,6 +91,7 @@ public final class SixNodeMultiplayerProbe {
 
         ServerLevel level = player.serverLevel();
         player.setGameMode(GameType.CREATIVE);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ElnContent.MULTIMETER.get()));
         BlockPos sourcePos = hostPos(CONFIG_SOURCE_FACE_INDEX, CONFIG_SOURCE_COMPONENT_INDEX);
         player.teleportTo(
                 level,
@@ -100,6 +104,7 @@ public final class SixNodeMultiplayerProbe {
         pendingMenuTicks = 20;
         probePlayer = player;
         cameraTeleported = false;
+        cameraTeleportDelay = -1;
         ElectricalAge.LOGGER.info("SIX_NODE_MULTIPLAYER_SERVER_PLAYER_JOINED: {}", player.getGameProfile().getName());
     }
 
@@ -110,7 +115,13 @@ public final class SixNodeMultiplayerProbe {
             pendingMenuPlayer = null;
             openConfigurationMenu(player);
         }
-        if (!cameraTeleported && probePlayer != null && configuredVoltageWasApplied(probePlayer.serverLevel())) {
+        if (!cameraTeleported
+                && probePlayer != null
+                && cameraTeleportDelay < 0
+                && configuredVoltageWasApplied(probePlayer.serverLevel())) {
+            cameraTeleportDelay = 20;
+        }
+        if (!cameraTeleported && probePlayer != null && cameraTeleportDelay >= 0 && cameraTeleportDelay-- == 0) {
             cameraTeleported = true;
             probePlayer.teleportTo(
                     probePlayer.serverLevel(),

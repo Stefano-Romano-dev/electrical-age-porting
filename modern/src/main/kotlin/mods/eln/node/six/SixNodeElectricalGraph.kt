@@ -107,6 +107,32 @@ class SixNodeElectricalGraph(private val simulator: Simulator) {
     fun resistorCurrentAt(pos: BlockPos, face: Direction): Double? =
         (runtimeByEndpoint[Endpoint(pos, face)]?.runtime as? ResistorRuntime)?.resistor?.current
 
+    fun measurementAt(pos: BlockPos, face: Direction): SixNodeElectricalMeasurement? =
+        when (val runtime = runtimeByEndpoint[Endpoint(pos, face)]?.runtime) {
+            is CableRuntime -> SixNodeElectricalMeasurement(
+                SixNodeElectricalMeasurement.Kind.CABLE,
+                runtime.load.state,
+                runtime.load.current,
+                Double.NaN,
+                runtime.load.current * runtime.load.current * runtime.load.serialResistance,
+            )
+            is SourceRuntime -> SixNodeElectricalMeasurement(
+                SixNodeElectricalMeasurement.Kind.SOURCE,
+                runtime.load.state,
+                runtime.source.current,
+                Double.NaN,
+                Double.NaN,
+            )
+            is ResistorRuntime -> SixNodeElectricalMeasurement(
+                SixNodeElectricalMeasurement.Kind.RESISTOR,
+                -kotlin.math.abs(runtime.aLoad.state - runtime.bLoad.state),
+                kotlin.math.abs(runtime.resistor.current),
+                runtime.resistor.resistance,
+                Double.NaN,
+            )
+            null -> null
+        }
+
     fun hasConnection(first: Endpoint, second: Endpoint): Boolean = connections.keys.any {
         setOf(it.first.endpoint, it.second.endpoint) == setOf(first, second)
     }

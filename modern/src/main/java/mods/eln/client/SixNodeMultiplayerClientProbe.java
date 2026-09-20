@@ -3,6 +3,7 @@ package mods.eln.client;
 import java.util.Map;
 import mods.eln.ElectricalAge;
 import mods.eln.PortingBaseline;
+import mods.eln.client.screen.ElectricalSourceScreen;
 import mods.eln.gametest.SixNodeMultiplayerProbe;
 import mods.eln.node.six.MountedSixNodeComponent;
 import mods.eln.node.six.SixNodeBlockEntity;
@@ -12,14 +13,16 @@ import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import mods.eln.menu.ElectricalSourceMenu;
-import mods.eln.network.SetElectricalSourceVoltagePayload;
 import mods.eln.node.six.SixNodeElectricalGraph;
-import net.neoforged.neoforge.network.PacketDistributor;
+import mods.eln.registry.ElnContent;
 
 /** Client half of the development-only dedicated multiplayer synchronization probe. */
 @EventBusSubscriber(modid = PortingBaseline.MOD_ID, value = Dist.CLIENT)
@@ -34,6 +37,7 @@ public final class SixNodeMultiplayerClientProbe {
     private static boolean menuStateLogged;
     private static int configurationMenuTicks;
     private static boolean menuScreenshotRequested;
+    private static boolean multimeterUsed;
 
     private SixNodeMultiplayerClientProbe() {}
 
@@ -59,6 +63,10 @@ public final class SixNodeMultiplayerClientProbe {
         }
 
         inWorldTicks++;
+        if (!minecraft.player.getMainHandItem().is(ElnContent.MULTIMETER.get())) {
+            if (inWorldTicks > 40) throw new IllegalStateException("Client did not receive the synchronized multimeter");
+            return;
+        }
         if (!configurationSent) {
             verifySynchronizedScene(minecraft, false);
             if (!menuStateLogged && inWorldTicks >= 40) {
@@ -68,7 +76,8 @@ public final class SixNodeMultiplayerClientProbe {
                         minecraft.player.containerMenu.getClass().getName(),
                         minecraft.screen == null ? "<none>" : minecraft.screen.getClass().getName());
             }
-            if (minecraft.player.containerMenu instanceof ElectricalSourceMenu menu) {
+            if (minecraft.player.containerMenu instanceof ElectricalSourceMenu
+                    && minecraft.screen instanceof ElectricalSourceScreen screen) {
                 configurationMenuTicks++;
                 if (!menuScreenshotRequested && configurationMenuTicks >= 5) {
                     menuScreenshotRequested = true;
@@ -81,9 +90,9 @@ public final class SixNodeMultiplayerClientProbe {
                 }
                 if (configurationMenuTicks >= 10) {
                     configurationSent = true;
-                    PacketDistributor.sendToServer(new SetElectricalSourceVoltagePayload(
-                            menu.hostPos(), menu.face(), SixNodeMultiplayerProbe.CONFIGURED_SOURCE_VOLTAGE));
-                    ElectricalAge.LOGGER.info("SIX_NODE_MULTIPLAYER_CLIENT_CONFIGURATION_SENT");
+                    screen.commitVoltageForDevelopmentProbe(SixNodeMultiplayerProbe.CONFIGURED_SOURCE_VOLTAGE);
+                    ElectricalAge.LOGGER.info(
+                            "SIX_NODE_MULTIPLAYER_CLIENT_CONFIGURATION_COMMITTED_BY_WIDGET");
                 }
             }
             if (!configurationSent && inWorldTicks > 200) {
@@ -100,6 +109,18 @@ public final class SixNodeMultiplayerClientProbe {
             }
             minecraft.player.closeContainer();
             ElectricalAge.LOGGER.info("SIX_NODE_MULTIPLAYER_CLIENT_CONFIGURATION_SYNC_OK");
+        }
+        if (!multimeterUsed) {
+            multimeterUsed = true;
+            var sourcePos = SixNodeMultiplayerProbe.hostPos(
+                    SixNodeMultiplayerProbe.CONFIG_SOURCE_FACE_INDEX,
+                    SixNodeMultiplayerProbe.CONFIG_SOURCE_COMPONENT_INDEX);
+            Direction sourceFace = SixNodeMultiplayerProbe.FACES.get(SixNodeMultiplayerProbe.CONFIG_SOURCE_FACE_INDEX);
+            minecraft.gameMode.useItemOn(
+                    minecraft.player,
+                    InteractionHand.MAIN_HAND,
+                    new BlockHitResult(Vec3.atCenterOf(sourcePos), sourceFace, sourcePos, false));
+            ElectricalAge.LOGGER.info("SIX_NODE_MULTIPLAYER_CLIENT_MULTIMETER_USED");
         }
         verifySynchronizedScene(minecraft, true);
         synchronizedTicks++;

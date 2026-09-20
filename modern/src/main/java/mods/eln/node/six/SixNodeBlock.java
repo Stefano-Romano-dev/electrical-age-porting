@@ -18,6 +18,10 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.context.UseOnContext;
+import mods.eln.registry.ElnContent;
 import mods.eln.menu.ElectricalSourceMenu;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -84,6 +88,24 @@ public final class SixNodeBlock extends BaseEntityBlock {
             ElectricalSourceMenu.open(player, pos, face, component);
         }
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    protected ItemInteractionResult useItemOn(
+            ItemStack stack,
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hitResult) {
+        if (!stack.is(ElnContent.MULTIMETER.get())) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        InteractionResult result = stack.getItem().useOn(new UseOnContext(level, player, hand, stack, hitResult));
+        return result.consumesAction()
+                ? ItemInteractionResult.sidedSuccess(level.isClientSide)
+                : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override

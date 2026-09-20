@@ -299,3 +299,20 @@ Punto di ripresa: iniziare M3 dal payload tipizzato e validato per la configuraz
 - Prova end-to-end finale verde, senza affidarsi a modifiche client-side dello stato.
 
 Punto di ripresa: estrarre il campo numerico in un widget comune e portare il primo strumento di misura previsto da M3.
+
+## 16 settembre 2026 — Widget numerico comune M3
+
+- Estratto `ElnNumericEditBox` con conversione numerica separata e testabile, parsing secondo il locale del giocatore e la precisione visiva di `GuiTextFieldEln`.
+- Riallineato il comportamento legacy: il valore viene inviato su Invio o perdita del focus, non a ogni carattere; un input non valido ripristina l'ultimo valore confermato.
+- Il primo probe widget ha evidenziato che una stringa con punto simulata su host `it_IT` diventava `1235`; il probe usa ora la stessa formattazione locale della GUI e verifica correttamente `123,5 V`.
+- Build, 174 test unitari e 11/11 GameTest superati; probe finale Superflat 1920×1080 verde con commit dal widget, ritorno server-authoritative e 18 facce sincronizzate.
+
+Punto di ripresa: portare il multimetro come primo strumento di misura M3.
+
+## 20 settembre 2026 — Primo multimetro M3
+
+- Portati item `eln:multimeter`, texture originale, formato ingegneristico delle stringhe legacy e lettura server dei tre runtime elettrici del primo SixNode.
+- Il GameTest usa lo strumento sulla faccia del resistore e conferma che non viene consumato; suite da 177 test, 11/11 GameTest e build verde.
+- Il probe client ha sincronizzato l'item e inviato un clic, ma il blocco ha aperto il menu prima dell'item. Riallineata la precedenza all'originale; la prova multiplayer dopo questa correzione resta aperta.
+
+Punto di ripresa: ripetere il probe dedicated→client e verificare nei log la misura emessa dal server prima di chiudere M3.

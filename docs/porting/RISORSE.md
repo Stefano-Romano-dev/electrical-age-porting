@@ -75,6 +75,7 @@ Un contenuto non passa allo stato `verificato` finché il confronto estetico non
 | `model/PowerElectricPrimitives/PowerElectricPrimitives.obj` | `models/six_node/power_electric_primitives.obj` | resistore di potenza | integrato | path e `mtllib` lowercase |
 | `model/PowerElectricPrimitives/PowerElectricPrimitives.mtl` | `models/six_node/power_electric_primitives.mtl` | resistore di potenza | integrato | riferimenti texture normalizzati |
 | `model/PowerElectricPrimitives/PowerElectricPrimitives.png` | `textures/block/six_node/power_electric_primitives.png` | resistore di potenza | integrato | texture canonica condivisa |
+| `textures/items/multimeter.png` | `textures/item/multimeter.png` | multimetro | integrato | copia identica SHA-256 `FD2FB4210E7D11192EB768C02A957527FD2774944FB617ED8731C47A68AF12BF`; confronto in-game affiancato aperto |
 
 ## Registro delle conversioni
 
@@ -84,6 +85,7 @@ Un contenuto non passa allo stato `verificato` finché il confronto estetico non
 | Cavo bassa tensione | geometria procedurale del renderer | dimensioni descriptor + `sprites/cable.png` | quads dinamici SixNode | aperta | larghezza `1,95/16`, altezza `0,95/16` |
 | Resistore di potenza OBJ | copia selettiva + visibilità gruppi | OBJ/MTL/PNG legacy condivisi | modello baked `six_node/power_resistor` | aperta | visibili solo i quattro gruppi del resistore |
 | Item della vertical slice | override per proprietà del data component | tre PNG item legacy | tre varianti di `six_node_component` | caricamento verificato; confronto aperto | nessuna icona provvisoria; nomi localizzati |
+| Multimetro | copia della texture 16×16 e modello item JSON `generated` | PNG legacy | `eln:multimeter` | caricamento client senza warning del modello; confronto affiancato aperto | nessuna sostituzione grafica |
 
 ## Controlli automatici da introdurre
 

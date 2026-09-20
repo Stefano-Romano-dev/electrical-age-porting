@@ -12,7 +12,7 @@ Modern implementation of the Electrical Age 1.24.8 port. The repository overview
 - Mod id `eln`
 - Version `0.1.0-alpha.1`
 
-Milestones M0, M1, and M2 are complete. M3 has started with a typed, server-authoritative electrical-source configuration payload and the first localized menu. The baseline passes 171 unit tests and 11 GameTests, including a real dedicated-to-client `50 → 123.5 V` configuration probe. The complete catalog, remaining GUIs and tools, audio, and integrations remain in development.
+Milestones M0, M1, and M2 are complete. M3 includes a typed, server-authoritative electrical-source configuration payload, a localized menu, a reusable locale-aware numeric field, and the first multimeter slice. The baseline passes 177 unit tests and 11 GameTests, including a real widget-to-dedicated-to-client `50 → 123.5 V` configuration probe. The final multiplayer click-through for the multimeter, complete catalog, remaining GUIs and tools, audio, and integrations remain in development.
 
 From this directory on Windows:
 

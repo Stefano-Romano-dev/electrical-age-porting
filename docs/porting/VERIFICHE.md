@@ -358,6 +358,28 @@ Registrare soltanto comandi e prove realmente eseguiti. Ogni risultato deve esse
 - Artifact locali: `electrical-source-menu.png` mostra il primo menu con valore iniziale `50 V`; `six-node-multiplayer.png` conserva la scena finale. Il toast vanilla del server offline è visibile nell'immagine del menu e non appartiene al mod.
 - Aggiunti successivamente il test del codec payload e l'asserzione di persistenza del valore configurato. Build conclusiva con lo stesso comando superata in 18 s: 171 test, 0 fallimenti/errori, 11/11 GameTest e build completa.
 
+## 16 settembre 2026 — Widget numerico comune M3
+
+- Primo comando confinato `$env:GRADLE_USER_HOME = (Resolve-Path '.\.gradle').Path; .\gradlew.bat test --no-daemon`: fallito prima di una compilazione attendibile per `AccessDeniedException` sul JAR `mergetool-2.0.3-api.jar`; gli errori di classpath a cascata non sono stati attribuiti al codice.
+- Comando fuori sandbox `$env:GRADLE_USER_HOME = (Resolve-Path '.\.gradle').Path; .\gradlew.bat build --no-daemon`: superato in 20 s.
+- Comando finale `$env:GRADLE_USER_HOME = (Resolve-Path '.\.gradle').Path; .\gradlew.bat test runGameTestServer build --no-daemon`: superato in 20 s; report XML con 174 test unitari, 0 fallimenti/errori, 11/11 GameTest e build completa.
+- Primo probe multiplayer attraverso il widget: fallito con asserzione esplicita, perché il test inseriva `123.5` mentre il client usa locale `it_IT`; `NumberFormat` lo interpretava correttamente secondo quel locale come `1235`. Nessun esito verde dichiarato per quel tentativo.
+- Corretto il solo input del probe affinché usi la formattazione locale condivisa con il widget; nessuna tolleranza o conversione permissiva è stata aggiunta al percorso di produzione.
+- Probe finale: `runSixNodeMultiplayerServer --no-daemon` e `runSixNodeMultiplayerClient --no-daemon`, mondo `world-superflat`, finestra 1920×1080; client terminato con exit code 0.
+- Marker osservati: `SIX_NODE_MULTIPLAYER_CLIENT_CONFIGURATION_COMMITTED_BY_WIDGET`, `SIX_NODE_MULTIPLAYER_CLIENT_CONFIGURATION_SYNC_OK`, `SIX_NODE_MULTIPLAYER_SERVER_CAMERA_READY` e sync finale di 18 facce a `123.5 V`.
+- Screenshot controllato: `modern/run-six-node-multiplayer-client/screenshots/electrical-source-menu.png`, effettivamente 1920×1080, campo iniziale `50,00` nel locale italiano dell'host; il toast vanilla offline non appartiene al mod.
+
+## 20 settembre 2026 — Multimetro M3
+
+- Riferimento legacy: `registerMeter(14)` assegna `14 << 6 = 896` al multimetro; `NodeBase.onBlockActivated` intercetta lo strumento prima dell'azione del componente; `ElectricalCableElement`, `ElectricalSourceElement` e `ResistorElement` definiscono le rispettive stringhe.
+- Copia asset: `Copy-Item` da `original/src/main/resources/assets/eln/textures/items/multimeter.png` a `modern/src/main/resources/assets/eln/textures/item/multimeter.png`; SHA-256 origine e destinazione identici: `FD2FB4210E7D11192EB768C02A957527FD2774944FB617ED8731C47A68AF12BF`.
+- Primo comando `$env:GRADLE_USER_HOME = (Resolve-Path '.\.gradle').Path; .\gradlew.bat test --no-daemon`: 176 test eseguiti, 1 fallimento nella fixture degli spazi della stringa attesa; implementazione compilata.
+- Comando mirato `test --tests mods.eln.node.six.LegacyElectricalMeasurementFormatterTest --no-daemon`: inizialmente fallito per un secondo spazio atteso errato; fixture riallineata alle stringhe effettive della 1.24.8.
+- Comando `$env:GRADLE_USER_HOME = (Resolve-Path '.\.gradle').Path; .\gradlew.bat test runGameTestServer build --no-daemon`: superato con 177 test unitari, 0 fallimenti/errori, 11/11 GameTest e build completa. Ripetuto dopo la correzione del dispatch del blocco con esito verde.
+- Primo probe `runSixNodeMultiplayerServer --no-daemon` + `runSixNodeMultiplayerClient --no-daemon`: mondo Superflat, client 1920×1080, item sincronizzato, configurazione della sorgente e 18 facce verdi; il marker client `SIX_NODE_MULTIPLAYER_CLIENT_MULTIMETER_USED` non è stato seguito da una misura server, perché il blocco aveva consumato il clic aprendo il menu. Non dichiarato superato per la misura.
+- Corretto `SixNodeBlock.useItemOn` per dare precedenza allo strumento come il nodo legacy. La prova dedicated→client dopo questa correzione non è ancora conclusa.
+- `git diff --check`: nessun errore di whitespace, solo avvisi di conversione LF→CRLF del working tree Windows.
+
 ## Modello di registrazione
 
 ```text

@@ -6,6 +6,7 @@ import mods.eln.node.six.SixNodeBlockEntity;
 import mods.eln.node.six.SixNodeComponentItem;
 import mods.eln.node.six.SixNodeComponentCatalog;
 import mods.eln.node.six.SixNodeComponentStack;
+import mods.eln.item.MultimeterItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceLocation;
@@ -46,6 +47,9 @@ public final class ElnContent {
     public static final DeferredItem<Item> SIX_NODE_COMPONENT =
             ITEMS.registerItem("six_node_component", SixNodeComponentItem::new);
 
+    /** Legacy shared-item id 896 (14 << 6), now represented by a stable namespaced item. */
+    public static final DeferredItem<Item> MULTIMETER = ITEMS.registerItem("multimeter", MultimeterItem::new);
+
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SixNodeBlockEntity>> SIX_NODE_BLOCK_ENTITY =
             BLOCK_ENTITY_TYPES.register(
                     "six_node",
@@ -70,5 +74,6 @@ public final class ElnContent {
         event.accept(SixNodeComponentStack.create(SixNodeComponentCatalog.LOW_VOLTAGE_CABLE));
         event.accept(SixNodeComponentStack.create(SixNodeComponentCatalog.ELECTRICAL_SOURCE));
         event.accept(SixNodeComponentStack.create(SixNodeComponentCatalog.POWER_RESISTOR));
+        event.accept(MULTIMETER.get());
     }
 }

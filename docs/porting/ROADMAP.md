@@ -1,6 +1,6 @@
 # Roadmap
 
-Aggiornata: 16 settembre 2026
+Aggiornata: 20 settembre 2026
 
 ## M0 — Baseline NeoForge
 
@@ -93,11 +93,11 @@ Obiettivo: interazione completa server-authoritative.
 - [x] primo payload tipizzato e validato: configurazione della tensione della sorgente;
 - [x] sincronizzazione client minima tramite stato persistente del block entity;
 - [x] primo menu macchina: campo singolo della sorgente elettrica;
-- [ ] multimetro o strumento equivalente;
-- [ ] widget comuni riutilizzabili oltre il primo campo numerico;
+- [ ] multimetro: item, misura server e GameTest completati; clic dedicated→client dopo la correzione del dispatch da verificare;
+- [x] primo widget numerico comune con parsing locale, commit su Invio/perdita focus e ripristino degli input non validi;
 - [x] prima prova multiplayer del percorso menu→server→stato client.
 
-Prossimo slice: estrarre il campo numerico in un widget comune fedele e scegliere il primo strumento di misura, senza anticipare l'inventario/termica del resistore.
+Prossimo controllo: chiudere la prova multiplayer del clic multimetro e confrontare l'icona con la 1.24.8; inventario/termica del resistore restano fuori da questo slice.
 
 ## M4 — Catalogo fondamentale
 
